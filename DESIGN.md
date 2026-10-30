@@ -699,21 +699,25 @@ With `prefers-reduced-motion: reduce`:
 Sounds are **on by default**, quiet, and one tap away from off.
 
 - They play through [use-sound](https://github.com/joshwcomeau/use-sound)
-  from a single audio sprite. The sounds issue checks that it works with
-  React 19 before relying on it.
+  from a single audio sprite (WebM, with MP3 for browsers without it), which
+  loads once the page is idle, never on the critical path. The rain loop is
+  a file of its own, since a looping slice of a sprite clicks at its seams,
+  and loads only the first time it's needed. `docs/sounds.md` lists each
+  file's source and licence, and how to replace one.
 - Browsers block audio until the first interaction with the page. That's
   fine: every sound here answers something the visitor did.
 - **The sound toggle** is always visible (in the hero, and in the compact bar
-  on mobile). The choice is stored in a cookie (`sound=on|off`), so the
-  server renders the right icon.
+  on mobile), labelled "Mute sounds" or "Turn sounds on". The choice is
+  stored in a cookie (`sound=on|off`, a year), so the server renders the
+  right icon.
 - All sounds are short and quiet (the loudest at about half volume), and no
   sound plays more than once every 150ms.
 
 | Moment                               | Sound                                 |
 | ------------------------------------ | ------------------------------------- |
 | Send a question                      | A "pop"                               |
-| An answer starts                     | A soft brush                          |
-| An answer ends                       | A short chime                         |
+| An answer starts (its first word)    | A soft brush                          |
+| An answer ends (its last word)       | A short chime                         |
 | Tap the cow                          | A soft "moo" (at most once every 3s)  |
 | Theme toggle                         | A switch click                        |
 | Language toggle                      | A soft tick                           |
@@ -721,9 +725,11 @@ Sounds are **on by default**, quiet, and one tap away from off.
 | Heavy rain (7 or more)               | A rain loop, very low, while it lasts |
 | Download the CV                      | A paper rustle                        |
 
-Which sounds: Julian's own (made with his synths) or a CC0 pack such as
-Kenney's Interface Sounds, plus a CC0 moo. The sounds issue asks Julian before
-it starts, and records each file's source and licence in `docs/sounds.md`.
+Only the visitor's own answers make the answer sounds: the greeting that
+types itself out in the first visit's entrance is silent, and so is a theme
+change that Glasgow's dusk or dawn brings. The sounds are a CC0 pack for
+now, such as Kenney's Interface Sounds, plus a CC0 moo; Julian will replace
+them one by one with his own, made with his synths, each one a file swap.
 
 ## 13. The portrait
 
