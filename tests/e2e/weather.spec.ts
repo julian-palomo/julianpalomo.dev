@@ -30,6 +30,18 @@ test("rain 8 reaches the chip and the sky", async ({ page }) => {
   await expect(page.locator(".particle.snow")).toHaveCount(0);
 });
 
+test("below 400px the chip shows only the temperature, and its name the whole weather", async ({
+  page,
+}) => {
+  await answerWeather(page, {
+    weather: { clouds: 5, rain: 8, wind: 2, snow: false, haar: false, temperatureC: 9 },
+  });
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto("/");
+  await expect(chip(page)).toHaveText("9°C", { useInnerText: true });
+  await expect(chip(page)).toHaveAccessibleName(/^Weather in Glasgow: 9°C, heavy rain\./);
+});
+
 test("snow reaches the chip and falls as snowflakes", async ({ page }) => {
   await answerWeather(page, {
     weather: { clouds: 7, rain: 3, wind: 1, snow: true, haar: false, temperatureC: -1 },
@@ -41,7 +53,8 @@ test("snow reaches the chip and falls as snowflakes", async ({ page }) => {
 });
 
 test("on a phone the chip leaves out the place and the time", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 800 });
+  // From 400px: below it, only the temperature shows.
+  await page.setViewportSize({ width: 414, height: 800 });
   await answerWeather(page, {
     weather: { clouds: 2, rain: 0, wind: 1, snow: false, haar: false, temperatureC: 12 },
   });

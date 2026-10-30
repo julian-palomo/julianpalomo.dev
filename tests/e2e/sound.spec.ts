@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { expect, type Page, test } from "@playwright/test";
 import { DEMO_ANSWER_INTRO } from "../../src/lib/bot/demo";
 
@@ -50,6 +51,11 @@ test("the server renders the muted toggle from the cookie", async ({ request }) 
 });
 
 test.describe("with the sprite loaded", () => {
+  // These need the sprite `pnpm sounds` builds from sounds/ (docs/sounds.md).
+  // Read from disk: Playwright's loader can't import JSON without an attribute.
+  const built: { slices: object } = JSON.parse(readFileSync("src/lib/sound/sprite.json", "utf8"));
+  test.skip(Object.keys(built.slices).length === 0, "no sprite built yet");
+
   test.beforeEach(async ({ page }) => {
     await countSounds(page);
     // The sprite loads once the page is idle; wait for it before asking.

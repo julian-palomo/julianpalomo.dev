@@ -21,10 +21,12 @@ type Props = {
 
 /**
  * Glasgow's time and weather on the landscape, as a button: "Glasgow · 15:04 ·
- * 9°C · Drizzle" from 640px, "9°C · Drizzle" below, or only the time without
+ * 9°C · Drizzle" from 640px, "9°C · Drizzle" below, "9°C" below 400px so the
+ * hero's row of buttons fits a 320px phone, or only the time without
  * weather; pressing it opens the gear's panel. While the visitor plays, it
  * turns accent and reads "Your sky · 15:00 · tap to reset" ("Your sky ·
- * 15:00" below 640px), and pressing it goes back to live.
+ * 15:00" below 640px, "15:00" below 400px), and pressing it goes back to
+ * live. Its accessible name always says it all.
  */
 export function WeatherChip({ weather, playingHour, onOpen, onBackToLive }: Props) {
   const locale = useLocale();
@@ -40,7 +42,8 @@ export function WeatherChip({ weather, playingHour, onOpen, onBackToLive }: Prop
         onClick={onBackToLive}
       >
         <span>
-          {t(locale, "yourSky")} · {hour}
+          <span className="max-[400px]:hidden">{t(locale, "yourSky")} · </span>
+          {hour}
           <span className="hidden sm:inline"> · {t(locale, "tapToReset")}</span>
         </span>
       </button>
@@ -84,7 +87,8 @@ export function WeatherChip({ weather, playingHour, onOpen, onBackToLive }: Prop
           between flex items, white space is dropped. */}
       <span>
         <span className="hidden sm:inline">{where} · </span>
-        {temperature} · {label}
+        {temperature}
+        <span className="max-[400px]:hidden"> · {label}</span>
       </span>
     </button>
   );

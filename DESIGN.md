@@ -156,7 +156,8 @@ From top to bottom:
 1. **The hero** (230px tall): the landscape fills it edge to edge. On top of
    it, a row of controls 12px from the edges:
    - left: the gear (section 8), 44px round in `accent`, and the weather chip
-     ("9°C · Drizzle", in `glass`);
+     ("9°C · Drizzle", in `glass`; only "9°C" below 400px, so the row fits a
+     320px phone in both languages);
    - right: the language toggle ("ES" / "EN"), the sound toggle and the theme
      toggle, 44px round buttons in `glass`, the size of every icon button on the site.
 2. **The portrait** (96 × 120px), overlapping the hero's bottom edge by half
@@ -389,9 +390,10 @@ come from Glasgow (below); the gear lets visitors set them (section 8).
   - the chip's temperature: rounded to a whole degree.
 - **Attribution:** Open-Meteo's terms ask for a credit under CC BY 4.0. The
   footer says "Weather data by Open-Meteo.com" with a link.
-- **The weather chip** reads "Glasgow · 15:04 · 9°C · Drizzle" on desktop and
-  "9°C · Drizzle" on mobile, in Glasgow's time. It's a button that opens the
-  gear's panel.
+- **The weather chip** reads "Glasgow · 15:04 · 9°C · Drizzle" on desktop,
+  "9°C · Drizzle" on mobile and "9°C" below 400px, in Glasgow's time. Its
+  accessible name always holds the whole weather. It's a button that opens
+  the gear's panel.
 
 ### Particles
 
@@ -492,7 +494,9 @@ Comeau's blog. It's a toy, and it's honest about being one.
   toggle then is an ordinary toggle.
 - **While playing**, the slider's time also drives the theme (night is dark),
   the chip turns `accent` and reads "Your sky · 15:00 · tap to reset" ("Your
-  sky · 15:00" on a phone), and tapping it goes back to live. A season other
+  sky · 15:00" on a phone, "15:00" below 400px, where its accent colour and
+  its accessible name still say it's the visitor's sky), and tapping it goes
+  back to live. A season other
   than today's moves the date to the 15th of its middle month, as `?sky=`
   does, so summer's evenings stay light. Pressing the theme toggle while
   playing moves the time to 13:00 (light) or 22:00 (dark); on a summer day
