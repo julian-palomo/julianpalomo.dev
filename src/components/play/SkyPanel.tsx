@@ -5,6 +5,7 @@ import type { Season } from "../../lib/scene/season";
 import type { SkyState } from "../../lib/scene/sky-state";
 import { useNow } from "../clock/Clock";
 import { useLocale } from "../i18n/useLocale";
+import { useSoundEffects } from "../sound/Sound";
 import { Button } from "../ui/Button";
 import { IconButton } from "../ui/IconButton";
 import { usePlay } from "./Play";
@@ -207,8 +208,21 @@ type SliderProps = {
   onChange: (value: number) => void;
 };
 
+// The keys that move a range input, whose release plays the slider's click.
+const RANGE_KEYS = new Set([
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "Home",
+  "End",
+  "PageUp",
+  "PageDown",
+]);
+
 function Slider({ label, track, min, max, value, word, ends, onChange }: SliderProps) {
   const id = useId();
+  const { play } = useSoundEffects();
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline justify-between gap-3">
@@ -226,6 +240,11 @@ function Slider({ label, track, min, max, value, word, ends, onChange }: SliderP
         value={value}
         aria-valuetext={word}
         onChange={(event) => onChange(Number(event.target.value))}
+        // A soft click when the slider is let go, not on every step.
+        onPointerUp={() => play("slider")}
+        onKeyUp={(event) => {
+          if (RANGE_KEYS.has(event.key)) play("slider");
+        }}
         className={`sky-range ${track}`}
       />
       {ends && (

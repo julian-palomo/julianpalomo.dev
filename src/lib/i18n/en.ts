@@ -27,6 +27,9 @@ export const en = {
   switchLanguage: { short: "ES", label: "Ver en español" },
   themeToDark: "Switch to dark theme",
   themeToLight: "Switch to light theme",
+  // The sound toggle, in the hero and the compact bar.
+  muteSounds: "Mute sounds",
+  turnSoundsOn: "Turn sounds on",
 
   chatLabel: "Chat",
   // The heading beside the cow on the chat's edge, and its line.

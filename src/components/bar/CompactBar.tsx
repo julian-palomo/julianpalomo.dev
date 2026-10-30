@@ -3,6 +3,7 @@ import { land } from "../../lib/scene/palette";
 import { seasonOf } from "../../lib/scene/season";
 import { useNow } from "../clock/Clock";
 import { useLocale } from "../i18n/useLocale";
+import { SoundToggle } from "../sound/SoundToggle";
 import { useTheme } from "../theme/Theme";
 import { ThemeToggle } from "../theme/ThemeToggle";
 
@@ -32,6 +33,7 @@ export function CompactBar() {
       </p>
       {/* The sound toggle's place. */}
       <span aria-hidden="true" className="size-11 shrink-0" />
+      <SoundToggle look="tint" />
       <ThemeToggle look="tint" />
       <svg
         aria-hidden="true"

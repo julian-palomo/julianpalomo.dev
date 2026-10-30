@@ -3,6 +3,9 @@
   // `cloudflare:workers` is a module of the Workers runtime, not an npm
   // package. knip reads its prefix as a dependency called "cloudflare".
   "ignoreDependencies": ["cloudflare"],
+  // `pnpm sounds` runs ffmpeg, a local tool rather than a package: the npm
+  // packages that bundle it are GPL or LGPL (docs/sounds.md).
+  "ignoreBinaries": ["ffmpeg"],
   // The share images' card page, which scripts/og/index.html loads.
   "entry": ["scripts/og/main.tsx"]
 }

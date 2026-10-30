@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { rememberChoice } from "../../lib/cookie";
 import { LANG_COOKIE, type Locale, paramFromLocale } from "../../lib/i18n/locale";
 import { t } from "../../lib/i18n/t";
+import { useSoundEffects } from "../sound/Sound";
 import { IconButton } from "../ui/IconButton";
 import { useLocale } from "./useLocale";
 
@@ -11,8 +12,10 @@ export function LanguageToggle() {
   const navigate = useNavigate();
   const other: Locale = locale === "es" ? "en" : "es";
   const { short, label } = t(locale, "switchLanguage");
+  const { play } = useSoundEffects();
 
   function switchLanguage() {
+    play("language");
     rememberChoice(LANG_COOKIE, other);
     void navigate({ to: "/{-$locale}", params: { locale: paramFromLocale(other) }, search: true });
   }

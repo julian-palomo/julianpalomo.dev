@@ -7,6 +7,7 @@ import { t } from "../../lib/i18n/t";
 import { useCowState } from "../cow/use-cow-state";
 import { useEntrance } from "../entrance/Entrance";
 import { useLocale } from "../i18n/useLocale";
+import { useSoundEffects } from "../sound/Sound";
 import { ChatEdge } from "./ChatEdge";
 import { ChatErrorNotice } from "./ChatErrorNotice";
 import { Composer } from "./Composer";
@@ -60,6 +61,24 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
   // Stop stays until the answer has finished typing, so it can show the rest at once.
   const busy = requesting || reveal.revealing;
 
+  // An answer's sounds follow its typing: a brush at its first word on
+  // screen, a chime at its last, unless it was stopped or failed. Only the
+  // visitor's answers: the entrance's greeting types itself out elsewhere.
+  const { play } = useSoundEffects();
+  const startedAnswer = reveal.revealing && reveal.shown > 0 ? latestAnswer?.id : undefined;
+  const finishedAnswer =
+    !reveal.revealing && reveal.shown > 0 && status === "ready" && !stopped
+      ? latestAnswer?.id
+      : undefined;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: each answer plays once, when it starts.
+  useEffect(() => {
+    if (startedAnswer) play("answerStart");
+  }, [startedAnswer]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: each answer plays once, when it ends.
+  useEffect(() => {
+    if (finishedAnswer) play("answerEnd");
+  }, [finishedAnswer]);
+
   const cowState = useCowState({
     status,
     answerHasText: reveal.revealing && reveal.shown > 0,
@@ -77,6 +96,7 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
   const [flight, setFlight] = useState<{ text: string; from: DOMRect } | null>(null);
 
   function send(text: string, from?: DOMRect) {
+    play("send");
     if (messages.length === 0) onStarted?.();
     setFlight(from ? { text, from } : null);
     setStopped(false);
