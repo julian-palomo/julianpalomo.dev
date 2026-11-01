@@ -206,6 +206,8 @@ Each decision is recorded as it's made, one file each, in `docs/adr/`.
   through the limits, the model, its tools and the citation check.
 - [`DESIGN.md`](DESIGN.md): how the site looks, moves and sounds: colours,
   type, the live Highland landscape, the cow and the chat.
+- [Sounds](docs/sounds.md): where each sound came from, its licence, and how
+  to replace one and rebuild the sprite.
 - [Evals](docs/evals.md): how the assistant is tested against its claims,
   and the score of every baseline.
 - [Architecture decision records](docs/adr/README.md): what was decided,
