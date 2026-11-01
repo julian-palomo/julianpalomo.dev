@@ -1,4 +1,16 @@
 {
-  "slices": {},
-  "loops": []
+  "slices": {
+    "send": [0, 238],
+    "suggestion": [438, 81],
+    "answerEnd": [720, 277],
+    "sources": [1196, 56],
+    "moo": [1452, 1698],
+    "theme": [3351, 180],
+    "language": [3731, 70],
+    "panelOpen": [4001, 105],
+    "panelClose": [4306, 57],
+    "slider": [4563, 64],
+    "cv": [4827, 1285]
+  },
+  "loops": ["rain", "typing"]
 }
