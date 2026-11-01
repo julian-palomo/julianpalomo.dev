@@ -7,7 +7,7 @@ import { t } from "../../lib/i18n/t";
 import { useCowState } from "../cow/use-cow-state";
 import { useEntrance } from "../entrance/Entrance";
 import { useLocale } from "../i18n/useLocale";
-import { useSoundEffects } from "../sound/Sound";
+import { type AnswerTyping, useSoundEffects } from "../sound/Sound";
 import { ChatEdge } from "./ChatEdge";
 import { ChatErrorNotice } from "./ChatErrorNotice";
 import { Composer } from "./Composer";
@@ -52,28 +52,29 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
 
   // The latest answer types itself out from what has arrived; with reduced
   // motion, after Stop or after an error, all of it shows at once.
+  const instant = stopped || status === "error" || (latestAnswer !== undefined && reducedMotion());
   const reveal = useReveal({
     id: latestAnswer?.id,
     text: latestText,
     streaming: status === "streaming" && last?.role === "assistant",
-    instant: stopped || status === "error" || (latestAnswer !== undefined && reducedMotion()),
+    instant,
   });
   // Stop stays until the answer has finished typing, so it can show the rest at once.
   const busy = requesting || reveal.revealing;
 
-  // An answer's sounds follow its typing: a brush at its first word on
-  // screen, a chime at its last, unless it was stopped or failed. Only the
-  // visitor's answers: the entrance's greeting types itself out elsewhere.
-  const { play } = useSoundEffects();
-  const startedAnswer = reveal.revealing && reveal.shown > 0 ? latestAnswer?.id : undefined;
+  // An answer's sounds follow its typing: a soft typing loop from its first
+  // word on screen to its last, then a chime, unless it was stopped or
+  // failed. Nothing types itself out with reduced motion, so the loop stays
+  // silent there. Only the visitor's answers: the entrance's greeting types
+  // itself out elsewhere.
+  const { play, setAnswerTyping } = useSoundEffects();
+  let answerTyping: AnswerTyping = requesting && !reducedMotion() ? "soon" : "idle";
+  if (!instant && reveal.revealing && reveal.shown > 0) answerTyping = "now";
+  useEffect(() => setAnswerTyping(answerTyping), [answerTyping, setAnswerTyping]);
   const finishedAnswer =
     !reveal.revealing && reveal.shown > 0 && status === "ready" && !stopped
       ? latestAnswer?.id
       : undefined;
-  // biome-ignore lint/correctness/useExhaustiveDependencies: each answer plays once, when it starts.
-  useEffect(() => {
-    if (startedAnswer) play("answerStart");
-  }, [startedAnswer]);
   // biome-ignore lint/correctness/useExhaustiveDependencies: each answer plays once, when it ends.
   useEffect(() => {
     if (finishedAnswer) play("answerEnd");
@@ -95,8 +96,10 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
   // flies in from there.
   const [flight, setFlight] = useState<{ text: string; from: DOMRect } | null>(null);
 
+  // A suggestion chip clicks instead of the send pop: both at once would be
+  // within 150ms, which plays only the first.
   function send(text: string, from?: DOMRect) {
-    play("send");
+    play(from ? "suggestion" : "send");
     if (messages.length === 0) onStarted?.();
     setFlight(from ? { text, from } : null);
     setStopped(false);

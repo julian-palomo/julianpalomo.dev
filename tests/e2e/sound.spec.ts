@@ -8,20 +8,41 @@ import { DEMO_ANSWER_INTRO } from "../../src/lib/bot/demo";
 const mute = (page: Page) => page.getByRole("button", { name: "Mute sounds" }).first();
 const unmute = (page: Page) => page.getByRole("button", { name: "Turn sounds on" }).first();
 
+type Counted = { soundsStarted: number; loopsPlaying: number; loopsStarted: number };
+
+/** Counts the sounds started, and the loops started and still playing; Howler stops a loop's node to pause it. */
 async function countSounds(page: Page) {
   await page.addInitScript(() => {
-    const counted = window as unknown as { soundsStarted: number };
+    const counted = window as unknown as Counted;
     counted.soundsStarted = 0;
-    const start = AudioBufferSourceNode.prototype.start;
+    counted.loopsPlaying = 0;
+    counted.loopsStarted = 0;
+    const playing = new WeakSet<AudioBufferSourceNode>();
+    const { start, stop } = AudioBufferSourceNode.prototype;
     AudioBufferSourceNode.prototype.start = function (...args) {
+      // Howler unlocks the audio at the first interaction by starting a
+      // one-sample buffer, which nobody hears; it isn't a sound.
+      if ((this.buffer?.length ?? 0) <= 1) return start.apply(this, args);
       counted.soundsStarted += 1;
+      if (this.loop) {
+        counted.loopsStarted += 1;
+        counted.loopsPlaying += 1;
+        playing.add(this);
+      }
       return start.apply(this, args);
+    };
+    AudioBufferSourceNode.prototype.stop = function (...args) {
+      if (playing.delete(this)) counted.loopsPlaying -= 1;
+      return stop.apply(this, args);
     };
   });
 }
 
-const soundsStarted = (page: Page) =>
-  page.evaluate(() => (window as unknown as { soundsStarted: number }).soundsStarted);
+const counted = (page: Page) => page.evaluate(() => ({ ...(window as unknown as Counted) }));
+const soundsStarted = async (page: Page) => (await counted(page)).soundsStarted;
+
+// A sky without rain, so the only loop that can play is the typing.
+const DRY = "/?sky=summer,12:00,rain=0";
 
 async function ask(page: Page, question: string) {
   await page.getByLabel("Your question").fill(question);
@@ -59,8 +80,11 @@ test.describe("with the sprite loaded", () => {
   test.beforeEach(async ({ page }) => {
     await countSounds(page);
     // The sprite loads once the page is idle; wait for it before asking.
-    await page.goto("/");
-    await page.waitForResponse((response) => response.url().includes("/sounds/sprite."));
+    const sprite = page.waitForResponse((response) => response.url().includes("/sounds/sprite."));
+    await page.goto(DRY);
+    await sprite;
+    // A tap during the entrance ends it with a moo; these start after it.
+    await expect(page.locator("[data-entrance]")).toHaveCount(0);
   });
 
   test("sending a question plays its sound", async ({ page }) => {
@@ -75,6 +99,72 @@ test.describe("with the sprite loaded", () => {
     await ask(page, "What has Julian worked on?");
     await expect(page.getByRole("article", { name: "Answer" })).toContainText(DEMO_ANSWER_INTRO);
     await expect(page.getByRole("button", { name: "Copy" })).toBeVisible();
+    expect(await soundsStarted(page)).toBe(0);
+  });
+
+  test("an answer types itself out over a loop that stops at its last word", async ({ page }) => {
+    const typing = page.waitForRequest((request) => request.url().includes("/sounds/typing."));
+    await page.getByLabel("Your question").click();
+    await ask(page, "What has Julian worked on?");
+    await typing;
+    await expect.poll(async () => (await counted(page)).loopsPlaying).toBe(1);
+    await expect(page.getByRole("button", { name: "Copy" })).toBeVisible();
+    await expect.poll(async () => (await counted(page)).loopsPlaying).toBe(0);
+    expect((await counted(page)).loopsStarted).toBeGreaterThan(0);
+  });
+});
+
+test.describe("with reduced motion", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("an answer shows at once and the typing loop never loads", async ({ page }) => {
+    await countSounds(page);
+    const typing: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("/sounds/typing.")) typing.push(request.url());
+    });
+    const sprite = page.waitForResponse((response) => response.url().includes("/sounds/sprite."));
+    await page.goto(DRY);
+    await sprite;
+    await page.getByLabel("Your question").click();
+    await ask(page, "What has Julian worked on?");
+    await expect(page.getByRole("button", { name: "Copy" })).toBeVisible();
+    await expect.poll(() => soundsStarted(page)).toBeGreaterThan(0);
+    expect(typing).toEqual([]);
+    expect((await counted(page)).loopsStarted).toBe(0);
+  });
+});
+
+/** Presses Shift until the entrance ends: a key before hydration doesn't end it yet. */
+async function endEntranceWithAKey(page: Page) {
+  const playing = page.locator("[data-entrance]");
+  await expect(playing).toHaveCount(1);
+  await expect(async () => {
+    await page.keyboard.press("Shift");
+    await expect(playing).toHaveCount(0, { timeout: 300 });
+  }).toPass({ timeout: 3000 });
+}
+
+test.describe("the entrance", () => {
+  // The first visit's entrance: without the `visited` cookie the other specs get.
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test("a key that ends the entrance makes the cow moo", async ({ page }) => {
+    await countSounds(page);
+    await page.goto(DRY);
+    await endEntranceWithAKey(page);
+    await expect.poll(() => soundsStarted(page)).toBe(1);
+  });
+
+  test("with sound off, ending the entrance stays silent", async ({ page, context }) => {
+    await context.addCookies([{ name: "sound", value: "off", url: "http://localhost:4173" }]);
+    await countSounds(page);
+    const sprite = page.waitForResponse((response) => response.url().includes("/sounds/sprite."));
+    await page.goto(DRY);
+    await endEntranceWithAKey(page);
+    // Long enough for the sprite to load and decode, and a moo to play if one were asked for.
+    await sprite;
+    await page.waitForTimeout(500);
     expect(await soundsStarted(page)).toBe(0);
   });
 });

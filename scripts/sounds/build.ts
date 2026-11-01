@@ -1,14 +1,15 @@
 /**
  * `pnpm sounds`: builds the site's audio from one source file per moment in
- * sounds/ (docs/sounds.md). Every moment but the rain goes into one sprite,
+ * sounds/ (docs/sounds.md). The short sounds go into one sprite,
  * public/sounds/sprite.webm (Opus) and sprite.mp3, with each slice's place
- * written to src/lib/sound/sprite.json; the rain loop becomes
- * public/sounds/rain.webm and rain.mp3. Rerun it after replacing a file, and
- * commit what it writes. It needs ffmpeg, which isn't an npm package here:
+ * written to src/lib/sound/sprite.json; each loop (the rain, the typing)
+ * becomes its own public/sounds/<loop>.webm and .mp3. Rerun it after
+ * replacing a file, and commit what it writes. It needs ffmpeg, which isn't an npm package here:
  * the ones that bundle it are GPL or LGPL.
  *
- * Every file is mono 48 kHz, trimmed of silence at both ends (the rain loop
- * isn't trimmed, so it still loops) and brought to the same peak. Peak, not
+ * Every file is mono 48 kHz, trimmed of silence at both ends and brought to
+ * the same peak. A loop isn't trimmed, so it still loops; it fades in and out
+ * over 15ms instead, so its seam dips rather than clicks. Peak, not
  * EBU R128 loudness: R128 measures in 400ms blocks, longer than most of these
  * clicks, so it can't measure them. src/lib/sound/moments.ts's volumes set
  * how loud each one plays.
@@ -27,9 +28,10 @@ const root = fileURLToPath(new URL("../..", import.meta.url));
 
 // The moments and their files, from the module the site uses. Loaded by URL,
 // because Node needs the file's extension, which the site's imports leave out.
-const { SPRITE_MOMENTS, SOURCE_FILES } = z
+const { SPRITE_MOMENTS, LOOPS, SOURCE_FILES } = z
   .object({
     SPRITE_MOMENTS: z.array(z.string()),
+    LOOPS: z.array(z.string()),
     SOURCE_FILES: z.record(z.string(), z.string()),
   })
   .parse(await import(new URL("../../src/lib/sound/names.ts", import.meta.url).href));
@@ -53,8 +55,15 @@ const RATE = 48_000;
 // Between slices, so one never bleeds into the next, even through MP3's
 // encoder delay (about 25ms).
 const GAP_S = 0.25;
+// Each slice plays this much of the silence after it. Some clicks are under
+// 10ms once trimmed, and a browser that doesn't skip MP3's encoder delay
+// would otherwise play the silence before them and nothing else. Keep it
+// well under GAP_S.
+const SLICE_TAIL_S = 0.05;
 // Every file's peak, a little under full scale.
 const PEAK_DB = -1;
+// A loop's fade at each end, short enough not to hear as a dip.
+const LOOP_FADE_S = 0.015;
 const EXTENSIONS = [".wav", ".flac", ".ogg", ".mp3", ".aiff", ".aif"];
 
 function run(command: string, args: string[]): string {
@@ -96,10 +105,11 @@ function peakGain(file: string): number {
   return PEAK_DB - peak;
 }
 
-/** The file as mono 48 kHz PCM, trimmed unless it loops, at the shared peak. */
-function prepare(file: string, target: string, { trim }: { trim: boolean }): void {
+/** The file as mono 48 kHz PCM at the shared peak: trimmed, or faded at both ends if it loops. */
+function prepare(file: string, target: string, { loop }: { loop: boolean }): void {
   const silence =
     "silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse";
+  const fades = `afade=t=in:d=${LOOP_FADE_S},areverse,afade=t=in:d=${LOOP_FADE_S},areverse`;
   const mono = ["-ac", "1", "-ar", String(RATE)];
   const trimmed = `${target}.trimmed.wav`;
   run("ffmpeg", [
@@ -108,7 +118,8 @@ function prepare(file: string, target: string, { trim }: { trim: boolean }): voi
     "-i",
     file,
     ...mono,
-    ...(trim ? ["-af", silence] : []),
+    "-af",
+    loop ? fades : silence,
     trimmed,
   ]);
   const gain = peakGain(trimmed);
@@ -169,9 +180,9 @@ try {
       continue;
     }
     const prepared = join(work, `${moment}.wav`);
-    prepare(file, prepared, { trim: true });
+    prepare(file, prepared, { loop: false });
     const length = duration(prepared);
-    slices[moment] = [Math.round(at * 1000), Math.round(length * 1000)];
+    slices[moment] = [Math.round(at * 1000), Math.round((length + SLICE_TAIL_S) * 1000)];
     parts.push(prepared);
     at += length + GAP_S;
   }
@@ -208,14 +219,18 @@ try {
     encode(joined, "sprite");
   }
 
-  // The rain loop: its own file, untrimmed, so it loops without a seam.
-  const rainSource = await sourceOf(fileOf("rain"));
-  if (rainSource) {
-    const rain = join(work, "rain.wav");
-    prepare(rainSource, rain, { trim: false });
-    encode(rain, "rain");
-  } else {
-    console.warn(`no sounds/${fileOf("rain")}.*: there's no rain loop`);
+  // Each loop: its own file, untrimmed, so it loops without a seam.
+  const loops: string[] = [];
+  for (const loop of LOOPS) {
+    const source = await sourceOf(fileOf(loop));
+    if (!source) {
+      console.warn(`no sounds/${fileOf(loop)}.*: the ${loop} loop stays silent`);
+      continue;
+    }
+    const prepared = join(work, `${loop}.wav`);
+    prepare(source, prepared, { loop: true });
+    encode(prepared, loop);
+    loops.push(loop);
   }
 
   // Laid out as Biome formats it, so `pnpm check` passes on the file as written.
@@ -223,8 +238,9 @@ try {
     return `    "${moment}": [${start}, ${length}]`;
   });
   const body = lines.length > 0 ? `{\n${lines.join(",\n")}\n  }` : "{}";
-  await writeFile(spriteJson, `{\n  "slices": ${body},\n  "rain": ${Boolean(rainSource)}\n}\n`);
-  for (const name of ["sprite.webm", "sprite.mp3", "rain.webm", "rain.mp3"]) {
+  const built = loops.map((loop) => `"${loop}"`).join(", ");
+  await writeFile(spriteJson, `{\n  "slices": ${body},\n  "loops": [${built}]\n}\n`);
+  for (const name of ["sprite", ...LOOPS].flatMap((file) => [`${file}.webm`, `${file}.mp3`])) {
     const path = join(publicDir, name);
     if (existsSync(path)) {
       const size = Number(run("wc", ["-c", path]).trim().split(/\s+/)[0]);

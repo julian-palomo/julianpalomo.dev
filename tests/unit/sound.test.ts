@@ -8,8 +8,8 @@ import {
   MOO_GAP_MS,
   passGate,
 } from "../../src/lib/sound/gate";
-import { SPRITE, VOLUMES } from "../../src/lib/sound/moments";
-import { SOURCE_FILES, type SoundMoment, SPRITE_MOMENTS } from "../../src/lib/sound/names";
+import { HAS_LOOP, SPRITE, VOLUMES } from "../../src/lib/sound/moments";
+import { LOOPS, SOURCE_FILES, type SoundMoment, SPRITE_MOMENTS } from "../../src/lib/sound/names";
 
 /** Plays each moment at Date.now(), as the provider does with the clock, and says which got through. */
 function playAll(moments: { moment: SoundMoment; afterMs: number }[], start: GateState) {
@@ -89,9 +89,15 @@ describe("parseSoundCookie", () => {
 });
 
 describe("the sound map", () => {
-  it("names a source file for every moment and the rain", () => {
-    for (const moment of SPRITE_MOMENTS) expect(SOURCE_FILES[moment]).toBeTruthy();
-    expect(SOURCE_FILES.rain).toBe("rain");
+  it("names a different source file for every moment and loop", () => {
+    const files = [...SPRITE_MOMENTS, ...LOOPS].map((name) => SOURCE_FILES[name]);
+    for (const file of files) expect(file).toBeTruthy();
+    expect(new Set(files).size).toBe(files.length);
+  });
+
+  it("knows which loops were built", () => {
+    const built = JSON.parse(readFileSync("src/lib/sound/sprite.json", "utf8"));
+    for (const loop of LOOPS) expect(HAS_LOOP[loop]).toBe(built.loops.includes(loop));
   });
 
   it("plays nothing louder than half volume", () => {
