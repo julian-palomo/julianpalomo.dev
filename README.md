@@ -42,10 +42,11 @@ sky when it fails. The footer credits Open-Meteo, as its CC BY 4.0 terms ask.
 
 You ask a question and the answer streams in from Claude (Sonnet 5.5, through
 the Vercel AI SDK), which can only look up the facts I've confirmed. Each fact
-an answer cites shows as a numbered citation and a source chip, such as "1 ·
-CV · Cazoo · Redux → Zustand", and a citation only counts if the model looked
-that fact up while answering. Tapping a number or a chip opens the claim as I
-confirmed it, with the date I confirmed it; the model never sees that date.
+an answer cites shows as a numbered citation, and a "Check sources" link under
+the answer unfolds a chip for each one, such as "1 · CV · Cazoo · Redux →
+Zustand"; a citation only counts if the model looked that fact up while
+answering. Tapping a number or a chip opens the claim as I confirmed it, with
+the date I confirmed it; the model never sees that date.
 Answers type themselves out word by word, can be copied with their sources,
 and are followed by more questions to ask. On a phone the chat gets a compact
 bar and a composer fixed above the keyboard; screen readers hear each answer
@@ -127,7 +128,7 @@ mode.
 
 `pnpm eval` reads the API key from `.dev.vars` too, asks the assistant every
 case in [`evals/`](evals/) through the same code as `/api/chat`, checks each
-answer in code (citations, links, no contact details, no Markdown), and then
+answer in code (citations, length, no contact details, no Markdown), and then
 has a second model, Claude Sonnet 5.5, judge every answer sentence by
 sentence against the claims it used: a sentence that says more than its claim
 ("managed" where the claim says "technical lead") fails the case. Before any
@@ -189,7 +190,7 @@ version from `packageManager` in `package.json`.
 ## The plan
 
 The next steps are tracked as
-[GitHub issues](https://github.com/Zitric/julianpalomo.dev/issues), one per
+[GitHub issues](https://github.com/julian-palomo/julianpalomo.dev/issues), one per
 piece of work.
 
 Each decision is recorded as it's made, one file each, in `docs/adr/`.
@@ -215,5 +216,5 @@ photos) is not licensed for reuse. [`LICENSE`](LICENSE) has the exact split.
 
 ## Contact
 
-[LinkedIn](https://www.linkedin.com/in/julianpalomodeonis) ·
-[GitHub](https://github.com/Zitric)
+[LinkedIn](https://www.linkedin.com/in/julianpalomo) ·
+[GitHub](https://github.com/julian-palomo)

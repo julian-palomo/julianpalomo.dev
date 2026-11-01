@@ -3,8 +3,8 @@ export const site = {
   role: "Senior Software Engineer",
   url: "https://julianpalomo.dev",
   links: {
-    linkedin: "https://www.linkedin.com/in/julianpalomodeonis",
-    github: "https://github.com/Zitric",
+    linkedin: "https://www.linkedin.com/in/julianpalomo",
+    github: "https://github.com/julian-palomo",
   },
 } as const;
 
