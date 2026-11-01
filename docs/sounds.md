@@ -110,6 +110,8 @@ repo.
   tap, click or key if that comes first, never on the critical path; a sound
   asked for before it has loaded plays if it loads within a second;
 - nothing plays before the visitor's first tap, click or key;
+- a tap, click or key that ends the entrance moos, unless it's on a control
+  marked `data-silent-press`: pressing the mute button never makes a sound;
 - no sound plays within 150ms of another, and the moo at most once every 3s
   (`src/lib/sound/gate.ts`);
 - the rain loop loads only the first time sound is on, the visitor has
