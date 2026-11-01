@@ -76,8 +76,12 @@ type Props = {
 
 const SKIP_EVENTS = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
 // The skips that are a tap, a click or a key: browsers allow sound from them,
-// so the cow moos as the entrance ends.
+// so the cow moos as the entrance ends, unless the press is on a control
+// marked `data-silent-press`, such as the mute button.
 const MOO_EVENTS = new Set<string>(["pointerdown", "keydown"]);
+const mooes = (event: Event) =>
+  MOO_EVENTS.has(event.type) &&
+  !(event.target instanceof Element && event.target.closest("[data-silent-press]"));
 
 /**
  * The page's entrance (DESIGN.md section 11). It renders the page's root with
@@ -106,7 +110,7 @@ export function Entrance({ kind, greeting, hero, className, children }: Props) {
     // The listeners stay after the entrance ends, so only a skip while the
     // root still has `data-entrance` moos.
     const skip = (event: Event) => {
-      if (MOO_EVENTS.has(event.type) && element.hasAttribute("data-entrance")) moo();
+      if (mooes(event) && element.hasAttribute("data-entrance")) moo();
       end();
     };
     let timer: ReturnType<typeof setTimeout> | undefined;

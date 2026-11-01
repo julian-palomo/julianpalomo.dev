@@ -8,7 +8,15 @@ export function SoundToggle({ look = "glass" }: { look?: "glass" | "tint" }) {
   const { on, toggle } = useSoundEffects();
   const locale = useLocale();
   return (
-    <IconButton look={look} label={t(locale, on ? "muteSounds" : "turnSoundsOn")} onClick={toggle}>
+    // `data-silent-press`: pressing it never makes a sound, not even the moo
+    // that ends the entrance (Entrance.tsx), since its pointerdown comes
+    // before the click that mutes.
+    <IconButton
+      look={look}
+      label={t(locale, on ? "muteSounds" : "turnSoundsOn")}
+      onClick={toggle}
+      data-silent-press=""
+    >
       <svg
         aria-hidden="true"
         viewBox="0 0 24 24"

@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Locator, type Page, test } from "@playwright/test";
 import { DEMO_ANSWER_INTRO } from "../../src/lib/bot/demo";
 
 // Sounds (DESIGN.md section 12). Nothing here listens for real audio: an
@@ -53,18 +53,23 @@ test("the toggle mutes sounds, says so, and remembers it across a reload", async
   page,
   context,
 }) => {
-  await page.goto("/");
-  await expect(mute(page)).toBeVisible();
-  await mute(page).click();
-  await expect(unmute(page)).toBeVisible();
+  await page.goto(DRY);
+  await press(mute(page), unmute(page));
   const cookie = (await context.cookies()).find(({ name }) => name === "sound");
   expect(cookie?.value).toBe("off");
 
   await page.reload();
-  await expect(unmute(page)).toBeVisible();
-  await unmute(page).click();
-  await expect(mute(page)).toBeVisible();
+  await press(unmute(page), mute(page));
 });
+
+/** Presses the toggle until it shows its other label: a press before hydration does nothing. */
+async function press(from: Locator, to: Locator) {
+  await expect(from).toBeVisible();
+  await expect(async () => {
+    if (await from.isVisible()) await from.click();
+    await expect(to).toBeVisible({ timeout: 500 });
+  }).toPass({ timeout: 5000 });
+}
 
 test("the server renders the muted toggle from the cookie", async ({ request }) => {
   const response = await request.get("/", { headers: { cookie: "sound=off" } });
@@ -154,6 +159,22 @@ test.describe("the entrance", () => {
     await page.goto(DRY);
     await endEntranceWithAKey(page);
     await expect.poll(() => soundsStarted(page)).toBe(1);
+  });
+
+  test("pressing Mute ends the entrance without a sound", async ({ page }) => {
+    await countSounds(page);
+    const sprite = page.waitForResponse((response) => response.url().includes("/sounds/sprite."));
+    await page.goto(DRY);
+    const playing = page.locator("[data-entrance]");
+    // With the sprite loaded and decoded, a moo would play at once, before
+    // the click that mutes; the first visit's entrance lasts long enough.
+    await sprite;
+    await page.waitForTimeout(500);
+    await expect(playing).toHaveCount(1);
+    await mute(page).click();
+    await expect(playing).toHaveCount(0);
+    await expect(unmute(page)).toBeVisible();
+    expect(await soundsStarted(page)).toBe(0);
   });
 
   test("with sound off, ending the entrance stays silent", async ({ page, context }) => {
