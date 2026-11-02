@@ -8,6 +8,7 @@ import { useTrack } from "../analytics/Analytics";
 import { useNow } from "../clock/Clock";
 import { useLocale } from "../i18n/useLocale";
 import { useSoundEffects } from "../sound/Sound";
+import { useTheme } from "../theme/Theme";
 import { Button } from "../ui/Button";
 import { CloseIcon } from "../ui/CloseIcon";
 import { IconButton } from "../ui/IconButton";
@@ -36,6 +37,7 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
   const locale = useLocale();
   const now = useNow();
   const { state, dispatch } = usePlay();
+  const { backToLive } = useTheme();
   // Opening the panel changes nothing: it shows the live sky, read afresh on
   // every render, and the first change starts playing from it.
   const controls = state.status === "playing" ? state : panelSky(live);
@@ -163,7 +165,7 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
               look="primary"
               onClick={() => {
                 track({ name: "toy", which: "back_to_live" });
-                dispatch({ type: "backToLive" });
+                backToLive();
                 close();
               }}
             >

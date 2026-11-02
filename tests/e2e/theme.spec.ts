@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { type BrowserContext, expect, type Page, test } from "@playwright/test";
 import { resolveTheme, TWILIGHT_MARGIN_MS } from "../../src/lib/theme";
 import { nextTwilight } from "../../src/lib/twilight";
 
@@ -123,5 +123,75 @@ test.describe("with reduced motion", () => {
     });
     expect(changing).toBe(true);
     expect(longest).toBeLessThanOrEqual(0.3);
+  });
+});
+
+// "Back to live Glasgow" (DESIGN.md section 8) ends a theme choice as well as
+// the visitor's own sky. The server renders the theme from its own clock, so
+// these run against Glasgow's theme at the time: in daytime, dark goes back
+// to light; at night, the mirror.
+test.describe("Back to live Glasgow", () => {
+  // The gear spins in and pulses after the short entrance; a click waits until it holds still.
+  const gear = (page: Page) => page.getByRole("button", { name: "Play with the sky", exact: true });
+  const panel = (page: Page) => page.getByRole("dialog", { name: "Play with the sky" });
+  const themeCookie = async (context: BrowserContext) =>
+    (await context.cookies()).find(({ name }) => name === "theme");
+
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/weather", (route) => route.fulfill({ json: { weather: null } }));
+  });
+
+  /** Chooses the theme Glasgow isn't showing, and returns both. */
+  async function chooseTheOther(page: Page) {
+    const glasgow = resolveTheme({ choice: null, now: Date.now() });
+    const other = glasgow === "dark" ? "light" : "dark";
+    await page.getByRole("button", { name: `Switch to ${other} theme` }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", other);
+    return { glasgow, other };
+  }
+
+  test("from the panel's button, ends the choice and shows Glasgow's theme", async ({
+    page,
+    context,
+  }) => {
+    await page.goto("/");
+    const { glasgow } = await chooseTheOther(page);
+    expect(await themeCookie(context)).toBeDefined();
+    await gear(page).click();
+    await panel(page).getByRole("button", { name: "Back to live Glasgow" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", glasgow);
+    expect(await themeCookie(context)).toBeUndefined();
+  });
+
+  test("from the chip, after playing, ends the choice and shows Glasgow's theme", async ({
+    page,
+    context,
+  }) => {
+    await page.goto("/");
+    const { glasgow } = await chooseTheOther(page);
+    await gear(page).click();
+    await panel(page).getByLabel("Clouds").fill("4");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: /^Your sky, \d{2}:00\. Back to live Glasgow$/ }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", glasgow);
+    expect(await themeCookie(context)).toBeUndefined();
+  });
+
+  test("with no choice and nothing to change, leaves the theme and the cookies alone", async ({
+    page,
+    context,
+  }) => {
+    await page.goto("/");
+    const html = page.locator("html");
+    const glasgow = resolveTheme({ choice: null, now: Date.now() });
+    const before = (await context.cookies()).map(({ name, value }) => `${name}=${value}`).sort();
+    await gear(page).click();
+    await panel(page).getByRole("button", { name: "Back to live Glasgow" }).click();
+    await expect(panel(page)).toBeHidden();
+    await expect(html).toHaveAttribute("data-theme", glasgow);
+    // Not a toggle in disguise: no theme change runs, and no cookie is written.
+    await expect(html).not.toHaveAttribute("data-theme-change");
+    const after = (await context.cookies()).map(({ name, value }) => `${name}=${value}`).sort();
+    expect(after).toEqual(before);
   });
 });
