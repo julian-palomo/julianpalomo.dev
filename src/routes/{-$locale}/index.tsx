@@ -1,6 +1,7 @@
-import { createFileRoute, getRouteApi, redirect } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { createFileRoute, getRouteApi, redirect, useNavigate } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
+import { Analytics, useTrack } from "../../components/analytics/Analytics";
 import { CompactBar } from "../../components/bar/CompactBar";
 import { Chat } from "../../components/chat/Chat";
 import { useNow } from "../../components/clock/Clock";
@@ -21,6 +22,7 @@ import { SiteFooter } from "../../components/SiteFooter";
 import { SoundProvider } from "../../components/sound/Sound";
 import { SoundToggle } from "../../components/sound/SoundToggle";
 import { ThemeToggle } from "../../components/theme/ThemeToggle";
+import { parseRef } from "../../lib/analytics/events";
 import { localeFromParam } from "../../lib/i18n/locale";
 import { rootLanguage } from "../../lib/i18n/root-language";
 import { t } from "../../lib/i18n/t";
@@ -35,7 +37,12 @@ export const Route = createFileRoute("/{-$locale}/")({
     parse: ({ locale }) => (locale === undefined || locale === "es" ? { locale } : false),
   },
   // `?sky=` sets the landscape on previews and in e2e (SCENE_OVERRIDE).
-  validateSearch: z.object({ sky: z.string().optional().catch(undefined) }),
+  // `?ref=` says where a visit came from (linkedin, cv, github); the page
+  // reads it once, then removes it from the address bar.
+  validateSearch: z.object({
+    sky: z.string().optional().catch(undefined),
+    ref: z.unknown().optional(),
+  }),
   beforeLoad: ({ params }) => {
     if (params.locale !== undefined || rootLanguage() !== "es") return;
     // 302, never cached: it depends on the visitor's cookie and country. The
@@ -72,10 +79,53 @@ const rootRoute = getRouteApi("__root__");
 
 type PanelState = { open: boolean; position: { top: number; left: number } | null };
 
+/**
+ * The page, inside its analytics. The visit is read once, on mount: where it
+ * came from (`?ref=`) and whether the `visited` cookie was there before the
+ * server refreshed it, which means a visit within the last 7 days.
+ */
 function Home() {
+  const { entrance, track } = rootRoute.useLoaderData();
+  const { ref } = Route.useSearch();
+  const [visit] = useState(() => ({
+    name: "visit" as const,
+    ref: parseRef(ref),
+    returning: entrance === "short",
+  }));
+  useCleanUrl();
+  return (
+    <Analytics on={track} visit={visit}>
+      <Page />
+    </Analytics>
+  );
+}
+
+/**
+ * Removes `?ref=` and `?notrack` from the address bar once the page has read
+ * them, so a copied link doesn't carry them on. Through the router, never
+ * history.replaceState: the language toggle navigates with `search: true`,
+ * which copies the router's own location, and would put them back.
+ */
+function useCleanUrl() {
+  const navigate = useNavigate();
+  const { ref } = Route.useSearch();
+  const { notrack } = rootRoute.useSearch();
+  const dirty = ref !== undefined || notrack !== undefined;
+  useEffect(() => {
+    if (!dirty) return;
+    void navigate({
+      to: ".",
+      search: (search) => ({ ...search, ref: undefined, notrack: undefined }),
+      replace: true,
+    });
+  }, [dirty, navigate]);
+}
+
+function Page() {
   const locale = useLocale();
   // Read once by Entrance, when the page mounts, so a language switch never replays it.
   const { entrance, sound, contactDemo } = rootRoute.useLoaderData();
+  const track = useTrack();
   const heroRef = useRef<HTMLDivElement>(null);
   const { sky } = Route.useSearch();
   const override = useSceneOverride(sky);
@@ -125,7 +175,10 @@ function Home() {
                       weather={weather}
                       playingHour={play.status === "playing" ? play.hour : null}
                       onOpen={openPanel}
-                      onBackToLive={() => dispatch({ type: "backToLive" })}
+                      onBackToLive={() => {
+                        track({ name: "toy", which: "back_to_live" });
+                        dispatch({ type: "backToLive" });
+                      }}
                     />
                   </div>
                 </div>

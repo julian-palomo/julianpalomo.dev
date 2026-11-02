@@ -56,6 +56,11 @@ must keep doing; the ADRs say why.
 
 - `src/components/chat/` renders the answer with `parseCitations` and shows a chip only for an id that is both cited in the text and in the answer's `data-sources` part. The pure logic lives in `chat-view.ts`, with unit tests.
 - **The chat sends only the latest `MAX_MESSAGES` messages**, trimmed by `latestMessages` in `chat-view.ts` so they start with a question, through `DefaultChatTransport`'s `prepareSendMessagesRequest` in `Chat.tsx`. The screen keeps the whole conversation. `send` passes the page's `locale` as each message's `body`, read from `useLocale()` when it is sent, so a question after a language switch carries the new one; `tests/e2e/language.spec.ts` checks the request. `MAX_MESSAGES` lives in `limits.ts`, the one constant the transport and `chat.ts`'s validation share; the endpoint still rejects longer requests, which only a forged one can be.
+- **The chat records analytics events** through `useTrack` (`src/components/analytics/Analytics.tsx`):
+  - a `question` in `send`;
+  - an `answer` once the request ends, with `answerOutcome` and `sourceCount` from `chat-view.ts`.
+
+  Neither touches `/api/chat` or anything in `src/lib/bot/`, so they need no eval run (`docs/analytics.md`).
 - Code the browser imports must not pull in server code or `claims.json`: share values through client-safe modules (`limits.ts`, `chat-error.ts`, `chat-message.ts`, `../claim-id.ts`), never through `chat.ts` or `claims.ts`.
 
 ## Where things live

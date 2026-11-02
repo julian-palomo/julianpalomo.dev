@@ -2,6 +2,7 @@ import { useEffect, useId, useState } from "react";
 import type { ChatUIMessage } from "../../lib/bot/chat-message";
 import { chipLabel, type Source } from "../../lib/bot/citations";
 import { t } from "../../lib/i18n/t";
+import { useTrack } from "../analytics/Analytics";
 import { useLocale } from "../i18n/useLocale";
 import { useSoundEffects } from "../sound/Sound";
 import {
@@ -58,10 +59,14 @@ export function AssistantMessage({ message, typed }: Props) {
 
   const [view, setView] = useState(SOURCES_CLOSED);
   const { play } = useSoundEffects();
+  const track = useTrack();
   // Opening the sources clicks; closing them is silent.
   const tap = (event: SourcesEvent) => {
     const next = nextSources(view, event);
-    if (next.list && !view.list) play("sources");
+    if (next.list && !view.list) {
+      play("sources");
+      track({ name: "sources_opened" });
+    }
     setView(next);
   };
   const open = view.claim;
@@ -190,6 +195,7 @@ type CopyState = "idle" | "copied" | "failed";
 function CopyButton({ text }: { text: string }) {
   const locale = useLocale();
   const [state, setState] = useState<CopyState>("idle");
+  const track = useTrack();
 
   useEffect(() => {
     if (state === "idle") return;
@@ -201,6 +207,7 @@ function CopyButton({ text }: { text: string }) {
     try {
       await navigator.clipboard.writeText(text);
       setState("copied");
+      track({ name: "copied" });
     } catch {
       // No permission, no focus, or no clipboard at all: say so instead.
       setState("failed");

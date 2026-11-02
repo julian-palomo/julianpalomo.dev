@@ -65,6 +65,15 @@ The live site has its API key and its limits in place, so the chat answers on
 [julianpalomo.dev](https://julianpalomo.dev); without a key it says it isn't
 available.
 
+The site counts how it's used with its own small event log in D1, read with
+`pnpm stats`: where visits come from, what visitors ask, which questions had
+no claim to answer them, how far they get and which toys they play with. No
+IP, user agent or cookie id is stored. Question text is kept anonymously for
+90 days, and the composer says so; events are kept for 13 months. Only the
+real site counts, bots and headless browsers are dropped, and `?notrack`
+leaves a browser out. Cloudflare Web Analytics stays as a rough second opinion
+on visit counts ([`docs/analytics.md`](docs/analytics.md)).
+
 What exists around it:
 
 - Biome for lint and format, `tsc` for types, knip for unused code and
@@ -122,6 +131,7 @@ pnpm dev
 | `pnpm db:migrate:local` | Applies the D1 migrations to the local database in `.wrangler/state`.                                                                                                     |
 | `pnpm og`               | Rewrites the link preview images and the icons in `public/` from a card drawn with the site's own components (`scripts/og/`). Run it after changing the name or the role. |
 | `pnpm sounds`           | Builds the sound sprite in `public/sounds/` from one file per sound in `sounds/` (`docs/sounds.md`). Needs ffmpeg.                                                        |
+| `pnpm stats`            | Prints the analytics report for the last 7 and 30 days from the production D1 (needs a Cloudflare login); `--local` reads the local one (`docs/analytics.md`).            |
 
 To try the assistant locally, copy `.dev.vars.example` to `.dev.vars` (it's
 gitignored), put an Anthropic API key in it, and set `VISITOR_SALT` to any long
@@ -218,6 +228,8 @@ Each decision is recorded as it's made, one file each, in `docs/adr/`.
   type, the live Highland landscape, the cow and the chat.
 - [Sounds](docs/sounds.md): where each sound came from, its licence, and how
   to replace one and rebuild the sprite.
+- [Analytics](docs/analytics.md): what the site counts and never counts, how
+  long it keeps it, who is left out, and how to read `pnpm stats`.
 - [Evals](docs/evals.md): how the assistant is tested against its claims,
   and the score of every baseline.
 - [Architecture decision records](docs/adr/README.md): what was decided,

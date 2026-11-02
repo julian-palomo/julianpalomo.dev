@@ -63,6 +63,8 @@ export const en = {
   fromJulian: "from Julian",
   newAnswer: "New answer ↓",
   composerHint: "Enter to send · Shift+Enter for a new line",
+  // Under the composer: what happens to a question (docs/analytics.md).
+  questionsKept: "Questions are kept anonymously for 90 days to improve the assistant.",
   // Announced to screen readers when an answer starts.
   answering: "Answering…",
   answerLabel: "Answer",

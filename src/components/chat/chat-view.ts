@@ -2,6 +2,7 @@
  * Pure helpers that turn the chat's state into what the components render.
  * Kept free of React so they can be unit-tested.
  */
+import type { AnswerOutcome } from "../../lib/analytics/events";
 import { type ChatErrorCode, chatErrorSchema } from "../../lib/bot/chat-error";
 import { chipLabel, parseCitations, type Source } from "../../lib/bot/citations";
 import type { Locale } from "../../lib/i18n/locale";
@@ -243,6 +244,30 @@ function chatErrorCode(error: Error): ChatErrorCode | undefined {
 export function outOfQuestions(error: Error | undefined): boolean {
   const code = error ? chatErrorCode(error) : undefined;
   return code === "visitor_limit" || code === "daily_budget";
+}
+
+/**
+ * How an answer's request ended, for the `answer` event: a daily limit's 429
+ * by its code, any other failure as `error`, then Stop, else `done`. Stop
+ * aborts the request without an error, so an error always wins.
+ */
+export function answerOutcome({
+  error,
+  stopped,
+}: {
+  error: Error | undefined;
+  stopped: boolean;
+}): AnswerOutcome {
+  if (error) {
+    const code = chatErrorCode(error);
+    return code === "visitor_limit" || code === "daily_budget" ? code : "error";
+  }
+  return stopped ? "stopped" : "done";
+}
+
+/** How many source chips an answer shows once it has finished typing itself out. */
+export function sourceCount(text: string, sources: readonly Source[]): number {
+  return renderAnswer(text, sources, false).chips.length;
 }
 
 /**

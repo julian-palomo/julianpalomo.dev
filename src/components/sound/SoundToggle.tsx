@@ -1,4 +1,5 @@
 import { t } from "../../lib/i18n/t";
+import { useTrack } from "../analytics/Analytics";
 import { useLocale } from "../i18n/useLocale";
 import { IconButton } from "../ui/IconButton";
 import { useSoundEffects } from "./Sound";
@@ -7,6 +8,7 @@ import { useSoundEffects } from "./Sound";
 export function SoundToggle({ look = "glass" }: { look?: "glass" | "tint" }) {
   const { on, toggle } = useSoundEffects();
   const locale = useLocale();
+  const track = useTrack();
   return (
     // `data-silent-press`: pressing it never makes a sound, not even the moo
     // that ends the entrance (Entrance.tsx), since its pointerdown comes
@@ -14,7 +16,10 @@ export function SoundToggle({ look = "glass" }: { look?: "glass" | "tint" }) {
     <IconButton
       look={look}
       label={t(locale, on ? "muteSounds" : "turnSoundsOn")}
-      onClick={toggle}
+      onClick={() => {
+        track({ name: "toy", which: "sound" });
+        toggle();
+      }}
       data-silent-press=""
     >
       <svg

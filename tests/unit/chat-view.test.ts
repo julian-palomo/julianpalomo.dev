@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   answerAsText,
+  answerOutcome,
   chatErrorMessage,
   confirmationLine,
   hideTrailingPartialMarker,
@@ -13,6 +14,7 @@ import {
   SOURCES_CLOSED,
   type SourcesView,
   shouldFollow,
+  sourceCount,
   sourcesLinkLabel,
   splitIntoChunks,
   toolStatus,
@@ -365,5 +367,35 @@ describe("confirmationLine", () => {
     });
     expect(naive.format(midnightUtc)).toBe("26");
     expect(confirmationLine(zustand, "en")).toContain("27 Oct 2026");
+  });
+});
+
+describe("answerOutcome", () => {
+  const body = (code: Parameters<typeof chatErrorBody>[0]) =>
+    new Error(JSON.stringify(chatErrorBody(code)));
+
+  it("is done for an answer that finished, and stopped after Stop", () => {
+    expect(answerOutcome({ error: undefined, stopped: false })).toBe("done");
+    expect(answerOutcome({ error: undefined, stopped: true })).toBe("stopped");
+  });
+
+  it("names the daily limit that was hit", () => {
+    expect(answerOutcome({ error: body("visitor_limit"), stopped: false })).toBe("visitor_limit");
+    expect(answerOutcome({ error: body("daily_budget"), stopped: false })).toBe("daily_budget");
+  });
+
+  it("calls every other failure an error, even after Stop", () => {
+    expect(answerOutcome({ error: body("unavailable"), stopped: false })).toBe("error");
+    expect(answerOutcome({ error: new Error("network"), stopped: true })).toBe("error");
+  });
+});
+
+describe("sourceCount", () => {
+  it("counts the chips a finished answer shows: each cited source once, if the server sent it", () => {
+    const text =
+      "Zustand [[redux-zustand]], again [[redux-zustand]], remote [[remote-work]] [[made-up]].";
+    expect(sourceCount(text, [zustand, remote])).toBe(2);
+    expect(sourceCount(text, [zustand])).toBe(1);
+    expect(sourceCount("No claim covers that.", [zustand])).toBe(0);
   });
 });

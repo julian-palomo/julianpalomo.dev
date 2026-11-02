@@ -1,4 +1,5 @@
 import { t } from "../../lib/i18n/t";
+import { useTrack } from "../analytics/Analytics";
 import { useLocale } from "../i18n/useLocale";
 import { useSoundEffects } from "../sound/Sound";
 import { useContact } from "./Contact";
@@ -16,10 +17,12 @@ export function CvAndContact({ className }: { className: string }) {
   const locale = useLocale();
   const { play } = useSoundEffects();
   const contact = useContact();
+  const track = useTrack();
 
   // Everything that happens when the CV is downloaded, in one place.
   function downloadCv() {
     play("cv");
+    track({ name: "cv_download" });
   }
 
   return (

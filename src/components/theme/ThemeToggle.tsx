@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { t } from "../../lib/i18n/t";
+import { useTrack } from "../analytics/Analytics";
 import { useLocale } from "../i18n/useLocale";
 import { useSoundEffects } from "../sound/Sound";
 import { IconButton } from "../ui/IconButton";
@@ -20,6 +21,7 @@ const RAY_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 export function ThemeToggle({ look = "glass" }: { look?: "glass" | "tint" }) {
   const { theme, toggle } = useTheme();
   const { play } = useSoundEffects();
+  const track = useTrack();
   const locale = useLocale();
   const maskId = useId();
   const isDark = theme === "dark";
@@ -36,6 +38,7 @@ export function ThemeToggle({ look = "glass" }: { look?: "glass" | "tint" }) {
       onClick={() => {
         // Only a press clicks: Glasgow's dusk and dawn change the theme in silence.
         play("theme");
+        track({ name: "toy", which: "theme" });
         toggle();
       }}
     >

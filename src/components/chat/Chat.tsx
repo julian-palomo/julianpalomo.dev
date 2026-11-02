@@ -5,6 +5,7 @@ import type { ChatUIMessage } from "../../lib/bot/chat-message";
 import { MAX_MESSAGES } from "../../lib/bot/limits";
 import { LICK_MS } from "../../lib/cow-state";
 import { t } from "../../lib/i18n/t";
+import { useTrack } from "../analytics/Analytics";
 import { useContact } from "../contact/Contact";
 import { useCowState } from "../cow/use-cow-state";
 import { useEntrance } from "../entrance/Entrance";
@@ -15,11 +16,13 @@ import { ChatErrorNotice } from "./ChatErrorNotice";
 import { Composer } from "./Composer";
 import {
   answerAsText,
+  answerOutcome,
   latestMessages,
   messageText,
   outOfQuestions,
   remainingSuggestions,
   shouldFollow,
+  sourceCount,
 } from "./chat-view";
 import { Greeting } from "./Greeting";
 import { MessageList } from "./MessageList";
@@ -113,10 +116,26 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
   // flies in from there.
   const [flight, setFlight] = useState<{ text: string; from: DOMRect } | null>(null);
 
+  // The analytics: each question when it's sent, and its answer once the
+  // request ends (src/lib/analytics/events.ts). `awaiting` is the question
+  // whose answer isn't recorded yet.
+  const track = useTrack();
+  const awaiting = useRef<number | null>(null);
+
   // A suggestion chip clicks instead of the send pop: both at once would be
   // within 150ms, which plays only the first.
   function send(text: string, from?: DOMRect) {
     play(from ? "suggestion" : "send");
+    const nth = messages.filter((message) => message.role === "user").length + 1;
+    const suggestion = from ? t(locale, "suggestions").indexOf(text) : -1;
+    track({
+      name: "question",
+      via: from ? "suggestion" : "typed",
+      suggestion: suggestion === -1 ? null : suggestion,
+      nth,
+      text,
+    });
+    awaiting.current = nth;
     if (messages.length === 0) onStarted?.();
     setFlight(from ? { text, from } : null);
     setStopped(false);
@@ -124,6 +143,26 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
     setInput("");
     inputRef.current?.focus();
   }
+
+  // Recorded when the request ends, not when the answer has typed itself
+  // out: Stop during the typing only shows the rest at once. Keyed on
+  // `requesting` alone, so the render between send() and the request starting
+  // can't record an answer that hasn't come.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: records once, when a request ends.
+  useEffect(() => {
+    const nth = awaiting.current;
+    if (requesting || nth === null) return;
+    awaiting.current = null;
+    const answer = last?.role === "assistant" ? last : undefined;
+    const sources = answer
+      ? sourceCount(
+          messageText(answer.parts),
+          answer.parts.find((part) => part.type === "data-sources")?.data.sources ?? [],
+        )
+      : 0;
+    const outcome = answerOutcome({ error: status === "error" ? error : undefined, stopped });
+    track({ name: "answer", nth, sources, outcome });
+  }, [requesting]);
 
   // For screen readers: "Answering…" when an answer starts, then the whole
   // answer once, as plain text, when it has finished typing; never piece by

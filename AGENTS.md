@@ -64,6 +64,7 @@ blocks something, change course; don't look for another way to run it.
 | `pnpm db:migrate:local` | Applies the D1 migrations to the local database only.         |
 | `pnpm og`               | Rewrites the link preview images and icons in `public/`.      |
 | `pnpm sounds`           | Builds the sound sprite from `sounds/` (needs ffmpeg).        |
+| `pnpm stats`            | The analytics report, read-only, from production D1 (Julián). |
 
 Run `pnpm build` and `pnpm test:e2e` without asking when the change touches
 routes, components, styles, the landscape, the build or CI, and say so in one
@@ -84,9 +85,10 @@ wrangler commands that change Cloudflare.
 - `src/routes/`: file-based routes. `src/routeTree.gen.ts` is generated; never edit it by hand.
 - `src/lib/`: plain TypeScript modules, such as `site.ts`.
 - `src/lib/bot/`: the assistant: model settings, the system prompt, the read-only tools, the citation parser, demo mode, the daily limits and the chat logic. `src/routes/api/chat.ts` is its endpoint, `POST /api/chat`.
+- `src/lib/analytics/`: the site's own analytics (`docs/analytics.md`): the closed list of events, who is never counted, the page's queue, the D1 store with its retention, and the endpoint's logic. `src/routes/api/events.ts` is its endpoint, `POST /api/events`; `src/components/analytics/` records the events in the page.
 - `src/lib/weather/`: Glasgow's live weather: the Open-Meteo request, its mapping to the landscape's levels and the endpoint's logic, with the 30-minute cache. `src/routes/api/weather.ts` is its endpoint, `GET /api/weather`.
 - `src/lib/contact/`: the contact form's logic: the schema the form and the server share, Turnstile's check, the daily count in D1 and the email (`docs/contact.md`). `server.ts` is its server function, `sendContact`.
-- `migrations/`: D1 migrations for the daily limits, the chat's and the contact form's. `pnpm db:migrate:local` applies them locally; only Julián applies them to production.
+- `migrations/`: D1 migrations for the daily limits, the chat's and the contact form's, and for the analytics events. `pnpm db:migrate:local` applies them locally; only Julián applies them to production.
 - `src/components/`: React components, one folder per feature, such as `chat/` (the chat on the home page); shared pieces such as `IconButton` live in `ui/`.
 - `src/content/`: personal content, such as `claims.json`. It isn't MIT (`LICENSE`, section 2), and in `src/` only `src/lib/claims.ts` reads it.
 - `src/styles/tokens.css`: the only place colours are defined.
@@ -95,6 +97,7 @@ wrangler commands that change Cloudflare.
 - `.github/workflows/ci.yml`: CI on every pull request to `main`; the evals only on the `run-evals` label. Deploys aren't here: Cloudflare Workers Builds deploys `main` and comments a preview URL on every PR.
 - `docs/adr/`: one file per decision. `docs/tech-debt.md`: shortcuts taken on purpose.
 - `sounds/`: one source file per sound; `scripts/sounds/` builds them into `public/sounds/` and `src/lib/sound/sprite.json` (`docs/sounds.md`).
+- `scripts/stats/`: `pnpm stats`, the read-only analytics report. It runs `SELECT`s through wrangler, against production or, with `--local`, the local database. Agents run it only with `--local`.
 - `scripts/og/`: the card and the icon that `pnpm og` draws with the site's own components and screenshots into `public/` (the link preview images and the icons). It never reaches the site's bundle.
 - `.claude/`: rules, hooks, skills and subagents for Claude Code; `.claude/README.md` explains them.
 
@@ -106,6 +109,7 @@ wrangler commands that change Cloudflare.
 - `docs/evals.md`: what the evals do, the thresholds and why, and a row per baseline. Add a row after every run that changes the prompt, the model or its settings; never edit one.
 - `docs/adr/README.md`: the index of decisions. Records are history; a change of mind is a new ADR.
 - `docs/tech-debt.md`: add a row when you take a shortcut.
+- `docs/analytics.md`: what the analytics record and never record, the retention, who is counted, `?notrack`, and how to read `pnpm stats`.
 - `docs/sounds.md`: each sound's file, source and licence, and how to replace one and rebuild the sprite with `pnpm sounds`.
 - `docs/contact.md`: how a contact message reaches Julian, what is checked and never kept, and the secrets it needs.
 - `.claude/rules/*.md`: per-area rules. Each starts with a `paths:` list; before editing a file, read every rule whose paths match it.

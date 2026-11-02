@@ -558,7 +558,11 @@ mobile; desktop is the same inside the right-hand card.
 1. **Typing.** The composer grows as the visitor types, up to 6 lines, and its
    border lights up in `accent`. The cow listens. The character counter only
    appears near the limit (from 900 of 1,000). Hint under the box: "Enter to
-   send · Shift+Enter for a new line" (hidden on touch screens).
+   send · Shift+Enter for a new line" (hidden on touch screens). Under it from
+   1024px, a muted line: "Questions are kept anonymously for 90 days to
+   improve the assistant." (`docs/analytics.md`). On a phone the same line
+   ends the chat, just above the fixed composer, so the composer stays as
+   short as before.
 2. **Thinking.** The question jumps into place as a bubble, with a small
    bounce and a "pop". The cow chews. A status pill says what's happening in
    words ("Looking up claims…") with three bouncing dots. Send becomes Stop.
