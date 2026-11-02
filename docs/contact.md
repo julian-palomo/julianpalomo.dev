@@ -34,7 +34,8 @@ why it uses Cloudflare's own email binding is
    5. **Count.** Only once the email has gone, so a failed send doesn't use up
       the visitor's day.
 4. **The visitor sees the outcome.** On success, "Thanks! Julian will get back
-   to you." and the chat's cow licks its lips. On a failure, a warm message
+   to you." and the chat's cow moos (when sound is on, `DESIGN.md` section 12)
+   and licks its lips. On a failure, a warm message
    says what to do next, and what they wrote stays in the form.
 
 ## What is never kept or logged
