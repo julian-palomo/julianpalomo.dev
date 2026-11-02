@@ -85,7 +85,8 @@ wrangler commands that change Cloudflare.
 - `src/lib/`: plain TypeScript modules, such as `site.ts`.
 - `src/lib/bot/`: the assistant: model settings, the system prompt, the read-only tools, the citation parser, demo mode, the daily limits and the chat logic. `src/routes/api/chat.ts` is its endpoint, `POST /api/chat`.
 - `src/lib/weather/`: Glasgow's live weather: the Open-Meteo request, its mapping to the landscape's levels and the endpoint's logic, with the 30-minute cache. `src/routes/api/weather.ts` is its endpoint, `GET /api/weather`.
-- `migrations/`: D1 migrations for the daily limits. `pnpm db:migrate:local` applies them locally; only Julián applies them to production.
+- `src/lib/contact/`: the contact form's logic: the schema the form and the server share, Turnstile's check, the daily count in D1 and the email (`docs/contact.md`). `server.ts` is its server function, `sendContact`.
+- `migrations/`: D1 migrations for the daily limits, the chat's and the contact form's. `pnpm db:migrate:local` applies them locally; only Julián applies them to production.
 - `src/components/`: React components, one folder per feature, such as `chat/` (the chat on the home page); shared pieces such as `IconButton` live in `ui/`.
 - `src/content/`: personal content, such as `claims.json`. It isn't MIT (`LICENSE`, section 2), and in `src/` only `src/lib/claims.ts` reads it.
 - `src/styles/tokens.css`: the only place colours are defined.
@@ -106,5 +107,6 @@ wrangler commands that change Cloudflare.
 - `docs/adr/README.md`: the index of decisions. Records are history; a change of mind is a new ADR.
 - `docs/tech-debt.md`: add a row when you take a shortcut.
 - `docs/sounds.md`: each sound's file, source and licence, and how to replace one and rebuild the sprite with `pnpm sounds`.
+- `docs/contact.md`: how a contact message reaches Julian, what is checked and never kept, and the secrets it needs.
 - `.claude/rules/*.md`: per-area rules. Each starts with a `paths:` list; before editing a file, read every rule whose paths match it.
 - `.claude/skills/*/SKILL.md`: step-by-step procedures (handoff, opening a PR, implementing an issue).

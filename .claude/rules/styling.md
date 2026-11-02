@@ -7,7 +7,7 @@ paths:
 # Styling
 
 Tailwind CSS 4 through `@tailwindcss/vite`. `src/styles/app.css` imports
-Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `cow.css` and `entrance.css`;
+Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `cow.css`, `entrance.css` and `contact.css`;
 `src/routes/__root.tsx` links `app.css`.
 
 ## Fonts live only in `src/styles/fonts.css`
@@ -35,6 +35,10 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 ## The gear's panel styles live in `src/styles/play.css`
 
 - The third exception to "Tailwind utilities only": the `<dialog>`'s sheet and popover layout and its clear backdrop, the range inputs' gradient tracks and two-tone thumbs, and the gear's entrance. Colours are tokens only (the `track-*` tokens for the tracks); `tests/unit/tokens.test.ts` checks the thumbs reach 3:1 against every track and the panel. Everything that moves sits inside `prefers-reduced-motion: no-preference`.
+
+## The contact form's dialog lives in `src/styles/contact.css`
+
+- Like the gear's panel, a `<dialog>` whose layout has no Tailwind utilities: a bottom sheet below 1024px and a centred 480px dialog from 1024px, over a backdrop that mixes `background` at 70%. Colours are tokens only. The sheet's rise and the dialog's fade sit inside `prefers-reduced-motion: no-preference`.
 
 ## The chat's motion lives in `src/styles/chat.css`
 
@@ -67,6 +71,7 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 
 - Small, typed and feature-free. `IconButton` is a round, flat, 44px icon-only button with a required `label` (its accessible name) and a `look`: `accent`, `glass` (`bg-glass` with a 6px blur) for buttons on the landscape, or `tint` for buttons on a panel. Its press scale (0.92 over 80ms) runs only under `motion-safe`.
 - `BubbleTail` is a speech bubble's comic-style tail (`DESIGN.md` section 4), on the bubble's `left`, `top` or `bottom` edge, in `field` and `border`. Its callers place it so its joining edge covers the bubble's 1.5px border: the hero's hello, the cow's "Moo!" and the gear's hint.
+- `CloseIcon` is the cross on a dialog's or panel's Close button: the gear's panel and the contact form.
 - `Button` is the wide, flat, fully round button (`DESIGN.md` section 4), with a `look` (`primary` today) and a 0.97 press scale under `motion-safe`. "Back to live Glasgow" is its first caller.
 - A piece, or a new look of one, is added with its first caller, not ahead of it.
 
@@ -77,4 +82,4 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - Semantic elements first (`main`, `h1`, `nav`, `button`); the e2e test finds the page by role (`tests/e2e/home.spec.ts`).
 - The layout works at 375px wide (small phone) before anything else.
 
-If `tokens.css`, `fonts.css`, `cow.css`, `landscape.css`, `play.css`, `chat.css`, `entrance.css`, `app.css`, `src/lib/scene/palette.ts` or `src/components/ui/` change shape, update this rule.
+If `tokens.css`, `fonts.css`, `cow.css`, `landscape.css`, `play.css`, `chat.css`, `entrance.css`, `contact.css`, `app.css`, `src/lib/scene/palette.ts` or `src/components/ui/` change shape, update this rule.

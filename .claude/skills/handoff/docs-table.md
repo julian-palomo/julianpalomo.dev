@@ -13,6 +13,7 @@ it: when a change doesn't obviously fit a row, apply the test directly.
 | `docs/adr/`                                                | a decision was made that shapes the project. Add a new ADR; never rewrite an accepted one. Update the index in `docs/adr/README.md`. |
 | `DESIGN.md`, `docs/design/`                                | a colour, font, layout, animation, sound or any other visible behaviour changed. The design is decided there first.                  |
 | `docs/sounds.md`                                           | a sound was added, replaced or removed, or `pnpm sounds` or the sound rules changed.                                                 |
+| `docs/contact.md`                                          | the contact form's checks, limit, secrets, demo mode or what it stores or logs changed.                                              |
 | `docs/tech-debt.md`                                        | a shortcut was taken on purpose, or an existing row was paid off (update its status; don't delete it).                               |
 
 If a doc is added or removed, update this table.

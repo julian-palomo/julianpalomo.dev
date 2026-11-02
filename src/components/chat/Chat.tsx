@@ -3,7 +3,9 @@ import { DefaultChatTransport } from "ai";
 import { type RefObject, useEffect, useRef, useState } from "react";
 import type { ChatUIMessage } from "../../lib/bot/chat-message";
 import { MAX_MESSAGES } from "../../lib/bot/limits";
+import { LICK_MS } from "../../lib/cow-state";
 import { t } from "../../lib/i18n/t";
+import { useContact } from "../contact/Contact";
 import { useCowState } from "../cow/use-cow-state";
 import { useEntrance } from "../entrance/Entrance";
 import { useLocale } from "../i18n/useLocale";
@@ -80,6 +82,20 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
     if (finishedAnswer) play("answerEnd");
   }, [finishedAnswer]);
 
+  // A message sent through the contact form makes the cow lick its lips once.
+  const { sent } = useContact();
+  const [cheeredFor, setCheeredFor] = useState(sent);
+  const [cheering, setCheering] = useState(false);
+  if (sent !== cheeredFor) {
+    setCheeredFor(sent);
+    setCheering(true);
+  }
+  useEffect(() => {
+    if (!cheering) return;
+    const timer = setTimeout(() => setCheering(false), LICK_MS);
+    return () => clearTimeout(timer);
+  }, [cheering]);
+
   const cowState = useCowState({
     status,
     answerHasText: reveal.revealing && reveal.shown > 0,
@@ -87,6 +103,7 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
     stopped,
     composer: { hasText: input.length > 0, focused: composerFocused },
     entrance: entrance.cow,
+    cheering,
   });
 
   // Sending swaps Send for Stop, a suggestion removes its own button, and

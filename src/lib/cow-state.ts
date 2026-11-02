@@ -18,6 +18,8 @@ export type CowSituation = {
   composer: { hasText: boolean; focused: boolean };
   /** While the page's entrance plays, what it makes the cow do; null once the chat leads. */
   entrance: CowState | null;
+  /** A message to Julian just went through the contact form. */
+  cheering?: boolean;
 };
 
 /** How long the one lick of `satisfied`, and of a pat, lasts. Keep in step with cow.css. */
@@ -27,13 +29,17 @@ export const LICK_MS = 1600;
  * The cow's next state. It follows the typing, not the stream: it talks from
  * the first word on screen until the last, through a tool call or a pause in
  * the stream, and an answer that just finished typing plays `satisfied` once,
- * as does the entrance's greeting. The entrance, while it plays, wins.
+ * as does the entrance's greeting and a sent contact message. The entrance,
+ * while it plays, wins.
  * `previous` is what it showed last; the caller ends `satisfied` after
  * LICK_MS. Applying it twice to the same situation gives the same state.
  */
 export function nextCowState(previous: CowState, situation: CowSituation): CowState {
-  const { status, answerHasText, revealing, stopped, composer, entrance } = situation;
+  const { status, answerHasText, revealing, stopped, composer, entrance, cheering } = situation;
   if (entrance !== null) return entrance;
+  // A sent contact message licks too, unless an answer is on its way.
+  const answering = status === "submitted" || status === "streaming" || revealing;
+  if (cheering && !answering) return "satisfied";
   switch (status) {
     case "error":
       return "sorry";

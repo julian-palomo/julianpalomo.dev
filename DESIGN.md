@@ -163,8 +163,10 @@ From top to bottom:
 2. **The portrait** (96 × 120px), overlapping the hero's bottom edge by half
    its height, 20px from the left, with a 4px ring in `background`.
 3. **Name, role and one line** ("Ask about my experience. Answers come only
-   from facts I've confirmed, with their sources."), then **"Download CV"**
-   and **"Contact"**.
+   from facts I've confirmed, with their sources."). On a phone, **"Download
+   CV"** and **"Contact"** sit at the end of the page, above the footer, so
+   the chat's first suggestions still show above the fixed composer (section
+   14).
 4. **The chat** (section 10). At its top, the cow (100 × 79px on a phone) rests
    its chin on the chat's edge, like a fence, with its two front hooves over it:
    on a phone the edge is a 3px line in `border` with rounded ends, across
@@ -646,7 +648,7 @@ On a first visit, or the first in a week:
 
 | When                   | What                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0.08s to 0.32s         | The name, the role, the line, and "Download CV" and "Contact" rise, 80ms apart, 0.45s each. The portrait drops in at 0.1s (0.6s). The hero's buttons pop in from 0.3s, 70ms apart. They work from the start.                                                                                                                                                                                                                                            |
+| 0.08s to 0.32s         | The name, the role and the line rise, 80ms apart, 0.45s each; from 1024px, "Download CV" and "Contact" rise with the line. The portrait drops in at 0.1s (0.6s). The hero's buttons pop in from 0.3s, 70ms apart. They work from the start.                                                                                                                                                                                                             |
 | 0.6s to about 3.9s     | The glen wakes, slowly. The sky fades in (1.05s from 0.6s). The land rises back to front: far hills from 0.68s, middle from 0.87s, near land from 1.05s, 1.5s each. The loch fades in at 1.2s, the trees grow one after another from 1.43s to 1.85s, the cottage pops at 1.73s, the haar fades in at 1.5s, the two herd groups walk in at 1.88s and 2.03s (1.8s each), and the particles fade in at 2.4s.                                               |
 | 2.5s                   | The cow appears big in the middle of the hero, about 200px wide (at most 62% of the hero's height), scaling up from nothing with a small overshoot (0.6s). It talks.                                                                                                                                                                                                                                                                                    |
 | 3.15s                  | A speech bubble says "Hi! I'm the Highland cow" ("¡Hola! Soy la vaca de las Highlands"), with no full stop and its text centred, for 1.7s. From `lg` it's a pill above the cow. On a phone it sits beside the cow's head, under the hero's controls and clear of them, wrapping naturally in about 92px with a 14px radius and a comic-style tail on its left edge, pointing down towards the cow's mouth. It's decoration, hidden from screen readers. |
@@ -736,6 +738,7 @@ Sounds are **on by default**, quiet, and one tap away from off.
 | Release a slider in the gear's panel       | A soft click                                          |
 | Heavy rain (7 or more)                     | A rain loop, very low, while it lasts                 |
 | Download the CV                            | A paper rustle                                        |
+| A contact message is sent                  | The moo, then the lick                                |
 
 Only the visitor's own answers make the answer sounds: the greeting that
 types itself out in the first visit's entrance is silent, and so is a theme
@@ -774,13 +777,17 @@ centred and the background left exactly as it is: no blur, no fade.
   **without his phone number or email address**, with LinkedIn, GitHub and
   this site as contact. Julian provides the PDF; it never contains private
   data, because the repo is public.
+- **Where they sit:** from 1024px, the two secondary buttons sit under the
+  intro. Below 1024px they sit at the end of the page, above the footer: under
+  the intro they'd push the chat's first suggestions below the fixed composer
+  on a 390 × 844 phone.
 - **"Contact"** opens a form: a bottom sheet on mobile, a dialog on desktop.
   Fields: name, email (so Julian can reply), message (up to 2,000
   characters). Protected by Cloudflare Turnstile and a hidden honeypot field,
   and limited per visitor per day like the chat. The message goes to Julian's
   email from the server; his address is a secret and never appears in the
   repo or the page. Success: "Thanks! Julian will get back to you." and the
-  cow licks, satisfied.
+  cow moos (when sound is on, section 12) and licks, satisfied.
 
 ### Sharing
 
