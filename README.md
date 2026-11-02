@@ -218,6 +218,8 @@ Each decision is recorded as it's made, one file each, in `docs/adr/`.
   type, the live Highland landscape, the cow and the chat.
 - [Sounds](docs/sounds.md): where each sound came from, its licence, and how
   to replace one and rebuild the sprite.
+- [Analytics](docs/analytics.md): what the site counts and never counts, how
+  long it keeps it, who is left out, and how to read `pnpm stats`.
 - [Evals](docs/evals.md): how the assistant is tested against its claims,
   and the score of every baseline.
 - [Architecture decision records](docs/adr/README.md): what was decided,
