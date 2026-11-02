@@ -225,6 +225,9 @@ export const en = {
   pagesLabel: "Pages",
   projectsTitle: "Projects",
   howItsBuiltTitle: "How it's built",
+  // The inner pages' cards at the end of the home page.
+  projectsCard: "Form:at and this site, with screenshots and why I made each one.",
+  howItsBuiltCard: "How the cow is built so it can't make up my experience.",
   // The How it's built page (DESIGN.md section 18), for readers who don't
   // program. Every sentence is true to the code and the docs; the numbers
   // come from the code.

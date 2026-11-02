@@ -2,7 +2,6 @@ import { t } from "../../lib/i18n/t";
 import { springs } from "../../lib/spring";
 import { useTrack } from "../analytics/Analytics";
 import { useLocale } from "../i18n/useLocale";
-import { PageLinks } from "../page/PageLinks";
 import { useSoundEffects } from "../sound/Sound";
 import { boopOnHover } from "../ui/boop";
 import { useContact } from "./Contact";
@@ -13,7 +12,7 @@ const CV_PATH = "/cv/Julian-Palomo-CV.pdf";
 // Secondary buttons: `border`-outlined pills (DESIGN.md section 4). One is a
 // link and one a button, so they share the classes rather than a component.
 const pill =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border-2 border-border px-5 font-display font-bold transition-transform duration-[80ms] hover:border-accent motion-safe:active:scale-[0.97]";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border-2 border-border px-5 font-display font-bold transition-transform duration-[80ms] hover:border-accent motion-safe:active:scale-[0.97] whitespace-nowrap max-[359px]:w-full lg:px-4";
 
 // On hover the sheet's corner folds out, as if the CV were coming out, and the
 // envelope's flap opens a little.
@@ -36,15 +35,14 @@ const onContactHover = boopOnHover({
   ],
 });
 
-// The inner pages' links: text links beside the pills, the same height.
-const textLink =
-  "inline-flex min-h-11 items-center px-2 font-display font-bold text-accent hover:underline";
-
 /**
- * "Download CV" and "Contact" (DESIGN.md section 14), and the links to the
- * inner pages (section 18). The caller places the
- * row and sets its alignment with a `justify-*` class: left under the intro
- * from 1024px, centred above the footer below it.
+ * The two actions, "Download CV" and "Contact" (DESIGN.md section 14): the
+ * inner pages are places, and live in their own cards (section 18). The
+ * caller places the row and sets its alignment with a `justify-*` class:
+ * left under the intro from 1024px, centred under the chat below it. The two
+ * share a line from 360px; narrower, they stack, both full width. In the
+ * intro's 300px column they fit with 16px padding, and the row never wraps
+ * there: a font that renders wider runs into the column gap instead.
  */
 export function CvAndContact({ className }: { className: string }) {
   const locale = useLocale();
@@ -59,7 +57,7 @@ export function CvAndContact({ className }: { className: string }) {
   }
 
   return (
-    <div className={`flex flex-wrap gap-2 ${className}`}>
+    <div className={`flex flex-wrap gap-2 max-[359px]:flex-col lg:flex-nowrap ${className}`}>
       <a href={CV_PATH} download onClick={downloadCv} onPointerEnter={onCvHover} className={pill}>
         <SheetIcon />
         {t(locale, "downloadCv")}
@@ -68,7 +66,6 @@ export function CvAndContact({ className }: { className: string }) {
         <EnvelopeIcon />
         {t(locale, "contactOpen")}
       </button>
-      <PageLinks className={textLink} />
     </div>
   );
 }

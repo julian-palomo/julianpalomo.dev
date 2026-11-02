@@ -198,6 +198,8 @@ export const es: Messages = {
   pagesLabel: "Páginas",
   projectsTitle: "Proyectos",
   howItsBuiltTitle: "Cómo está hecha",
+  projectsCard: "Form:at y esta web, con capturas y por qué hice cada una.",
+  howItsBuiltCard: "Cómo está hecha la vaca para que no pueda inventarse mi experiencia.",
   howItsBuilt: {
     lead: "Los asistentes de IA a veces se inventan cosas, y las dicen con mucha seguridad. Este está hecho para que no pueda inventarse mi experiencia. Te cuento cómo, en palabras sencillas.",
     whatItDoes: "Qué hace",
