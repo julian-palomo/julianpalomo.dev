@@ -164,9 +164,9 @@ From top to bottom:
    its height, 20px from the left, with a 4px ring in `background`.
 3. **Name, role and one line** ("Ask about my experience. Answers come only
    from facts I've confirmed, with their sources."). On a phone, **"Download
-   CV"** and **"Contact"** sit at the end of the page, above the footer, so
-   the chat's first suggestions still show above the fixed composer (section
-   14).
+   CV"** and **"Contact"**, with the **"Projects"** text link beside them,
+   sit at the end of the page, above the footer, so the chat's first
+   suggestions still show above the fixed composer (sections 14 and 18).
 4. **The chat** (section 10). At its top, the cow (100 × 79px on a phone) rests
    its chin on the chat's edge, like a fence, with its two front hooves over it:
    on a phone the edge is a 3px line in `border` with rounded ends, across
@@ -190,8 +190,8 @@ the on-screen keyboard.
   and the slice shows more of it (a distant cow on the right hill, for
   example).
 - **Two columns** under the hero: on the left (about 300px) the portrait at
-  120 × 150px overlapping the hero, the name, the role, the line and the two
-  buttons; on the right, the chat in a card with a 2px `border` and a 20px
+  120 × 150px overlapping the hero, the name, the role, the line, the two
+  buttons and the "Projects" link (section 18); on the right, the chat in a card with a 2px `border` and a 20px
   radius. The card's top border is the cow's edge: the cow sits on it, 28px
   from its left edge, overlapping it from above, with the heading beside it,
   so the card starts about 7.5rem lower to make room.
@@ -853,4 +853,52 @@ Open the SVGs in a browser to see them animate.
 - A babbling voice while the cow talks.
 - Special dates (Halloween, Bonfire Night, Christmas). The season mechanism
   allows them later.
-- More pages. The site is one page in two languages.
+
+## 18. Inner pages
+
+Besides the home page, the site has inner pages, each in both languages at the
+same slug: `/projects` and `/es/projects`. The language rules are section 5's:
+a visitor in Spain without a `lang` cookie gets `/es/projects`, and the
+language toggle goes to the same page in the other language.
+
+### The shell every inner page shares
+
+- **The hero** is the live landscape, shorter: 140px on a phone, 200px from
+  1024px, with the home page's row of controls (gear, weather chip, language,
+  sound, theme). No portrait, no entrance, and no hero cow.
+- **The title** (Bricolage, 34px, 40px from 1024px) sits on a `background` tab
+  with a 20px radius over the hero's lower edge, where the portrait sits on
+  the home page. Text straight on the landscape couldn't keep AA contrast
+  across every sky in both themes.
+- **The column** is at most 680px wide, centred, with the home page's gutters.
+- **The way back:** under the title, the text link "← Ask the cow" ("←
+  Pregunta a la vaca") goes to the home page in the same language and
+  focuses the composer.
+- **The end of the page:** the assistant cow peeking over a short 3px edge in
+  `border`, as on the chat's edge, with "Anything else? Ask me" ("¿Algo más?
+  Pregúntame") beside it, linking to the chat the same way. It can be patted.
+  With reduced motion it's still.
+- **The footer** carries the links to the inner pages on every page, above
+  Open-Meteo's credit.
+
+### Navigation
+
+- **On the home page,** the inner pages' text links ("Projects",
+  "Proyectos") sit beside "Download CV" and "Contact", in `accent`, as tall
+  as the buttons, wherever the row sits (section 14).
+- **In the footer,** the same links, on every page.
+
+### Projects
+
+- **One card per project:** Form:at, then julianpalomo.dev. Each card has the
+  chat card's 2px `border` and 20px radius, and holds the name (Bricolage,
+  24px), when and how it was made, the "why" in Julian's own words, three to
+  five points, and its links.
+- **Every point is taken from one of Julian's confirmed claims,** shortened
+  and adding nothing: no figure, purpose or result the claim doesn't state.
+  Julian approves the copy in both languages.
+- **Screenshots:** optimised (AVIF and WebP, with a PNG fallback), with their
+  width and height so nothing shifts, lazy below the fold, and with alt text
+  that says what each shows.
+- The page renders fully on the server; nothing on it is fetched on the
+  client.

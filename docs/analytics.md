@@ -17,16 +17,17 @@ Each event answers one question. The list is closed and typed
 ([`src/lib/analytics/events.ts`](../src/lib/analytics/events.ts)): anything
 else gets a `400` and isn't stored.
 
-| Event                         | Fields                                                                                                       | Answers                                                                                              |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| `visit`                       | `ref` (`linkedin`, `cv`, `github`, `other` or `none`), `referrer_host` (hostname only, or null), `returning` | How many come, from where, new or returning                                                          |
-| `question`                    | `via` (`typed` or `suggestion`), `suggestion` (its index in the list, or null), `nth`, `text`                | Who talks, what they ask, which suggestions, questions per visit                                     |
-| `answer`                      | `nth`, `sources` (the chips shown), `outcome` (`done`, `stopped`, `error`, `visitor_limit`, `daily_budget`)  | Questions with no claim to answer them, limits hit                                                   |
-| `sources_opened`, `copied`    | none                                                                                                         | Whether people read the sources                                                                      |
-| `toy`                         | `which` (`moo`, `panel_open`, `slider` with its `slider`, `back_to_live`, `theme`, `language`, `sound`)      | Which toys get played with                                                                           |
-| `cv_download`, `contact_sent` | none                                                                                                         | CV downloads and messages: a press on "Download CV", and a message that went (never one that failed) |
-| `outbound`                    | `to` (`linkedin` or `github`)                                                                                | Where people go next, from the links in the chat's error notice                                      |
+| Event                         | Fields                                                                                                                                                     | Answers                                                                                              |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `visit`                       | `page` (`home`, `projects`, `how_its_built`), `ref` (`linkedin`, `cv`, `github`, `other` or `none`), `referrer_host` (hostname only, or null), `returning` | Which pages are read, how many come, from where, new or returning                                    |
+| `question`                    | `via` (`typed` or `suggestion`), `suggestion` (its index in the list, or null), `nth`, `text`                                                              | Who talks, what they ask, which suggestions, questions per visit                                     |
+| `answer`                      | `nth`, `sources` (the chips shown), `outcome` (`done`, `stopped`, `error`, `visitor_limit`, `daily_budget`)                                                | Questions with no claim to answer them, limits hit                                                   |
+| `sources_opened`, `copied`    | none                                                                                                                                                       | Whether people read the sources                                                                      |
+| `toy`                         | `which` (`moo`, `panel_open`, `slider` with its `slider`, `back_to_live`, `theme`, `language`, `sound`)                                                    | Which toys get played with                                                                           |
+| `cv_download`, `contact_sent` | none                                                                                                                                                       | CV downloads and messages: a press on "Download CV", and a message that went (never one that failed) |
+| `outbound`                    | `to` (`linkedin` or `github`)                                                                                                                              | Where people go next, from the links in the chat's error notice                                      |
 - **`ref`** comes from `?ref=` in the link. The page reads it once, then removes it from the address bar through the router, so a copied link doesn't carry it on.
+- **`page`** is the page that was loaded. A visit sent without it, from a tab opened before it existed, counts as `home`.
 - **`returning`** means the visitor came back **within 7 days of their last visit**. It's the `visited` cookie that picks the entrance: it lasts a week and is refreshed on every visit, and the server reads it before refreshing it. Someone who comes back after two weeks counts as new.
 - **`moo`** is a press on the cow on the chat's edge, not the moo that ends the entrance.
 - **The season and the snow and haar switches** in the sky panel aren't recorded.
@@ -36,6 +37,8 @@ Every event carries a **`visit_id`**: a random UUID the page makes when it
 loads, kept in memory only, never in a cookie or storage. It joins one page
 load's events into a funnel without following anyone across visits. Switching
 language keeps the page loaded, so it stays one page load with one `visit`.
+Moving to another of the site's pages starts a new page load, with its own
+`visit`, and sends the old one's queued events first.
 The server adds the time.
 
 ## What is never recorded
@@ -81,7 +84,8 @@ bots run JavaScript, and some people block scripts.
 ## How events travel
 
 The page queues its events and sends them with `navigator.sendBeacon` to
-`POST /api/events` when the tab is hidden or the page is left. A send is split
+`POST /api/events` when the tab is hidden, the page is left, or a move to
+another of the site's pages unmounts it. A send is split
 into bodies under 60 KB, because browsers refuse a beacon past about 64 KB in
 flight. A body the browser refuses stays queued for the next send. Recording
 an event never throws and never waits.
@@ -134,9 +138,10 @@ Read-only: it runs only `SELECT`s, one wrangler call per section
 ([`scripts/stats/`](../scripts/stats/report.ts)). For the last 7 and 30 days
 it prints:
 
+- visits by page, with older visits that have no `page` counted as `home`;
 - visits by `ref` and by referrer host;
 - new and returning visits;
-- the funnel: visit → first question → second question → CV or contact, as page loads and as a percentage of visits;
+- the funnel: visit → first question → second question → CV or contact, as home page loads and as a percentage of them, since only the home page has the chat, the CV and the contact form;
 - questions per page load;
 - how questions were asked (typed, or which suggestion);
 - finished answers with no sources;
