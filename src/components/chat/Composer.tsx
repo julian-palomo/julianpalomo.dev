@@ -11,8 +11,21 @@ import {
 import { QUESTION_TEXT_DAYS } from "../../lib/analytics/events";
 import { MAX_VISITOR_TEXT } from "../../lib/bot/limits";
 import { t } from "../../lib/i18n/t";
+import { springs } from "../../lib/spring";
 import { useLocale } from "../i18n/useLocale";
+import { boopOnHover } from "../ui/boop";
 import { IconButton } from "../ui/IconButton";
+
+// On hover Send's arrow nudges up and springs back.
+const onSendHover = boopOnHover({
+  parts: [
+    {
+      part: "arrow",
+      spring: springs.boop,
+      frame: (value) => ({ transform: `translateY(${-3 * value}px)` }),
+    },
+  ],
+});
 
 type Props = {
   value: string;
@@ -143,7 +156,13 @@ export function Composer({
               <StopIcon />
             </IconButton>
           ) : (
-            <IconButton look="accent" label={t(locale, "send")} type="submit" disabled={!canSend}>
+            <IconButton
+              look="accent"
+              label={t(locale, "send")}
+              type="submit"
+              disabled={!canSend}
+              onPointerEnter={onSendHover}
+            >
               <SendIcon />
             </IconButton>
           )}
@@ -201,6 +220,7 @@ function SendIcon() {
       aria-hidden="true"
       viewBox="0 0 24 24"
       className="size-5"
+      data-boop="arrow"
       fill="none"
       stroke="currentColor"
       strokeWidth="2.5"

@@ -1,5 +1,17 @@
-/** The loch, its shimmer and the sun's reflection, the islet with its ruined tower, and rain ripples. */
-export function Loch() {
+import { Nessie } from "./Nessie";
+import type { Spot } from "./use-valley";
+
+type Props = {
+  /** Where Nessie rises, while she's up (DESIGN.md section 7). */
+  nessie: Spot | null;
+};
+
+/**
+ * The loch, its shimmer and the sun's reflection, the islet with its ruined
+ * tower, and rain ripples; and Nessie, only while she's up, so the still
+ * drawing never has her.
+ */
+export function Loch({ nessie }: Props) {
   return (
     <>
       <path
@@ -28,6 +40,7 @@ export function Loch() {
         <circle cx="640" cy="256" r="6" />
         <circle cx="820" cy="246" r="6" />
       </g>
+      {nessie && <Nessie key={nessie.id} x={nessie.x} />}
     </>
   );
 }

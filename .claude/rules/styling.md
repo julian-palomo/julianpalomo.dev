@@ -49,6 +49,7 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - The second exception to "Tailwind utilities only": SVG parts, keyframes and `transform-box` rules, ported from the `<style>` of `docs/design/highland-scene.svg` and `herd-cow.svg`, with keyframes prefixed `landscape-`. It has no colour literals: `src/components/landscape/Landscape.tsx` puts every colour and level on the SVG root as a custom property, computed by `src/lib/scene/`, and switches parts with `data-` attributes (`data-season`, `data-snowy`, `data-haar`, `data-aurora`, `data-choreography`, `data-paused`).
 - Every animation and transition sits inside `prefers-reduced-motion: no-preference`, so with reduced motion nothing in the hero moves and colours change instantly. Loops animate only `transform` and `opacity`; colours transition over 1.1s, and with the timings of `DESIGN.md` section 6 during a theme toggle.
 - `tests/unit/landscape-drawing.test.ts` renders the landscape and checks every shape against the reference, in order. Never redraw a part: copy it from the reference.
+- The valley's answers to the pointer (`DESIGN.md` section 7, `src/components/landscape/use-valley.ts`) live there too: the chimney's extra puff, the shooting star and Nessie, each drawn only while it plays, so the still drawing never has them; and the groups the springs move, `brush` around each pine and `hc-lift` and `hc-step` inside each herd cow, nested in the parts' own groups so they add to the loops instead of replacing them.
 - The particles (`src/components/landscape/Particles.tsx`) live there too: HTML elements in a size container over the hero, so `cqh` is the hero's height and a scene coordinate x sits at `50% + (x − 600) × 100cqh / 320`. Each particle's position, size, timing and colour arrive as custom properties computed by `src/lib/scene/particles.ts`. With reduced motion the layer isn't shown at all.
 
 ## The assistant cow's motion lives in `src/styles/cow.css`
@@ -56,6 +57,7 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - Its keyframes come from the `<style>` of `docs/design/assistant-cow.svg`, prefixed `cow-`, and are keyed by the `data-state` and `data-pat` that `src/components/cow/AssistantCow.tsx` sets. Only the chat's cow has `.cow-live`, so the link preview card's stays still. Its 8px rise over the chat's edge (`.edge-lift`, `src/components/chat/ChatEdge.tsx`) lives here too.
 - Every rule that moves it sits inside `prefers-reduced-motion: no-preference`, so with reduced motion it's the still drawing in every state. Only `transform` and `opacity` animate.
 - The lick lasts 1.6s here and in `LICK_MS` (`src/lib/cow-state.ts`); keep the two in step.
+- Its tilt towards the pointer arrives as `--cow-follow` from `src/components/cow/use-cow-follow.ts` and is applied with the `rotate` property on the drawing, which composes with the `transform` its states animate.
 
 ## The page's entrance lives in `src/styles/entrance.css`
 
@@ -72,6 +74,7 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - Small, typed and feature-free. `IconButton` is a round, flat, 44px icon-only button with a required `label` (its accessible name) and a `look`: `accent`, `glass` (`bg-glass` with a 6px blur) for buttons on the landscape, or `tint` for buttons on a panel. Its press scale (0.92 over 80ms) runs only under `motion-safe`.
 - `BubbleTail` is a speech bubble's comic-style tail (`DESIGN.md` section 4), on the bubble's `left`, `top` or `bottom` edge, in `field` and `border`. Its callers place it so its joining edge covers the bubble's 1.5px border: the hero's hello, the cow's "Moo!" and the gear's hint.
 - `CloseIcon` is the cross on a dialog's or panel's Close button: the gear's panel and the contact form.
+- `boop.ts` plays a button's gesture on hover (`DESIGN.md` sections 4 and 11): `boopOnHover` takes the parts to move, by their `data-boop` name, and keyframes as a function of the spring in `src/lib/spring.ts`, and plays them with the Web Animations API. Only with a mouse and without reduced motion, checked at the moment of hovering. A part that already has a CSS transform of its own (the theme toggle's sun and moon) moves in a group of its own inside it, so the two never fight.
 - `Button` is the wide, flat, fully round button (`DESIGN.md` section 4), with a `look` (`primary` today) and a 0.97 press scale under `motion-safe`. "Back to live Glasgow" is its first caller.
 - A piece, or a new look of one, is added with its first caller, not ahead of it.
 

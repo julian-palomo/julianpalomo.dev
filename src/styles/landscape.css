@@ -193,6 +193,31 @@
   transform-box: fill-box;
   transform-origin: center;
 }
+/* Nessie (Nessie.tsx): under the water until she rises, and her ring unseen. */
+.landscape .nessie-body {
+  fill: var(--tree);
+  transform: translateY(16px);
+}
+.landscape .nessie-eye {
+  fill: var(--lochhi);
+}
+.landscape .nessie-ring {
+  fill: none;
+  stroke: var(--lochhi);
+  stroke-width: 0.6;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* A shooting star (Sky.tsx), only while it crosses. */
+.landscape .shooting-star path {
+  fill: none;
+  stroke: var(--star);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  opacity: 0;
+}
 
 /* The near meadow */
 .landscape .patches path {
@@ -233,8 +258,9 @@
   opacity: 0.8;
 }
 
-/* Pines */
-.landscape .tree {
+/* Pines; `brush` is a pointer passing through one (use-valley.ts). */
+.landscape .tree,
+.landscape .brush {
   transform-box: fill-box;
   transform-origin: 50% 100%;
 }
@@ -289,7 +315,11 @@
   stroke-width: 2;
   stroke-linecap: round;
 }
-.landscape .hc-head {
+/* The head turns at the neck, with its grazing (hc-head) and when it looks
+   at the pointer (hc-lift, use-valley.ts), so the two add up. Keep the
+   origin in step with NECK in src/lib/scene/herd.ts. */
+.landscape .hc-head,
+.landscape .hc-lift {
   transform-box: view-box;
   transform-origin: 16px -17px;
 }
@@ -365,6 +395,11 @@
 }
 .particle.glint {
   opacity: 0.6;
+}
+/* The midges as one cloud, which a mouse can draw after it (use-valley.ts). */
+.midge-cloud {
+  position: absolute;
+  inset: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -480,6 +515,26 @@
   .landscape .look .hc-head {
     animation: landscape-look 11s ease-in-out infinite;
   }
+  /* A cow looking at the pointer holds its grazing where it is. */
+  .landscape .hcow[data-noticed] .hc-head {
+    animation-play-state: paused;
+  }
+
+  /* What the pointer sets off (DESIGN.md section 7): an extra puff from the
+     chimney, a shooting star, and Nessie's 4s visit (NESSIE.ms in
+     src/lib/scene/valley.ts), with the rain's ring where she rises. */
+  .landscape .smoke.puff {
+    animation: landscape-smoke 2s ease-out both;
+  }
+  .landscape .shooting-star path {
+    animation: landscape-shoot 0.9s ease-out both;
+  }
+  .landscape .nessie-body {
+    animation: landscape-nessie 4s ease-in-out both;
+  }
+  .landscape .nessie-ring {
+    animation: landscape-ripple 1.6s ease-out both;
+  }
 
   /* A theme toggle (DESIGN.md section 6): the rising orb jumps to its place
      while it's still hidden, the land darkens over 1.2s, the stars come out
@@ -561,6 +616,34 @@
   to {
     transform: scale(2.2);
     opacity: 0;
+  }
+}
+@keyframes landscape-shoot {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(150px, 52px);
+    opacity: 0;
+  }
+}
+/* Up out of the water, a glide to the right, and down again. */
+@keyframes landscape-nessie {
+  0% {
+    transform: translate(0, 16px);
+  }
+  22% {
+    transform: translate(4px, 0);
+  }
+  72% {
+    transform: translate(32px, 0);
+  }
+  100% {
+    transform: translate(40px, 16px);
   }
 }
 @keyframes landscape-fog {

@@ -100,6 +100,16 @@
       transform: translateY(-8px);
     }
   }
+
+  /* Tilting towards the pointer (src/components/cow/use-cow-follow.ts sets
+     --cow-follow), around its chin like its own tilts. The `rotate` property
+     on the whole drawing composes with the `transform` its states animate on
+     `.tilt`, so neither replaces the other. Not while it's sorry: its head
+     stays down. */
+  .edge-lift:not([data-state="sorry"]) .cow-live > svg {
+    rotate: var(--cow-follow, 0deg);
+    transform-origin: 50% 69%;
+  }
 }
 
 @keyframes cow-idle {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { effects } from "../../lib/scene/effects";
 import { glasgowElevation, sceneInstant, skyMix } from "../../lib/scene/moment";
 import { playInstant, playSky } from "../../lib/scene/play";
@@ -10,6 +10,7 @@ import { useSoundEffects } from "../sound/Sound";
 import { useTheme } from "../theme/Theme";
 import { Landscape } from "./Landscape";
 import { Particles } from "./Particles";
+import { useValley } from "./use-valley";
 
 // How long the landscape's half of a theme toggle runs (DESIGN.md section 6).
 // Keep in step with the glow's animation in src/styles/landscape.css.
@@ -69,16 +70,27 @@ export function HeroLandscape({ override, weather }: Props) {
   }, []);
 
   const elevation = glasgowElevation(at);
+  const fx = effects(sky);
+  // The layer takes the pointer where no control sits above it: the controls
+  // come later in the hero, so they're on top and keep every click meant for them.
+  const layer = useRef<HTMLDivElement>(null);
+  const reactions = useValley(layer, { elevation, clouds: fx.clouds, rain: sky.rain });
   return (
-    <>
-      <Landscape sky={sky} at={at} choreography={choreography} paused={paused} />
+    <div ref={layer} className="absolute inset-0">
+      <Landscape
+        sky={sky}
+        at={at}
+        choreography={choreography}
+        paused={paused}
+        reactions={reactions}
+      />
       <Particles
         sky={sky}
-        effects={effects(sky)}
+        effects={fx}
         elevation={elevation}
         landLight={skyMix(elevation).landLight}
         paused={paused}
       />
-    </>
+    </div>
   );
 }

@@ -145,7 +145,28 @@ in `.claude/rules/styling.md`. UI components still never use a colour literal.
   brightens slightly on hover and, when pressed, scales to `0.92` (round icon
   buttons such as Send) or `0.97` (wide buttons such as "Back to live
   Glasgow") for 80ms. Secondary buttons are `border`-outlined pills
-  ("Download CV", "Contact"). Never a 3D edge or a drop shadow.
+  ("Download CV", "Contact"), each with a 16px line icon before its words: a
+  sheet with a folded corner and an envelope. Never a 3D edge or a drop
+  shadow.
+- **Gestures on hover.** With a mouse, a button answers the pointer with a
+  small gesture on a spring (section 11), about 0.3s, back to rest:
+
+  | Button              | Gesture                                                                                                              |
+  | ------------------- | -------------------------------------------------------------------------------------------------------------------- |
+  | Gear                | Turns a sixth of a turn and springs back a little past rest                                                          |
+  | Theme (sun)         | The rays stretch and the sun turns 20°                                                                               |
+  | Theme (moon)        | The moon rocks and a small four-point star by it twinkles                                                            |
+  | Sound (on)          | The speaker's two waves pulse outwards, the inner one first                                                          |
+  | Sound (off)         | The X shakes, like "shh"                                                                                             |
+  | Language (EN/ES)    | The letters flip half over, like an airport board's flap, and back                                                   |
+  | Weather chip        | Its icon moves with the weather: the sun turns, a cloud drifts, the drop falls, the snowflake turns, the haar slides |
+  | Send                | The arrow nudges up 3px                                                                                              |
+  | Suggested questions | Rise 2px and settle; the chat's cow tilts towards the one under the pointer                                          |
+  | Download CV         | The sheet's corner folds out, as if the CV were coming out                                                           |
+  | Contact             | The envelope's flap opens                                                                                            |
+  | Check sources       | The answer's citation numbers hop, one after another                                                                 |
+
+  A disabled button has no gesture.
 
 ## 5. Layout
 
@@ -397,7 +418,10 @@ come from Glasgow (below); the gear lets visitors set them (section 8).
 - **The weather chip** reads "Glasgow · 15:04 · 9°C · Drizzle" on desktop,
   "9°C · Drizzle" on mobile and "9°C" below 400px, in Glasgow's time. Its
   accessible name always holds the whole weather. It's a button that opens
-  the gear's panel.
+  the gear's panel. From 640px, a 16px line icon comes before the words: the
+  sun for a clear sky (clouds 0–1), the sun behind a cloud for a few or some
+  clouds (2–4), a cloud for more, a drop for rain, a snowflake for snow and
+  three lines for haar. Below 640px the row of buttons has no room for it.
 
 ### Particles
 
@@ -444,12 +468,57 @@ feet on `y = 0`).
 - The assistant's cow doesn't appear in the landscape: its head is far bigger
   than the herd and would break the scale. It lives only in the chat.
 
+### The valley notices the pointer
+
+The glen answers a pointer on it, as decoration only: nothing is conveyed by
+it, none of it is announced, and the landscape stays `aria-hidden` and
+`pointer-events: none`. A layer under the hero's controls listens instead,
+turns each point into the scene's own units (`src/lib/scene/valley.ts`), and
+the controls, above it, keep every click meant for them. With a mouse:
+
+- **The midges chase you.** Where midges are shown (summer, still and dry), a
+  pointer near their cloud draws it after the pointer, at most 150 units from
+  home, for up to 3s; then it drifts back on its spring and won't chase again
+  for 2s. Out of season, `?sky=summer,15:00` on a preview shows them.
+- **The herd looks at you.** A pointer resting near a cow's head for 0.4s
+  makes it hold its grazing and turn its head towards the pointer, up to 20°
+  up. The calf takes a small step towards it. It lets go 1.5s after the
+  pointer leaves.
+- **The cottage:** hovering it sends an extra puff of smoke from the chimney,
+  in any season, and while its windows are lit (the sun below the horizon)
+  one flickers like a candle being lit.
+- **The pines** sway once more, on a spring, as the pointer passes through
+  their crowns.
+
+With a mouse or a finger, a tap being a `click`, which fires only when the
+finger didn't move, so scrolling past the hero never sets anything off:
+
+- **A shooting star:** at night (the sun at or below −6°, the theme's night)
+  with a clear sky (clouds at most 1, no rain), a click on the sky sends one
+  streak across it, one at a time. An easter egg, never announced.
+- **Nessie.** Five taps on the loch within ten seconds bring her up, at most
+  once a visit: a head on a long neck and two humps, in the moment's `tree`
+  colour with a `lochhi` eye
+  ([`docs/design/nessie.svg`](docs/design/nessie.svg)), about 34 units long,
+  smaller than the herd's cows. She rises near the loch's left end (x 470,
+  moved in if the hero is too narrow to show it), glides 40 units to the
+  right and sinks again, in about 4s, with a ring where she rose. Only taps
+  count, and they show nothing until she rises: the loch never answers the
+  pointer otherwise, neither a tap nor a mouse passing over it. No hint and
+  no sound.
+
+With reduced motion none of it happens. The springs' animations hold while
+the tab is hidden, like the CSS ones, and the chase stops with the frames.
+
 ### Performance
 
 - The scene is server-rendered inline SVG. The first paint has the right
-  season, time and theme; JavaScript only adds the clock, the weather and the
-  gear.
-- Only `transform` and `opacity` animate, and only with CSS.
+  season, time and theme; JavaScript only adds the clock, the weather, the
+  gear and the valley's answers to the pointer.
+- Only `transform` and `opacity` animate: with CSS for the loops, the
+  shooting star and Nessie, and with the Web Animations API or one style a
+  frame for what follows the pointer on a spring (the midges, a cow's head, a
+  brushed pine).
 - All animations pause (`animation-play-state: paused`) while the tab is
   hidden.
 - The hero has a fixed height, so nothing shifts when the weather or the fonts
@@ -551,6 +620,11 @@ through.
 - Its two front hooves are part of its drawing on the edge: two rounded
   shapes, 17 × 11px, in its darkest brown (`strand`), 26px in from each side
   and 17px up from its bottom at 132px, scaled with it on a phone.
+- **It notices the pointer.** With a mouse anywhere on the page, it tilts a
+  little towards it, up to 5°, around its chin as its own tilts turn, and
+  without ever turning its head; over a suggested question, towards that
+  question, up to 8°. A spring moves it (section 11), on top of whatever
+  its state is doing, except when it's sorry, when its head stays down.
 - It's a button labelled "Pat the cow", for the tap. The tap and hover are
   extras; nothing depends on them.
 - With reduced motion it's a still drawing in every state.
@@ -632,21 +706,45 @@ text, in both languages, in the pull request that adds it.
 
 ## 11. Motion
 
-| What                                    | Duration                                                                                                       | Easing                                             |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| UI colours on a theme change            | 0.6s                                                                                                           | `ease`                                             |
-| Theme toggle (sunset or sunrise)        | 1.7s                                                                                                           | Section 6                                          |
-| Theme change at Glasgow's dusk          | about 6s                                                                                                       | Same choreography, stretched                       |
-| Landscape colours (time, weather)       | 1.1s                                                                                                           | `ease`                                             |
-| The visitor's bubble appears            | 0.5s                                                                                                           | `cubic-bezier(.3, 1.5, .5, 1)` (a small overshoot) |
-| Source chips rise                       | 0.45s, 80ms apart                                                                                              | `cubic-bezier(.3, 1.4, .5, 1)`                     |
-| A claim opens                           | 0.35s                                                                                                          | `ease`                                             |
-| Each word as an answer types itself out | 0.2s fade; about 150 characters a second, faster when more than about 0.6s behind                              | `ease`                                             |
-| Button press                            | 80ms                                                                                                           | `ease`                                             |
-| The gear spins in                       | 0.6s, 2s after the entrance                                                                                    | Spring-like overshoot, then 3 pulses               |
-| Clouds cross the sky                    | 1700 units in 120–190s, over a 2900-unit loop (205–324s)                                                       | `linear`                                           |
-| Particles, before the wind              | Leaves 7–11s, petals 8–12s, rain 0.6–0.9s and snow 6–10s a fall; midges buzz in 1.2–2s, glints twinkle in 2–4s | `linear` falls; sways and twinkles `ease-in-out`   |
-| The herd's loops                        | 11s, 16s, 19s                                                                                                  | `ease-in-out`                                      |
+| What                                                        | Duration                                                                                                       | Easing                                             |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| UI colours on a theme change                                | 0.6s                                                                                                           | `ease`                                             |
+| Theme toggle (sunset or sunrise)                            | 1.7s                                                                                                           | Section 6                                          |
+| Theme change at Glasgow's dusk                              | about 6s                                                                                                       | Same choreography, stretched                       |
+| Landscape colours (time, weather)                           | 1.1s                                                                                                           | `ease`                                             |
+| The visitor's bubble appears                                | 0.5s                                                                                                           | `cubic-bezier(.3, 1.5, .5, 1)` (a small overshoot) |
+| Source chips rise                                           | 0.45s, 80ms apart                                                                                              | `cubic-bezier(.3, 1.4, .5, 1)`                     |
+| A claim opens                                               | 0.35s                                                                                                          | `ease`                                             |
+| Each word as an answer types itself out                     | 0.2s fade; about 150 characters a second, faster when more than about 0.6s behind                              | `ease`                                             |
+| Button press                                                | 80ms                                                                                                           | `ease`                                             |
+| The gear spins in                                           | 0.6s, 2s after the entrance                                                                                    | Spring-like overshoot, then 3 pulses               |
+| Clouds cross the sky                                        | 1700 units in 120–190s, over a 2900-unit loop (205–324s)                                                       | `linear`                                           |
+| Particles, before the wind                                  | Leaves 7–11s, petals 8–12s, rain 0.6–0.9s and snow 6–10s a fall; midges buzz in 1.2–2s, glints twinkle in 2–4s | `linear` falls; sways and twinkles `ease-in-out`   |
+| The herd's loops                                            | 11s, 16s, 19s                                                                                                  | `ease-in-out`                                      |
+| A button's gesture on hover                                 | About 0.3s, back to rest                                                                                       | A spring (section 11, "Springs")                   |
+| The chat's cow and a herd cow's head turning to the pointer | About 0.4s to settle                                                                                           | A spring                                           |
+| The midges chasing the pointer                              | Up to 3s, then home in about 0.9s                                                                              | A spring                                           |
+| A pine brushed by the pointer                               | About 0.3s                                                                                                     | A spring                                           |
+| A shooting star                                             | 0.9s                                                                                                           | `ease-out`                                         |
+| Nessie rises, glides and sinks                              | About 4s                                                                                                       | `ease-in-out`                                      |
+| A window flickering like a candle                           | 0.8s                                                                                                           | `ease-in-out`                                      |
+
+### Springs
+
+What answers the pointer moves on a spring, not a fixed curve: it's pushed
+and springs back, as on Josh Comeau's blog, where the idea ("boop") comes
+from. The spring is our own small one (`src/lib/spring.ts`), with a
+stiffness, a damping and a mass. A gesture samples it into keyframes for the
+Web Animations API (`src/components/ui/boop.ts`), so it settles back to rest
+in about 0.3s, with a little overshoot where it says so; what follows the
+pointer steps the same spring once a frame.
+
+- **Only with a mouse.** A gesture on hover plays only for a pointer that
+  hovers (`(hover: hover) and (pointer: fine)`), never on a tap, and a
+  gesture still running isn't restarted. Nessie and the shooting star answer
+  a tap as well (section 7).
+- Only `transform` and `opacity` move, and no gesture makes a sound.
+- With reduced motion none of it plays.
 
 ### Entrance
 
@@ -712,7 +810,9 @@ With `prefers-reduced-motion: reduce`:
   instantly;
 - answer text appears as it arrives, without typing itself out or fading;
   sources appear without rising;
-- the gear appears without spinning or pulsing.
+- the gear appears without spinning or pulsing;
+- no gesture on hover, the cow doesn't follow the pointer, the valley
+  doesn't answer it, and Nessie never rises.
 
 ## 12. Sound
 
@@ -784,6 +884,8 @@ centred and the background left exactly as it is: no blur, no fade.
 
 ## 14. CV and contact
 
+- **Both buttons have an icon** before their words, a sheet with a folded
+  corner and an envelope, which move on hover (section 4).
 - **"Download CV"** downloads the Software Engineer version of Julian's CV
   **without his phone number or email address**, with LinkedIn, GitHub and
   this site as contact. Julian provides the PDF; it never contains private
@@ -845,12 +947,16 @@ from. Nothing in it is imported by the app.
 | `landscape-palettes.json` | The five sky moments, the land per season, the cloud table, the cows' and particles' colours             |
 | `assistant-cow.svg`       | The assistant, with its part groups and its keyframes; the idle loop runs when you open it               |
 | `herd-cow.svg`            | One cow from the herd, grazing                                                                           |
+| `nessie.svg`              | Nessie as she shows above the loch, the waterline on y 0                                                 |
 
-Open the SVGs in a browser to see them animate.
+Open `highland-scene.svg`, `assistant-cow.svg` and `herd-cow.svg` in a browser
+to see them animate. `nessie.svg` is still: her rise and glide live only in
+`src/styles/landscape.css`.
 
 ## 17. Not in this design
 
-- Clicking a falling leaf to hear it crunch. Particles never take clicks.
+- Clicking a falling leaf to hear it crunch. Particles never take clicks:
+  the midges follow the pointer's position (section 7), not a click.
 - A babbling voice while the cow talks.
 - Special dates (Halloween, Bonfire Night, Christmas). The season mechanism
   allows them later.

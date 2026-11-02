@@ -15,14 +15,16 @@ type Props = {
  * The particles over the hero, in their own layer: leaves, petals, rain and
  * snow fall across it and fade out from 34% to 70% of its height, so they
  * never fall over the name or the chat; midges hover over the loch and frost
- * glints on the meadow, where the scene has them. Decoration only. The
+ * glints on the meadow, where the scene has them. Decoration only: a mouse
+ * can draw the midges after it, but nothing here takes a click. The
  * motion lives in src/styles/landscape.css; with reduced motion there are
  * none.
  */
 export function Particles({ sky, effects, elevation, landLight, paused }: Props) {
   const all = particlesFor({ sky, effects, elevation, landLight });
   const falling = all.filter(({ kind }) => kind !== "midge" && kind !== "glint");
-  const resting = all.filter(({ kind }) => kind === "midge" || kind === "glint");
+  const midges = all.filter(({ kind }) => kind === "midge");
+  const glints = all.filter(({ kind }) => kind === "glint");
 
   return (
     <div
@@ -40,8 +42,16 @@ export function Particles({ sky, effects, elevation, landLight, paused }: Props)
           />
         ))}
       </div>
-      {resting.map((particle) => (
-        <span key={particle.key} className={`particle ${particle.kind}`} style={style(particle)} />
+      {/* The midges' cloud moves as one after a mouse (use-valley.ts). */}
+      {midges.length > 0 && (
+        <div className="midge-cloud">
+          {midges.map((particle) => (
+            <span key={particle.key} className="particle midge" style={style(particle)} />
+          ))}
+        </div>
+      )}
+      {glints.map((particle) => (
+        <span key={particle.key} className="particle glint" style={style(particle)} />
       ))}
     </div>
   );
