@@ -479,8 +479,6 @@ the controls, above it, keep every click meant for them. With a mouse:
   pointer near their cloud draws it after the pointer, at most 150 units from
   home, for up to 3s; then it drifts back on its spring and won't chase again
   for 2s. Out of season, `?sky=summer,15:00` on a preview shows them.
-- **Ripples on the loch:** passing over the water rings it with the rain's
-  own rings, at most every 0.6s.
 - **The herd looks at you.** A pointer resting near a cow's head for 0.4s
   makes it hold its grazing and turn its head towards the pointer, up to 20°
   up. The calf takes a small step towards it. It lets go 1.5s after the
@@ -494,7 +492,6 @@ the controls, above it, keep every click meant for them. With a mouse:
 With a mouse or a finger, a tap being a `click`, which fires only when the
 finger didn't move, so scrolling past the hero never sets anything off:
 
-- **Ripples on the loch** where it's tapped.
 - **A shooting star:** at night (the sun at or below −6°, the theme's night)
   with a clear sky (clouds at most 1, no rain), a click on the sky sends one
   streak across it, one at a time. An easter egg, never announced.
@@ -505,8 +502,9 @@ finger didn't move, so scrolling past the hero never sets anything off:
   smaller than the herd's cows. She rises near the loch's left end (x 470,
   moved in if the hero is too narrow to show it), glides 40 units to the
   right and sinks again, in about 4s, with a ring where she rose. Only taps
-  count: a mouse sweeping over the loch ripples it too, and would bring her
-  up by accident. No hint and no sound.
+  count, and they show nothing until she rises: the loch never answers the
+  pointer otherwise, neither a tap nor a mouse passing over it. No hint and
+  no sound.
 
 With reduced motion none of it happens. The springs' animations hold while
 the tab is hidden, like the CSS ones, and the chase stops with the frames.
@@ -517,9 +515,9 @@ the tab is hidden, like the CSS ones, and the chase stops with the frames.
   season, time and theme; JavaScript only adds the clock, the weather, the
   gear and the valley's answers to the pointer.
 - Only `transform` and `opacity` animate: with CSS for the loops, the
-  touched loch's rings, the shooting star and Nessie, and with the Web
-  Animations API or one style a frame for what follows the pointer on a
-  spring (the midges, a cow's head, a brushed pine).
+  shooting star and Nessie, and with the Web Animations API or one style a
+  frame for what follows the pointer on a spring (the midges, a cow's head, a
+  brushed pine).
 - All animations pause (`animation-play-state: paused`) while the tab is
   hidden.
 - The hero has a fixed height, so nothing shifts when the weather or the fonts
@@ -726,7 +724,6 @@ text, in both languages, in the pull request that adds it.
 | The chat's cow and a herd cow's head turning to the pointer | About 0.4s to settle                                                                                           | A spring                                           |
 | The midges chasing the pointer                              | Up to 3s, then home in about 0.9s                                                                              | A spring                                           |
 | A pine brushed by the pointer                               | About 0.3s                                                                                                     | A spring                                           |
-| Rings where the loch is touched                             | 1.6s each, three 0.25s apart                                                                                   | `ease-out`                                         |
 | A shooting star                                             | 0.9s                                                                                                           | `ease-out`                                         |
 | Nessie rises, glides and sinks                              | About 4s                                                                                                       | `ease-in-out`                                      |
 | A window flickering like a candle                           | 0.8s                                                                                                           | `ease-in-out`                                      |
@@ -743,8 +740,8 @@ pointer steps the same spring once a frame.
 
 - **Only with a mouse.** A gesture on hover plays only for a pointer that
   hovers (`(hover: hover) and (pointer: fine)`), never on a tap, and a
-  gesture still running isn't restarted. The loch's ripples, Nessie and the
-  shooting star answer a tap as well (section 7).
+  gesture still running isn't restarted. Nessie and the shooting star answer
+  a tap as well (section 7).
 - Only `transform` and `opacity` move, and no gesture makes a sound.
 - With reduced motion none of it plays.
 

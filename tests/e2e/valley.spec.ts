@@ -95,16 +95,15 @@ test("with a mouse, hovering the theme toggle or a suggestion plays its gesture"
   }
 });
 
-test("tapping the loch ripples it, and five taps bring Nessie up once a visit", async ({
+test("five taps on the loch bring Nessie up once a visit, and show nothing before", async ({
   page,
 }) => {
   await page.goto("/?sky=autumn,15:00");
   const scene = page.locator("svg.landscape");
-  await tapLoch(page, 1);
-  await expect(scene.locator(".ripple-at").first()).toBeAttached();
+  await tapLoch(page, 4);
   await expect(scene.locator(".nessie")).toHaveCount(0);
 
-  await tapLoch(page, 4);
+  await tapLoch(page, 1);
   await expect(scene.locator(".nessie")).toHaveCount(1);
   // She rises, glides and sinks in about 4s, then leaves the drawing.
   await expect(scene.locator(".nessie")).toHaveCount(0, { timeout: 6000 });
@@ -150,11 +149,10 @@ test.describe("with reduced motion", () => {
     }
   });
 
-  test("taps on the loch bring no ripples and no Nessie", async ({ page }) => {
+  test("taps on the loch bring no Nessie", async ({ page }) => {
     await page.goto("/?sky=autumn,15:00");
     await tapLoch(page, 5);
     const scene = page.locator("svg.landscape");
-    await expect(scene.locator(".ripple-at")).toHaveCount(0);
     await expect(scene.locator(".nessie")).toHaveCount(0);
   });
 });

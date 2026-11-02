@@ -146,7 +146,7 @@ export function Landscape({ sky, at, choreography, paused, reactions = NO_REACTI
         <HaarBand band={1} />
       </g>
       <g className="enter-loch">
-        <Loch ripples={reactions.ripples} nessie={reactions.nessie} />
+        <Loch nessie={reactions.nessie} />
       </g>
       <g className="enter-near">
         <Meadow />

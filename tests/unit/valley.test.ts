@@ -17,7 +17,7 @@ import {
   scenePoint,
   shootingStarAllowed,
   visibleSpan,
-  watchRipple,
+  watchTap,
   windowsLit,
 } from "../../src/lib/scene/valley";
 
@@ -152,11 +152,11 @@ describe("shootingStarAllowed", () => {
 });
 
 describe("Nessie", () => {
-  function tapAt(times: number[], start: NessieWatch = NESSIE_ASLEEP, by: "tap" | "hover" = "tap") {
+  function tapAt(times: number[], start: NessieWatch = NESSIE_ASLEEP) {
     let watch = start;
     const rises: number[] = [];
     for (const time of times) {
-      const next = watchRipple(watch, time, by);
+      const next = watchTap(watch, time);
       watch = next.watch;
       if (next.rise) rises.push(time);
     }
@@ -171,12 +171,6 @@ describe("Nessie", () => {
 
   it("doesn't rise for five taps spread over more than ten seconds", () => {
     expect(tapAt([0, 3000, 6000, 9000, 12_000]).rises).toEqual([]);
-  });
-
-  it("never rises for ripples a mouse makes passing over the loch", () => {
-    const sweep = Array.from({ length: 20 }, (_, index) => index * 600);
-    expect(tapAt(sweep, NESSIE_ASLEEP, "hover").rises).toEqual([]);
-    expect(tapAt(sweep, NESSIE_ASLEEP, "hover").watch).toEqual(NESSIE_ASLEEP);
   });
 
   it("rises only once a visit", () => {

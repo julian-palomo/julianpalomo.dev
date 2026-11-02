@@ -186,19 +186,13 @@
 .landscape .ripples {
   opacity: var(--ripples);
 }
-.landscape .ripples circle,
-.landscape .ripple-at circle {
+.landscape .ripples circle {
   fill: none;
   stroke: var(--lochhi);
   stroke-width: 1;
   transform-box: fill-box;
   transform-origin: center;
 }
-/* The pointer's ripples (use-valley.ts) only show while they play. */
-.landscape .ripple-at circle {
-  opacity: 0;
-}
-
 /* Nessie (Nessie.tsx): under the water until she rises, and her ring unseen. */
 .landscape .nessie-body {
   fill: var(--tree);
@@ -526,18 +520,9 @@
     animation-play-state: paused;
   }
 
-  /* What the pointer sets off (DESIGN.md section 7): the rain's rings where
-     it touched the water, an extra puff from the chimney, a shooting star,
-     and Nessie's 4s visit (NESSIE.ms in src/lib/scene/valley.ts). */
-  .landscape .ripple-at circle {
-    animation: landscape-ripple 1.6s ease-out both;
-  }
-  .landscape .ripple-at circle:nth-child(2) {
-    animation-delay: 0.25s;
-  }
-  .landscape .ripple-at circle:nth-child(3) {
-    animation-delay: 0.5s;
-  }
+  /* What the pointer sets off (DESIGN.md section 7): an extra puff from the
+     chimney, a shooting star, and Nessie's 4s visit (NESSIE.ms in
+     src/lib/scene/valley.ts), with the rain's ring where she rises. */
   .landscape .smoke.puff {
     animation: landscape-smoke 2s ease-out both;
   }

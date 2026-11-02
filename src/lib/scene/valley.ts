@@ -220,17 +220,12 @@ export type NessieWatch = { taps: readonly number[]; risen: boolean };
 export const NESSIE_ASLEEP: NessieWatch = { taps: [], risen: false };
 
 /**
- * One more ripple on the loch at `now`, from a tap (or click) or a mouse
- * passing over the water. Only taps count: a mouse sweeping over the loch
- * ripples it every 0.6s, and would bring her up by accident. She rises once
- * a visit; after that taps are only ripples.
+ * One more tap (or click) on the loch's water at `now`. Five within ten
+ * seconds bring her up, once a visit; after that a tap does nothing. Only
+ * taps count: the loch never answers a mouse passing over it.
  */
-export function watchRipple(
-  watch: NessieWatch,
-  now: number,
-  by: "tap" | "hover",
-): { watch: NessieWatch; rise: boolean } {
-  if (watch.risen || by === "hover") return { watch, rise: false };
+export function watchTap(watch: NessieWatch, now: number): { watch: NessieWatch; rise: boolean } {
+  if (watch.risen) return { watch, rise: false };
   const taps = [...watch.taps.filter((at) => now - at < NESSIE.withinMs), now];
   if (taps.length >= NESSIE.taps) return { watch: { taps: [], risen: true }, rise: true };
   return { watch: { taps, risen: false }, rise: false };

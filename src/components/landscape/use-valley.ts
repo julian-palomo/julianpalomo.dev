@@ -18,7 +18,7 @@ import {
   shootingStarAllowed,
   unitPx,
   visibleSpan,
-  watchRipple,
+  watchTap,
   windowsLit,
 } from "../../lib/scene/valley";
 import {
@@ -36,7 +36,6 @@ import { isMouseHover, motionReduced } from "../ui/boop";
 export type Spot = { id: number; x: number; y: number };
 
 export type Reactions = {
-  ripples: readonly Spot[];
   star: Spot | null;
   nessie: Spot | null;
   /** Counts up with each puff of the cottage's chimney; 0 before the first. */
@@ -46,7 +45,6 @@ export type Reactions = {
 };
 
 export const NO_REACTIONS: Reactions = {
-  ripples: [],
   star: null,
   nessie: null,
   puff: 0,
@@ -56,10 +54,6 @@ export const NO_REACTIONS: Reactions = {
 /** What the scene shows now, which decides the shooting star and the candle. */
 type Scene = { elevation: number; clouds: number; rain: number };
 
-// A mouse over the loch ripples it at most this often.
-const HOVER_RIPPLE_MS = 600;
-// A ripple's three rings: 1.6s each, the last starting 0.5s in (landscape.css).
-const RIPPLE_MS = 2100;
 const STAR_MS = 900;
 // A pointer resting this long near a cow gets its attention; it lets go this long after.
 const NOTICE_MS = 400;
@@ -95,11 +89,10 @@ function settleTo(element: Element, from: number, to: number, frame: (value: num
  * The valley noticing the pointer (DESIGN.md section 7): listens on `layer`,
  * the hero's landscape under its controls, and says what to draw. Taps on
  * the loch and the sky are `click`s, which only fire when a finger didn't
- * move, so scrolling past the hero never ripples it. Everything else answers
+ * move, so scrolling past the hero never counts as a tap. Everything else answers
  * only a mouse. Nothing at all with reduced motion.
  */
 export function useValley(layer: RefObject<HTMLElement | null>, scene: Scene): Reactions {
-  const [ripples, setRipples] = useState<readonly Spot[]>([]);
   const [star, setStar] = useState<Spot | null>(null);
   const [nessie, setNessie] = useState<Spot | null>(null);
   const [puff, setPuff] = useState(0);
@@ -140,14 +133,10 @@ export function useValley(layer: RefObject<HTMLElement | null>, scene: Scene): R
     // The sky: above the meadow, and on no hill or mountain.
     const onSky = (point: Point) => point.y < 230 && !covers(".land", point);
 
-    // ── Ripples and Nessie ──
+    // ── Nessie: taps on the water show nothing until she rises ──
     let watch: NessieWatch = NESSIE_ASLEEP;
-    let lastHoverRipple = 0;
-    function ripple(point: Point, by: "tap" | "hover") {
-      const spot = { id: ids++, ...point };
-      setRipples((all) => [...all, spot]);
-      later(() => setRipples((all) => all.filter(({ id }) => id !== spot.id)), RIPPLE_MS);
-      const next = watchRipple(watch, performance.now(), by);
+    function tapLoch() {
+      const next = watchTap(watch, performance.now());
       watch = next.watch;
       if (!next.rise) return;
       setNessie({ id: ids++, x: nessieX(visibleSpan(box())), y: NESSIE.y });
@@ -169,7 +158,7 @@ export function useValley(layer: RefObject<HTMLElement | null>, scene: Scene): R
     function click(event: MouseEvent) {
       if (motionReduced()) return;
       const point = scenePoint(box(), event.clientX, event.clientY);
-      if (onLoch(point)) ripple(point, "tap");
+      if (onLoch(point)) tapLoch();
       else if (onSky(point)) shootingStar(point);
     }
 
@@ -333,10 +322,6 @@ export function useValley(layer: RefObject<HTMLElement | null>, scene: Scene): R
       moveFrame = 0;
       const point = latest;
       if (!point) return;
-      if (onLoch(point) && performance.now() - lastHoverRipple >= HOVER_RIPPLE_MS) {
-        lastHoverRipple = performance.now();
-        ripple(point, "hover");
-      }
       cottage(point);
       pines(point, movingRight);
       herd(point);
@@ -381,5 +366,5 @@ export function useValley(layer: RefObject<HTMLElement | null>, scene: Scene): R
     };
   }, [layer]);
 
-  return { ripples, star, nessie, puff, noticed };
+  return { star, nessie, puff, noticed };
 }

@@ -2,18 +2,16 @@ import { Nessie } from "./Nessie";
 import type { Spot } from "./use-valley";
 
 type Props = {
-  /** Rings where the pointer touched the water, the rain's own (DESIGN.md section 7). */
-  ripples: readonly Spot[];
-  /** Where Nessie rises, while she's up. */
+  /** Where Nessie rises, while she's up (DESIGN.md section 7). */
   nessie: Spot | null;
 };
 
 /**
  * The loch, its shimmer and the sun's reflection, the islet with its ruined
- * tower, and rain ripples; and, only while they last, the pointer's ripples
- * and Nessie, so the still drawing never has them.
+ * tower, and rain ripples; and Nessie, only while she's up, so the still
+ * drawing never has her.
  */
-export function Loch({ ripples, nessie }: Props) {
+export function Loch({ nessie }: Props) {
   return (
     <>
       <path
@@ -42,13 +40,6 @@ export function Loch({ ripples, nessie }: Props) {
         <circle cx="640" cy="256" r="6" />
         <circle cx="820" cy="246" r="6" />
       </g>
-      {ripples.map(({ id, x, y }) => (
-        <g key={id} className="ripple-at" transform={`translate(${x} ${y})`}>
-          <circle r="6" />
-          <circle r="6" />
-          <circle r="6" />
-        </g>
-      ))}
       {nessie && <Nessie key={nessie.id} x={nessie.x} />}
     </>
   );
