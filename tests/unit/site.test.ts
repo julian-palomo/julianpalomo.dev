@@ -9,6 +9,7 @@ describe("pageTitle", () => {
   it("puts the page first on any other page", () => {
     expect(pageTitle("Experience")).toBe(`Experience · ${site.name}`);
     expect(pageTitle("Projects")).toBe(`Projects · ${site.name}`);
+    expect(pageTitle("How it's built")).toBe(`How it's built · ${site.name}`);
   });
 
   it("treats a blank page label as the home page", () => {

@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { QUESTION_TEXT_DAYS } from "../../lib/analytics/events";
 import { MAX_VISITOR_TEXT } from "../../lib/bot/limits";
 import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
@@ -164,7 +165,7 @@ export function Composer({
         a 390 × 844 phone (tests/e2e/entrance.spec.ts). There the line ends the
         chat instead, just above the fixed composer; from lg it sits under it. */}
       <p className="enter-chat-later text-[12.5px] text-muted lg:-mt-4">
-        {t(locale, "questionsKept")}
+        {t(locale, "questionsKept")(QUESTION_TEXT_DAYS)}
       </p>
     </>
   );

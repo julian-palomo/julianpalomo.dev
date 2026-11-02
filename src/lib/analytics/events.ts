@@ -8,6 +8,12 @@
 import { z } from "zod";
 import { MAX_VISITOR_TEXT } from "../bot/limits";
 
+/**
+ * How long a question's text is kept, in days. The composer's notice and the
+ * How it's built page say it, so they read it from here.
+ */
+export const QUESTION_TEXT_DAYS = 90;
+
 /** At most this many events per page load: the client stops recording, and the server stops storing. */
 export const MAX_EVENTS_PER_LOAD = 100;
 

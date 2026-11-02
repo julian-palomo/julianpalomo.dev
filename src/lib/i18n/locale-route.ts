@@ -2,7 +2,7 @@ import { redirect } from "@tanstack/react-router";
 import { rootLanguage } from "./root-language";
 
 /** The routes that exist in both languages, at the same path with `/es` in front. */
-type LocaleRoute = "/{-$locale}" | "/{-$locale}/projects";
+type LocaleRoute = "/{-$locale}" | "/{-$locale}/projects" | "/{-$locale}/how-its-built";
 
 /**
  * A route's `beforeLoad`: an English URL sends a visitor whose `lang` cookie

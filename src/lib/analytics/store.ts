@@ -3,7 +3,7 @@
  * under the per-load cap, and the retention. Server only: endpoint.ts is the
  * one importer.
  */
-import { type AnalyticsEvent, MAX_EVENTS_PER_LOAD } from "./events";
+import { type AnalyticsEvent, MAX_EVENTS_PER_LOAD, QUESTION_TEXT_DAYS } from "./events";
 
 /**
  * The part of D1's binding this module uses (prepare, bind, first, run,
@@ -33,8 +33,6 @@ export function isEventsDb(value: unknown): value is EventsDb {
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-/** How long a question's text is kept. */
-const QUESTION_TEXT_DAYS = 90;
 /** How long an event is kept. */
 const EVENT_MONTHS = 13;
 

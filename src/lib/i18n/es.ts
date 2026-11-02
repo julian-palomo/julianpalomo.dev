@@ -50,8 +50,8 @@ export const es: Messages = {
   fromJulian: "de Julián",
   newAnswer: "Nueva respuesta ↓",
   composerHint: "Intro para enviar · Mayús+Intro para una línea nueva",
-  questionsKept:
-    "Las preguntas se guardan de forma anónima durante 90 días para mejorar el asistente.",
+  questionsKept: (days) =>
+    `Las preguntas se guardan de forma anónima durante ${days} días para mejorar el asistente.`,
   answering: "Respondiendo…",
   answerLabel: "Respuesta",
   sourcesLabel: "Fuentes",
@@ -197,6 +197,105 @@ export const es: Messages = {
 
   pagesLabel: "Páginas",
   projectsTitle: "Proyectos",
+  howItsBuiltTitle: "Cómo está hecha",
+  howItsBuilt: {
+    lead: "Los asistentes de IA a veces se inventan cosas, y las dicen con mucha seguridad. Este está hecho para que no pueda inventarse mi experiencia. Te cuento cómo, en palabras sencillas.",
+    whatItDoes: "Qué hace",
+    cow: {
+      title: "Una vaca que solo sabe lo que he comprobado",
+      body: "Esta web tiene un asistente: una vaca de las Highlands a la que puedes preguntar por mi experiencia. No busca en internet. Solo puede leer una lista de datos sobre mí que he escrito y comprobado uno a uno, como un currículum con mi firma al lado de cada línea.",
+    },
+    sources: {
+      title: "Siempre enseña de dónde lo ha sacado",
+      body: "Debajo de una respuesta puedes abrir sus fuentes: los datos exactos que ha usado y el día en que confirmé cada uno. Si intenta citar un dato que no ha consultado para esa respuesta, la web no lo acepta y no muestra ninguna fuente para él.",
+    },
+    exam: {
+      title: "Hace un examen antes de cada cambio",
+      body: 'Tengo una lista de preguntas, algunas con trampa, como "¿entonces era el jefe de ingeniería?" cuando fui el líder técnico. Cada vez que cambio cómo responde, la vaca hace el examen y otra IA corrige sus respuestas frase a frase. Hay unas pocas preguntas que siempre tiene que acertar: si falla una de ellas, no acepto el cambio.',
+    },
+    limits: {
+      title: "Con límites, y con respeto",
+      body: (questions, days) =>
+        `Cada visitante puede hacer ${questions} preguntas al día, y la web entera tiene un tope de gasto diario, para que los costes no se disparen. Para contar tus preguntas, la web no guarda tu dirección IP, solo un código hecho a partir de ella que cambia cada día. Las estadísticas de visitas no usan ni eso. Las preguntas se guardan de forma anónima durante ${days} días para mejorar el asistente.`,
+    },
+    valley: {
+      title: "Un valle de verdad",
+      body: "El paisaje de arriba está en directo. La estación sigue el calendario, el sol está a la altura a la que está ahora mismo sobre Glasgow, y el tiempo es el de Glasgow de la última media hora. Si allí llueve, aquí también.",
+    },
+    howIBuiltIt: "Cómo la hice",
+    buildFlow: {
+      plan: "Un plan",
+      tasks: "Tareas pequeñas",
+      sessions: "Sesiones de programación",
+      reviewers: "Dos revisores de IA",
+      mailbox: "Buzón",
+      supervisor: "Supervisor",
+      me: "Yo: decido",
+    },
+    answerFlow: {
+      question: "Tu pregunta",
+      limits: "Límites diarios",
+      model: "Claude",
+      tools: "Datos confirmados",
+      check: "Comprobación de citas",
+      answer: "Respuesta + fuentes",
+    },
+    flowAlt:
+      "El dibujo muestra el flujo: un plan se convierte en tareas pequeñas; cada tarea va a su propia sesión de programación; dos revisores de IA leen el cambio; un buzón despierta al supervisor, que lo revisa; y yo decido si entra.",
+    steps: [
+      {
+        title: "Hecha con ayuda de la IA, pero con reglas",
+        body: "Hice esta web con la ayuda de Claude, una IA de la empresa Anthropic, y de Claude Code, su asistente para escribir código. Le di reglas por escrito: puede proponer cambios, pero solo yo los acepto, y solo yo puedo aprobar una línea sobre mi experiencia.",
+      },
+      {
+        title: "Primero, un plan",
+        body: "Antes de escribir código, preparé el plan con Claude: fases (los datos, el asistente, su examen, el diseño…) y, en cada fase, tareas pequeñas, cada una escrita como una petición clara en GitHub, la web donde vive el código.",
+      },
+      {
+        title: "Un asistente de programación por tarea",
+        body: "Varias sesiones de Claude Code trabajan a la vez en mi ordenador, cada una en su propia tarea y en su propia copia del código, para que nunca se pisen.",
+      },
+      {
+        title: "Dos revisores en cada cambio",
+        body: "Antes de que un cambio me llegue, dos revisores de IA lo leen: uno comprueba que se cumplen las reglas del proyecto, y el otro que la documentación sigue diciendo la verdad.",
+      },
+      {
+        title: "Un supervisor que ve el conjunto",
+        body: "Conversaciones con Claude en la app de Claude supervisan el trabajo. Llevan notas de todo el proyecto, de sus decisiones y de cómo me gusta hacer las cosas, así que revisan cada plan y cada cambio con más contexto que la sesión que lo escribió.",
+      },
+      {
+        title: "Buzones entre ellos",
+        body: 'Se comunican por buzones: peticiones especiales en GitHub que nunca se aceptan, donde una sesión de programación deja una nota corta, como "plan listo" o "cambio listo", que despierta a su supervisor.',
+      },
+      {
+        title: "Decido yo",
+        body: "No se construye nada hasta que su plan está aprobado, solo yo puedo confirmar un dato sobre mí, y solo yo acepto un cambio en la web.",
+      },
+    ],
+    forDevelopers: "Para desarrolladores",
+    developersIntro: "La parte técnica, con enlaces a los documentos del propio repositorio.",
+    diagramLabel: "Cómo se responde una pregunta",
+    diagramSteps: [
+      "La pregunta llega al servidor, a POST /api/chat.",
+      "Se comprueban los límites del día en Cloudflare D1, por visitante y para toda la web.",
+      "Claude responde, con herramientas de solo lectura que devuelven solo claims confirmados.",
+      "La comprobación de citas solo acepta una cita si una herramienta devolvió ese claim para esta respuesta.",
+      "La respuesta llega por streaming con citas numeradas y sus fuentes.",
+    ],
+    docsHeading: "En el repositorio",
+    docs: [
+      { label: "Cómo se responde una pregunta", path: "docs/architecture.md" },
+      { label: "Las evals: casos, juez y umbrales", path: "docs/evals.md" },
+      { label: "Las reglas de los claims", path: ".claude/rules/claims.md" },
+      { label: "AGENTS.md: las reglas que sigue cada agente", path: "AGENTS.md" },
+      { label: "El flujo de trabajo y los buzones", path: "AGENTS.md#2-workflow" },
+      {
+        label: "La configuración de Claude Code: reglas, hooks, skills y revisores",
+        path: ".claude/README.md",
+      },
+      { label: "Las decisiones (ADRs)", path: "docs/adr/README.md" },
+    ],
+  },
   askTheCow: "← Pregunta a la vaca",
   anythingElse: "¿Algo más? Pregúntame",
   projectShots: {

@@ -64,7 +64,8 @@ export const en = {
   newAnswer: "New answer ↓",
   composerHint: "Enter to send · Shift+Enter for a new line",
   // Under the composer: what happens to a question (docs/analytics.md).
-  questionsKept: "Questions are kept anonymously for 90 days to improve the assistant.",
+  questionsKept: (days: number) =>
+    `Questions are kept anonymously for ${days} days to improve the assistant.`,
   // Announced to screen readers when an answer starts.
   answering: "Answering…",
   answerLabel: "Answer",
@@ -223,6 +224,109 @@ export const en = {
   // The inner pages (DESIGN.md section 18) and the links to them.
   pagesLabel: "Pages",
   projectsTitle: "Projects",
+  howItsBuiltTitle: "How it's built",
+  // The How it's built page (DESIGN.md section 18), for readers who don't
+  // program. Every sentence is true to the code and the docs; the numbers
+  // come from the code.
+  howItsBuilt: {
+    lead: "AI assistants sometimes make things up, and say them with great confidence. This one is built so it can't make up my experience. Here's how, in plain words.",
+    whatItDoes: "What it does",
+    cow: {
+      title: "A cow that only knows what I've checked",
+      body: "This site has an assistant: a Highland cow you can ask about my experience. It doesn't search the internet. It can only read a list of facts about me that I've written and checked one by one, like a CV with my signature next to every line.",
+    },
+    sources: {
+      title: "It always shows where it got it from",
+      body: "Under an answer you can open its sources: the exact facts it used, and the day I confirmed each one. If it tries to cite a fact it didn't look up for that answer, the site doesn't accept it, and no source is shown for it.",
+    },
+    exam: {
+      title: "It takes an exam before every change",
+      body: 'I keep a set of questions, some of them tricky, like "so he was the engineering manager?" when I was the technical lead. Whenever I change how it answers, the cow takes the exam, and another AI marks its answers sentence by sentence. A few questions are ones it must always get right: if it gets one of those wrong, I don\'t accept the change.',
+    },
+    limits: {
+      title: "With limits, and with respect",
+      body: (questions: number, days: number) =>
+        `Each visitor can ask ${questions} questions a day, and the whole site has a daily spending cap, so costs can't run away. To count your questions, the site doesn't keep your IP address, only a code made from it that changes every day. The visit counts don't use even that. Questions are kept anonymously for ${days} days to improve the assistant.`,
+    },
+    valley: {
+      title: "A real valley",
+      body: "The landscape at the top is live. The season follows the calendar, the sun sits at the height it really has over Glasgow right now, and the weather is Glasgow's, from the last half hour. If it's raining there, it's raining here.",
+    },
+    howIBuiltIt: "How I built it",
+    // The words in the two drawings.
+    buildFlow: {
+      plan: "A plan",
+      tasks: "Small tasks",
+      sessions: "Programming sessions",
+      reviewers: "Two AI reviewers",
+      mailbox: "Mailbox",
+      supervisor: "Supervisor",
+      me: "Me: I decide",
+    },
+    answerFlow: {
+      question: "Your question",
+      limits: "Daily limits",
+      model: "Claude",
+      tools: "Confirmed facts",
+      check: "Citation check",
+      answer: "Answer + sources",
+    },
+    flowAlt:
+      "The drawing shows the flow: a plan becomes small tasks; each task goes to its own programming session; two AI reviewers read the change; a mailbox wakes the supervisor, who reviews it; and I decide whether it goes in.",
+    steps: [
+      {
+        title: "Made with AI's help, but with rules",
+        body: "I built this site with the help of Claude, an AI made by the company Anthropic, and Claude Code, its assistant for writing code. I gave it written rules: it can propose changes, but only I accept them, and only I can approve a line about my experience.",
+      },
+      {
+        title: "A plan first",
+        body: "Before any code, I worked out the plan with Claude: phases (the facts, the assistant, its exam, the design…), and in each phase small tasks, each written as a clear request on GitHub, the website where the code lives.",
+      },
+      {
+        title: "One programming assistant per task",
+        body: "Several Claude Code sessions work at the same time on my computer, each on its own task and in its own copy of the code, so they never step on each other.",
+      },
+      {
+        title: "Two reviewers on every change",
+        body: "Before a change reaches me, two AI reviewers read it: one checks that the project's rules are kept, the other that the documentation still tells the truth.",
+      },
+      {
+        title: "A supervisor who sees the whole picture",
+        body: "Conversations with Claude in the Claude app supervise the work. They keep notes on the whole project, its decisions and how I like things done, so they review each plan and each change with more context than the session that wrote it.",
+      },
+      {
+        title: "Mailboxes between them",
+        body: 'They talk through mailboxes: special requests on GitHub that are never accepted, where a programming session leaves a short note, like "plan ready" or "change ready", that wakes its supervisor.',
+      },
+      {
+        title: "I decide",
+        body: "Nothing is built until its plan is approved, only I can confirm a fact about me, and only I accept a change into the site.",
+      },
+    ],
+    forDevelopers: "For developers",
+    developersIntro: "The technical side, with links to the repository's own documents.",
+    diagramLabel: "How a question is answered",
+    diagramSteps: [
+      "The question reaches the server, at POST /api/chat.",
+      "Today's limits are checked in Cloudflare D1, per visitor and for the whole site.",
+      "Claude answers, with read-only tools that return only confirmed claims.",
+      "The citation check keeps a citation only if a tool returned that claim for this answer.",
+      "The answer streams back with numbered citations and its sources.",
+    ],
+    docsHeading: "In the repository",
+    docs: [
+      { label: "How a question is answered", path: "docs/architecture.md" },
+      { label: "The evals: cases, judge and thresholds", path: "docs/evals.md" },
+      { label: "The rules for claims", path: ".claude/rules/claims.md" },
+      { label: "AGENTS.md: the rules every agent follows", path: "AGENTS.md" },
+      { label: "The workflow and the mailboxes", path: "AGENTS.md#2-workflow" },
+      {
+        label: "The Claude Code setup: rules, hooks, skills and reviewers",
+        path: ".claude/README.md",
+      },
+      { label: "The decisions (ADRs)", path: "docs/adr/README.md" },
+    ],
+  },
   askTheCow: "← Ask the cow",
   anythingElse: "Anything else? Ask me",
   // What each screenshot on the Projects page shows (src/components/projects/shots.ts).
