@@ -37,6 +37,11 @@ type ThemeState = {
   /** The theme follows the visitor's own sky from the gear, not their choice or Glasgow. */
   fromToy: boolean;
   toggle: () => void;
+  /**
+   * "Back to live Glasgow": ends playing with the sky and any theme choice,
+   * so the page shows Glasgow's own sky and theme (DESIGN.md section 8).
+   */
+  backToLive: () => void;
 };
 
 const ThemeContext = createContext<ThemeState | null>(null);
@@ -61,14 +66,14 @@ export function ThemeDocument({ initialChoice, lang, children }: Props) {
   // as the cookie's Max-Age does. It ends when Glasgow comes round to the same
   // theme, so its end never changes the theme on screen.
   const chosen = choice !== null && now < choice.until ? choice.theme : null;
-  // While playing, the visitor's own sky sets the theme (night is dark), and
-  // the choice is left alone for when they go back to live.
+  // While playing, the visitor's own sky sets the theme (night is dark). The
+  // choice is kept meanwhile, and going back to live ends it (backToLive).
   const toyTheme = playTheme(play, now);
   const theme = toyTheme ?? chosen ?? glasgowTheme;
 
   // The theme changed without a press of the toggle: Glasgow's dusk or dawn
   // arrived while it follows Glasgow, or the panel moved the sky (or the
-  // visitor left it). The toggle marks its own change.
+  // visitor left it). The toggle and backToLive mark their own change.
   const [previous, setPrevious] = useState({ theme, toy: toyTheme !== null });
   const [toggled, setToggled] = useState(false);
   if (previous.theme !== theme) {
@@ -105,9 +110,33 @@ export function ThemeDocument({ initialChoice, lang, children }: Props) {
     setToggled(true);
   };
 
+  const backToLive = () => {
+    dispatch({ type: "backToLive" });
+    // Only a stored choice is forgotten: with none, the cookies stay as they are.
+    if (choice !== null) {
+      forgetChoice(THEME_COOKIE);
+      setChoice(null);
+    }
+    // Glasgow's theme replaces whatever was on screen. A change it brings is
+    // the panel's, 600ms; unmarked it would read as Glasgow's dusk or dawn,
+    // 6s. No change, no mark, so the next real change isn't swallowed.
+    if (glasgowTheme !== theme) {
+      setChange({ kind: "panel" });
+      setToggled(true);
+    }
+  };
+
   return (
     <ThemeContext
-      value={{ theme, choice: chosen, glasgowTheme, change, fromToy: toyTheme !== null, toggle }}
+      value={{
+        theme,
+        choice: chosen,
+        glasgowTheme,
+        change,
+        fromToy: toyTheme !== null,
+        toggle,
+        backToLive,
+      }}
     >
       <html lang={lang} data-theme={theme} data-theme-change={change?.kind}>
         {children}

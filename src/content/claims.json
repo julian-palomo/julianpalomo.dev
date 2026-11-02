@@ -40,6 +40,22 @@
     "confirmedByJulian": "2026-11-02"
   },
   {
+    "id": "profile-learning",
+    "label": "Learning",
+    "text": "Keen to learn the languages and tools a role needs: when I haven't used one yet, I learn it.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "profile-python",
+    "label": "Python",
+    "text": "I have never used Python. I'd be glad to learn it for a role: I find it an interesting language.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
     "id": "cazoo-role",
     "label": "Role",
     "text": "Senior Frontend Engineer at Motors, the company behind the UK car marketplace Motors.co.uk, which bought the Cazoo brand in 2024 and rebranded as Cazoo in 2026; Glasgow, UK, remote, July 2022 – August 2026.",
@@ -119,6 +135,96 @@
     "org": "Cazoo",
     "source": "cv",
     "confirmedByJulian": "2026-10-27"
+  },
+  {
+    "id": "cazoo-navigation",
+    "label": "Site navigation",
+    "text": "Rebuilt the site header and navigation in both web apps: moved the monolith's header from server-rendered views to React with GA4 click tracking, then built the 2025 navigation redesign in the monolith and the Next.js app (desktop dropdown, mobile menu, focus trap and scroll lock, crawlable mobile links for SEO).",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-http-layer",
+    "label": "Typed fetch layer",
+    "text": "Built a shared, typed HTTP and error-handling layer for the monolith (fetch wrapper, error guards, request runner, handling of duplicate requests, form errors), rolled it out across the codebase and removed the old helpers.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-breakpoints",
+    "label": "Responsive breakpoints",
+    "text": "Replaced scattered screen-width checks in the monolith with a single breakpoint hook and naming convention across the vehicle page, search results, gallery and shortlist.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-dead-code",
+    "label": "Dead-code cleanup",
+    "text": "Set up Knip in the monolith and wrote scripts that find orphaned tests, stylesheets, views and unused LESS classes, then used them to remove dead code across 160+ files.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-sentry",
+    "label": "Sentry",
+    "text": "Added Sentry error monitoring to the Motors web apps: wrote the decision record proposing it, set up initialisation and error fallbacks, added a React error boundary, and cut noise from third-party scripts with a URL allow-list.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-ga4-lists",
+    "label": "GA4 list tracking",
+    "text": "Added GA4 e-commerce list tracking to the monolith: view_item_list and select_item events from result cards, the shortlist, recently viewed, recent searches and recommendations, with item and ad positions.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-pnpm",
+    "label": "npm → pnpm",
+    "text": "Moved the monolith from npm to pnpm, including the CI pipeline, and reworked how linting runs in CI.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-adrs",
+    "label": "Decision records",
+    "text": "Wrote several architecture decision records for the Motors web apps with help from colleagues, among them the ones proposing pnpm (2023) and Sentry (2025).",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-seo-pages",
+    "label": "Make and model pages",
+    "text": "Worked on the Next.js make and model SEO pages: built a new search-bar widget and in-page navigation, fixed the heading structure and condensed the model pages.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-dealer-squad",
+    "label": "Dealer squad",
+    "text": "Worked in the dealer squad before moving to the customer squad.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
   },
   {
     "id": "format-role",
@@ -479,5 +585,95 @@
     "org": "julianpalomo.dev",
     "source": "julian",
     "confirmedByJulian": "2026-10-29"
+  },
+  {
+    "id": "site-citations",
+    "label": "Citations",
+    "text": "Every fact an answer uses shows as a numbered citation that opens the claim as I confirmed it, with the date I confirmed it. A citation only counts if the assistant looked that fact up while answering, and the model never sees the confirmation date.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "site-bilingual",
+    "label": "English and Spanish",
+    "text": "In English at / and in Spanish at /es, with Spanish by default for visitors in Spain. Each claim is written once, in English, and the assistant answers in the visitor's language, or in the page's when the question doesn't make it clear.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "site-prompt-caching",
+    "label": "Prompt caching",
+    "text": "The system prompt and the tools are cached with one prompt-cache breakpoint; the page's language goes in a second, uncached system message, so visitors in English and Spanish share the same cached prompt.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "site-weather-proxy",
+    "label": "Weather through the Worker",
+    "text": "Glasgow's live weather comes from Open-Meteo through the site's own Worker, so a visitor's IP never reaches Open-Meteo. The forecast is cached for 30 minutes, and it needs no API key and no cron.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "site-no-key-in-browser",
+    "label": "No key in the browser",
+    "text": "The Anthropic API key is read only on the server. A Playwright test checks that neither the key's variable name nor the claims' confirmation field appears in the browser bundle, and the end-to-end tests run against a production build in demo mode, so they never call the model.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "site-accessibility",
+    "label": "Accessibility",
+    "text": "The chat works from the keyboard: citations and the sources list are buttons with aria-expanded. Screen readers hear each answer once, whole, and with prefers-reduced-motion nothing moves that does not have to: no entrance, no herd or cow animation, no typing effect.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "site-cow",
+    "label": "The Highland cow",
+    "text": "The assistant is an animated Highland cow that follows the chat: it listens while you type, chews while it looks things up, talks while the answer types itself out and lowers its head when something goes wrong. On a first visit the page introduces itself in order: who I am, the glen waking up, then the cow.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "site-decisions",
+    "label": "Decision records",
+    "text": "Every decision that shapes the project is written down as an architecture decision record, and every visual change starts in a design document (DESIGN.md).",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "site-agent-workflow",
+    "label": "Parallel agent sessions",
+    "text": "Several Claude Code sessions work in parallel, each in its own git worktree. GitHub issues are the spec, each plan is posted on its issue and reviewed before any code, a second Claude session reviews the pull requests, and only I merge.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "site-sharing",
+    "label": "Link previews",
+    "text": "A shared link shows a preview card in its language, drawn with the site's own components; search engines get a sitemap and a schema.org Person.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
   }
 ]

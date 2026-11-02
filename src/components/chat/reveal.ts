@@ -6,10 +6,10 @@
 import { hideTrailingPartialMarker } from "./chat-view";
 
 /** Characters a second the answer types itself out at. */
-export const REVEAL_CPS = 60;
+export const REVEAL_CPS = 150;
 
 /** How far behind what has arrived, in seconds of typing, the reveal may fall before it speeds up. */
-export const MAX_LAG_S = 1.5;
+export const MAX_LAG_S = 0.6;
 
 /**
  * Where the reveal may stop in the answer's text: the end of each word. A

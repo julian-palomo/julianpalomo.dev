@@ -21,6 +21,7 @@ import { SkyPanel } from "../../components/play/SkyPanel";
 import { SiteFooter } from "../../components/SiteFooter";
 import { SoundProvider } from "../../components/sound/Sound";
 import { SoundToggle } from "../../components/sound/SoundToggle";
+import { useTheme } from "../../components/theme/Theme";
 import { ThemeToggle } from "../../components/theme/ThemeToggle";
 import { parseRef } from "../../lib/analytics/events";
 import { localeFromParam } from "../../lib/i18n/locale";
@@ -132,7 +133,8 @@ function Page() {
   // An override is a fixed scene, so it doesn't wait for the real weather.
   const weather = useLiveWeather(override === null);
   const now = useNow();
-  const { state: play, dispatch } = usePlay();
+  const { state: play } = usePlay();
+  const { backToLive } = useTheme();
   const [panel, setPanel] = useState<PanelState>({ open: false, position: null });
 
   // After the first question a phone gets the compact bar, and the page
@@ -177,7 +179,7 @@ function Page() {
                       onOpen={openPanel}
                       onBackToLive={() => {
                         track({ name: "toy", which: "back_to_live" });
-                        dispatch({ type: "backToLive" });
+                        backToLive();
                       }}
                     />
                   </div>
@@ -222,7 +224,7 @@ function Page() {
           >
             <Chat onStarted={start} />
           </main>
-          <CvAndContact className="mt-10 px-4 sm:px-6 lg:hidden" />
+          <CvAndContact className="mt-10 justify-center px-4 sm:px-6 lg:hidden" />
           <SiteFooter className="lg:col-start-2 lg:col-end-4 lg:px-0" />
           <SkyPanel
             open={panel.open}
