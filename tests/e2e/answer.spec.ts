@@ -131,6 +131,42 @@ test("Keep asking offers the suggestions not asked yet", async ({ page }) => {
   await expect(more).not.toContainText("What is Form:at?");
 });
 
+/**
+ * For each row of a wrapped list, the gap between the list's left edge and
+ * the row's first item, and between the row's last item and the list's right
+ * edge.
+ */
+function rowGaps(list: import("@playwright/test").Locator) {
+  return list.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    const rows = new Map<number, { left: number; right: number }>();
+    for (const item of element.children) {
+      const at = item.getBoundingClientRect();
+      const top = Math.round(at.top);
+      const row = rows.get(top) ?? { left: at.left, right: at.right };
+      rows.set(top, { left: Math.min(row.left, at.left), right: Math.max(row.right, at.right) });
+    }
+    return [...rows.values()].map((row) => ({
+      left: row.left - box.left,
+      right: box.right - row.right,
+    }));
+  });
+}
+
+for (const width of [390, 1280]) {
+  test(`the suggestions are centred, every wrapped row, at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    const first = page.getByRole("list", { name: "Suggested questions" });
+    await expect(first.getByRole("button")).toHaveCount(3);
+    for (const gap of await rowGaps(first)) expect(Math.abs(gap.left - gap.right)).toBeLessThan(2);
+
+    await first.getByRole("button", { name: "What is Form:at?" }).click();
+    const more = page.getByRole("list", { name: "Keep asking" });
+    await expect(more.getByRole("button")).toHaveCount(3);
+    for (const gap of await rowGaps(more)) expect(Math.abs(gap.left - gap.right)).toBeLessThan(2);
+  });
+}
+
 test("scrolling up while an answer streams shows the New answer pill", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 500 });
   await ask(page, "What has Julian worked on?");

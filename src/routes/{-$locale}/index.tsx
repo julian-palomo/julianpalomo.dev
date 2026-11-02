@@ -222,7 +222,7 @@ function Page() {
           >
             <Chat onStarted={start} />
           </main>
-          <CvAndContact className="mt-10 px-4 sm:px-6 lg:hidden" />
+          <CvAndContact className="mt-10 justify-center px-4 sm:px-6 lg:hidden" />
           <SiteFooter className="lg:col-start-2 lg:col-end-4 lg:px-0" />
           <SkyPanel
             open={panel.open}

@@ -8,12 +8,15 @@ type Props = {
   onPick: (question: string, from: DOMRect) => void;
 };
 
-/** Questions to start with, or to keep asking, sent as an ordinary message. */
+/**
+ * Questions to start with, or to keep asking, sent as an ordinary message.
+ * Centred, wrapped rows too (DESIGN.md section 10).
+ */
 export function Suggestions({ label, heading, questions, onPick }: Props) {
   return (
     <div className="flex flex-col gap-2">
-      {heading && <p className="text-[12.5px] font-semibold text-muted">{heading}</p>}
-      <ul aria-label={label} className="flex flex-wrap gap-2">
+      {heading && <p className="text-center text-[12.5px] font-semibold text-muted">{heading}</p>}
+      <ul aria-label={label} className="flex flex-wrap justify-center gap-2">
         {questions.map((question) => (
           <li key={question}>
             <button
