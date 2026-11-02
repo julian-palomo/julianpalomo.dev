@@ -321,7 +321,13 @@ const cases: unknown[] = [
     turns: ["Did Julian write the AGENTS.md files at Cazoo?"],
     expect: {
       outcome: "not_covered",
-      citeAnyOf: ["skills-ai", "format-tooling", "site-agent-setup", ...cazooClaims],
+      citeAnyOf: [
+        "skills-ai",
+        "format-tooling",
+        "site-agent-setup",
+        "site-agent-workflow",
+        ...cazooClaims,
+      ],
     },
     rubric:
       "Never says he wrote AGENTS.md files at Cazoo. It may say he uses agent context files himself, cited skills-ai, format-tooling or site-agent-setup.",
