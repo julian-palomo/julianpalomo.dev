@@ -83,6 +83,48 @@ test("a filled-in form is sent and thanks the visitor", async ({ page }) => {
   await expect(page.locator(".edge-lift")).toHaveAttribute("data-state", "satisfied");
 });
 
+/** Counts the sounds started, leaving out the one-sample buffer Howler starts to unlock audio. */
+async function countSounds(page: Page) {
+  await page.addInitScript(() => {
+    const counted = window as unknown as { soundsStarted: number };
+    counted.soundsStarted = 0;
+    const { start } = AudioBufferSourceNode.prototype;
+    AudioBufferSourceNode.prototype.start = function (...args) {
+      if ((this.buffer?.length ?? 0) > 1) counted.soundsStarted += 1;
+      return start.apply(this, args);
+    };
+  });
+}
+
+const soundsStarted = (page: Page) =>
+  page.evaluate(() => (window as unknown as { soundsStarted: number }).soundsStarted);
+
+/** Sends a filled-in form once the entrance is over, so the tap that opens it makes no moo of its own. */
+async function sendMessage(page: Page) {
+  await page.goto("/");
+  await expect(page.locator("[data-entrance]")).toHaveCount(0);
+  await openContact(page);
+  await fillIn(page);
+  await expect(dialog(page).locator('[name="cf-turnstile-response"]')).toHaveValue(/DUMMY/);
+  await dialog(page).getByRole("button", { name: "Send message" }).click();
+  await expect(dialog(page).getByRole("status")).toBeVisible();
+}
+
+test("with sound on, a sent message makes the cow moo once, then lick", async ({ page }) => {
+  await countSounds(page);
+  await sendMessage(page);
+  await expect.poll(() => soundsStarted(page)).toBe(1);
+  await expect(page.locator(".edge-lift")).toHaveAttribute("data-state", "satisfied");
+});
+
+test("with sound off, a sent message only licks", async ({ page, context }) => {
+  await context.addCookies([{ name: "sound", value: "off", url: "http://localhost:4173" }]);
+  await countSounds(page);
+  await sendMessage(page);
+  await expect(page.locator(".edge-lift")).toHaveAttribute("data-state", "satisfied");
+  expect(await soundsStarted(page)).toBe(0);
+});
+
 test("an invalid email shows its field's error and sends nothing", async ({ page }) => {
   const sent: string[] = [];
   page.on("request", (request) => {

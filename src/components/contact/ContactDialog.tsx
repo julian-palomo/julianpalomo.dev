@@ -10,6 +10,7 @@ import {
 import { sendContact } from "../../lib/contact/server";
 import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
+import { useSoundEffects } from "../sound/Sound";
 import { useTheme } from "../theme/Theme";
 import { Button } from "../ui/Button";
 import { CloseIcon } from "../ui/CloseIcon";
@@ -48,6 +49,7 @@ export function ContactDialog({ open, siteKey, onClose, onSent }: Props) {
   const titleId = useId();
   const locale = useLocale();
   const { theme } = useTheme();
+  const { play } = useSoundEffects();
   const [fields, setFields] = useState<Fields>(EMPTY);
   const [website, setWebsite] = useState("");
   const [touched, setTouched] = useState<Record<ContactField, boolean>>({
@@ -119,7 +121,10 @@ export function ContactDialog({ open, siteKey, onClose, onSent }: Props) {
     else setStatus({ state: "failed", code });
   }
 
+  // Everything that happens when a message goes, in one place: the chat's
+  // cow moos (when sound is on, under the moo's 3s rule) and licks its lips.
   function onSuccess() {
+    play("moo");
     setStatus({ state: "sent" });
     setFields(EMPTY);
     setTouched({ name: false, email: false, message: false });
