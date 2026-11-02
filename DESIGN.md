@@ -145,7 +145,28 @@ in `.claude/rules/styling.md`. UI components still never use a colour literal.
   brightens slightly on hover and, when pressed, scales to `0.92` (round icon
   buttons such as Send) or `0.97` (wide buttons such as "Back to live
   Glasgow") for 80ms. Secondary buttons are `border`-outlined pills
-  ("Download CV", "Contact"). Never a 3D edge or a drop shadow.
+  ("Download CV", "Contact"), each with a 16px line icon before its words: a
+  sheet with a folded corner and an envelope. Never a 3D edge or a drop
+  shadow.
+- **Gestures on hover.** With a mouse, a button answers the pointer with a
+  small gesture on a spring (section 11), about 0.3s, back to rest:
+
+  | Button              | Gesture                                                                                                              |
+  | ------------------- | -------------------------------------------------------------------------------------------------------------------- |
+  | Gear                | Turns a sixth of a turn and springs back a little past rest                                                          |
+  | Theme (sun)         | The rays stretch and the sun turns 20°                                                                               |
+  | Theme (moon)        | The moon rocks and a small four-point star by it twinkles                                                            |
+  | Sound (on)          | The speaker's two waves pulse outwards, the inner one first                                                          |
+  | Sound (off)         | The X shakes, like "shh"                                                                                             |
+  | Language (EN/ES)    | The letters flip half over, like an airport board's flap, and back                                                   |
+  | Weather chip        | Its icon moves with the weather: the sun turns, a cloud drifts, the drop falls, the snowflake turns, the haar slides |
+  | Send                | The arrow nudges up 3px                                                                                              |
+  | Suggested questions | Rise 2px and settle; the chat's cow tilts towards the one under the pointer                                          |
+  | Download CV         | The sheet's corner folds out, as if the CV were coming out                                                           |
+  | Contact             | The envelope's flap opens                                                                                            |
+  | Check sources       | The answer's citation numbers hop, one after another                                                                 |
+
+  A disabled button has no gesture.
 
 ## 5. Layout
 
@@ -396,7 +417,10 @@ come from Glasgow (below); the gear lets visitors set them (section 8).
 - **The weather chip** reads "Glasgow · 15:04 · 9°C · Drizzle" on desktop,
   "9°C · Drizzle" on mobile and "9°C" below 400px, in Glasgow's time. Its
   accessible name always holds the whole weather. It's a button that opens
-  the gear's panel.
+  the gear's panel. From 640px, a 16px line icon comes before the words: the
+  sun for a clear sky (clouds 0–1), the sun behind a cloud for a few or some
+  clouds (2–4), a cloud for more, a drop for rain, a snowflake for snow and
+  three lines for haar. Below 640px the row of buttons has no room for it.
 
 ### Particles
 
@@ -849,6 +873,8 @@ centred and the background left exactly as it is: no blur, no fade.
 
 ## 14. CV and contact
 
+- **Both buttons have an icon** before their words, a sheet with a folded
+  corner and an envelope, which move on hover (section 4).
 - **"Download CV"** downloads the Software Engineer version of Julian's CV
   **without his phone number or email address**, with LinkedIn, GitHub and
   this site as contact. Julian provides the PDF; it never contains private

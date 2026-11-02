@@ -2,10 +2,23 @@ import { useNavigate } from "@tanstack/react-router";
 import { rememberChoice } from "../../lib/cookie";
 import { LANG_COOKIE, type Locale, paramFromLocale } from "../../lib/i18n/locale";
 import { t } from "../../lib/i18n/t";
+import { springs } from "../../lib/spring";
 import { useTrack } from "../analytics/Analytics";
 import { useSoundEffects } from "../sound/Sound";
+import { boopOnHover } from "../ui/boop";
 import { IconButton } from "../ui/IconButton";
 import { useLocale } from "./useLocale";
+
+// On hover the letters flip half over, like an airport board's flap, and back.
+const onHover = boopOnHover({
+  parts: [
+    {
+      part: "flap",
+      spring: springs.hop,
+      frame: (value) => ({ transform: `rotateX(${80 * value}deg)` }),
+    },
+  ],
+});
 
 /** Moves to the other language's page, keeping the conversation, and remembers the choice. */
 export function LanguageToggle() {
@@ -25,8 +38,16 @@ export function LanguageToggle() {
 
   // `lang` is the other language's, which the label is written in.
   return (
-    <IconButton look="glass" label={label} lang={other} onClick={switchLanguage}>
-      <span className="font-display text-[13px] font-bold">{short}</span>
+    <IconButton
+      look="glass"
+      label={label}
+      lang={other}
+      onPointerEnter={onHover}
+      onClick={switchLanguage}
+    >
+      <span data-boop="flap" className="inline-block font-display text-[13px] font-bold">
+        {short}
+      </span>
     </IconButton>
   );
 }

@@ -10,7 +10,7 @@ import { type Curve, kick, type Spring } from "../../lib/spring";
  */
 
 type Part = {
-  /** The `data-boop` name of what moves, inside the element hovered (or `within`). */
+  /** The `data-boop` name of what moves: the element hovered, or what's inside it (or `within`). */
   part: string;
   /** Its keyframe at the spring's value: 0 at rest, 1 at the furthest. */
   frame: (value: number) => Keyframe;
@@ -53,12 +53,16 @@ export function motionReduced(): boolean {
 export function boopOnHover(gesture: Gesture) {
   return (event: PointerEvent<Element>) => {
     if (!isMouseHover(event) || motionReduced()) return;
+    // A disabled button has nothing to offer, so it doesn't invite a press.
+    if (event.currentTarget.matches(":disabled")) return;
     const root = gesture.within ? event.currentTarget.closest(gesture.within) : event.currentTarget;
     if (!root) return;
     for (const { part, frame, spring, stagger = 0 } of gesture.parts) {
       const { values, durationMs } = curveOf(spring);
       const keyframes = values.map(frame);
-      root.querySelectorAll(`[data-boop="${part}"]`).forEach((element, index) => {
+      const selector = `[data-boop="${part}"]`;
+      const targets = root.matches(selector) ? [root] : [...root.querySelectorAll(selector)];
+      targets.forEach((element, index) => {
         // A gesture still running finishes as it is; it never jumps back to start.
         if (element.getAnimations().some((animation) => animation.id === ID)) return;
         const animation = element.animate(keyframes, {

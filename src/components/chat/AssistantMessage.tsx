@@ -2,9 +2,11 @@ import { useEffect, useId, useState } from "react";
 import type { ChatUIMessage } from "../../lib/bot/chat-message";
 import { chipLabel, type Source } from "../../lib/bot/citations";
 import { t } from "../../lib/i18n/t";
+import { springs } from "../../lib/spring";
 import { useTrack } from "../analytics/Analytics";
 import { useLocale } from "../i18n/useLocale";
 import { useSoundEffects } from "../sound/Sound";
+import { boopOnHover } from "../ui/boop";
 import {
   answerAsText,
   confirmationLine,
@@ -18,6 +20,19 @@ import {
   splitIntoChunks,
   toolStatus,
 } from "./chat-view";
+
+// On hover over "Check sources", the answer's citation numbers hop, one after another.
+const onSourcesHover = boopOnHover({
+  within: "article",
+  parts: [
+    {
+      part: "cite",
+      spring: springs.hop,
+      stagger: 60,
+      frame: (value) => ({ transform: `translateY(${-3 * value}px)` }),
+    },
+  ],
+});
 
 type Props = {
   message: ChatUIMessage;
@@ -104,6 +119,7 @@ export function AssistantMessage({ message, typed }: Props) {
               aria-controls={claimId}
               onClick={() => tap({ type: "citation", number: chunk.number })}
               className={fades ? "citation answer-chunk" : "citation"}
+              data-boop="cite"
             >
               {chunk.number}
             </button>
@@ -116,6 +132,7 @@ export function AssistantMessage({ message, typed }: Props) {
             type="button"
             aria-expanded={view.list}
             aria-controls={listId}
+            onPointerEnter={onSourcesHover}
             onClick={() => tap({ type: "link" })}
             className="min-h-11 w-fit text-left text-[13px] font-medium text-accent hover:underline"
           >

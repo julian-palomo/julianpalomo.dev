@@ -29,6 +29,25 @@ function sampleTransforms(page: Page, selector: string, ms: number): Promise<str
   );
 }
 
+/** How many gestures run at once at most, every frame for `ms`, starting now. */
+function sampleGestures(page: Page, ms: number): Promise<number> {
+  return page.evaluate(
+    (ms) =>
+      new Promise<number>((resolve) => {
+        let most = 0;
+        const start = performance.now();
+        const frame = () => {
+          const running = document.getAnimations().filter(({ id }) => id === "boop").length;
+          most = Math.max(most, running);
+          if (performance.now() - start < ms) requestAnimationFrame(frame);
+          else resolve(most);
+        };
+        frame();
+      }),
+    ms,
+  );
+}
+
 /** The screen point of a point in the landscape's viewBox (−600 0 2400 320, xMidYMax slice). */
 async function onScreen(page: Page, x: number, y: number) {
   const box = await page.locator("svg.landscape").boundingBox();
@@ -59,6 +78,21 @@ test("with a mouse, hovering the gear turns it and it springs back to rest", asy
   const seen = await sampling;
   expect(seen.some((transform) => transform !== "none")).toBe(true);
   expect(seen.at(-1)).toBe("none");
+});
+
+test("with a mouse, hovering the theme toggle or a suggestion plays its gesture", async ({
+  page,
+}) => {
+  await page.goto("/?sky=autumn,15:00");
+  for (const button of [
+    page.getByRole("button", { name: /^Switch to (dark|light) theme$/ }),
+    page.locator("[data-suggestion]").first(),
+  ]) {
+    await button.hover({ trial: true });
+    const sampling = sampleGestures(page, 1000);
+    await button.hover();
+    expect(await sampling).toBeGreaterThan(0);
+  }
 });
 
 test("tapping the loch ripples it, and five taps bring Nessie up once a visit", async ({
@@ -104,6 +138,16 @@ test.describe("with reduced motion", () => {
     const sampling = sampleTransforms(page, '[data-boop="gear"]', 1000);
     await gear(page).hover();
     expect(new Set(await sampling)).toEqual(new Set(["none"]));
+
+    for (const button of [
+      page.getByRole("button", { name: /^Switch to (dark|light) theme$/ }),
+      page.locator("[data-suggestion]").first(),
+    ]) {
+      await button.hover({ trial: true });
+      const sampling = sampleGestures(page, 600);
+      await button.hover();
+      expect(await sampling).toBe(0);
+    }
   });
 
   test("taps on the loch bring no ripples and no Nessie", async ({ page }) => {

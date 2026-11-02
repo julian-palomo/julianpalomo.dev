@@ -1,8 +1,10 @@
 import { useId } from "react";
 import { t } from "../../lib/i18n/t";
+import { springs } from "../../lib/spring";
 import { useTrack } from "../analytics/Analytics";
 import { useLocale } from "../i18n/useLocale";
 import { useSoundEffects } from "../sound/Sound";
+import { boopOnHover } from "../ui/boop";
 import { IconButton } from "../ui/IconButton";
 import { useTheme } from "./Theme";
 
@@ -16,6 +18,40 @@ const rays =
   "origin-center [transform-box:fill-box] motion-safe:transition-transform motion-safe:duration-[550ms] motion-safe:ease-in-out";
 
 const RAY_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
+
+// The gesture's parts sit in groups of their own, inside the ones the theme
+// change turns and scales, so a hover never fights a press.
+const part = "origin-center [transform-box:fill-box]";
+
+// On hover the sun stretches its rays and turns a little; the moon rocks and
+// a small star by it twinkles. Both play; only the one showing is seen.
+const onHover = boopOnHover({
+  parts: [
+    {
+      part: "sun",
+      spring: springs.boop,
+      frame: (value) => ({ transform: `rotate(${20 * value}deg)` }),
+    },
+    {
+      part: "rays",
+      spring: springs.hop,
+      frame: (value) => ({ transform: `scale(${1 + 0.3 * value})` }),
+    },
+    {
+      part: "moon",
+      spring: springs.shake,
+      frame: (value) => ({ transform: `rotate(${12 * value}deg)` }),
+    },
+    {
+      part: "twinkle",
+      spring: springs.hop,
+      frame: (value) => ({
+        opacity: Math.max(0, value),
+        transform: `scale(${0.4 + 0.6 * value}) rotate(${45 * value}deg)`,
+      }),
+    },
+  ],
+});
 
 /** Switches between the light and dark themes, and remembers the choice. */
 export function ThemeToggle({ look = "glass" }: { look?: "glass" | "tint" }) {
@@ -35,6 +71,7 @@ export function ThemeToggle({ look = "glass" }: { look?: "glass" | "tint" }) {
     <IconButton
       look={look}
       label={label}
+      onPointerEnter={onHover}
       onClick={() => {
         // Only a press clicks: Glasgow's dusk and dawn change the theme in silence.
         play("theme");
@@ -50,18 +87,22 @@ export function ThemeToggle({ look = "glass" }: { look?: "glass" | "tint" }) {
           fill="none"
           stroke="currentColor"
         >
-          <circle cx="12" cy="12" r="4.5" strokeWidth="2" />
-          <g className={`${rays} ${sunRays}`} strokeWidth="2" strokeLinecap="round">
-            {RAY_ANGLES.map((angle) => (
-              <line
-                key={angle}
-                x1="12"
-                y1="2.5"
-                x2="12"
-                y2="4.5"
-                transform={`rotate(${angle} 12 12)`}
-              />
-            ))}
+          <g data-boop="sun" className={part}>
+            <circle cx="12" cy="12" r="4.5" strokeWidth="2" />
+            <g data-boop="rays" className={part}>
+              <g className={`${rays} ${sunRays}`} strokeWidth="2" strokeLinecap="round">
+                {RAY_ANGLES.map((angle) => (
+                  <line
+                    key={angle}
+                    x1="12"
+                    y1="2.5"
+                    x2="12"
+                    y2="4.5"
+                    transform={`rotate(${angle} 12 12)`}
+                  />
+                ))}
+              </g>
+            </g>
           </g>
         </svg>
         <svg
@@ -75,7 +116,16 @@ export function ThemeToggle({ look = "glass" }: { look?: "glass" | "tint" }) {
             <rect width="24" height="24" fill="white" />
             <circle cx="17" cy="7" r="6.5" fill="black" />
           </mask>
-          <circle cx="12" cy="12" r="8.5" mask={`url(#${maskId})`} />
+          <g data-boop="moon" className={part}>
+            <circle cx="12" cy="12" r="8.5" mask={`url(#${maskId})`} />
+          </g>
+          {/* The star that twinkles by the moon on hover; unseen at rest. */}
+          <path
+            data-boop="twinkle"
+            className={part}
+            opacity="0"
+            d="M19.5 1.5l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z"
+          />
         </svg>
       </span>
     </IconButton>

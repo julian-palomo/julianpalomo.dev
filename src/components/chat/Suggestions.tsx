@@ -1,3 +1,17 @@
+import { springs } from "../../lib/spring";
+import { boopOnHover } from "../ui/boop";
+
+// On hover a question rises 2px and settles back.
+const onHover = boopOnHover({
+  parts: [
+    {
+      part: "rise",
+      spring: springs.hop,
+      frame: (value) => ({ transform: `translateY(${-2 * value}px)` }),
+    },
+  ],
+});
+
 type Props = {
   /** The list's accessible name. */
   label: string;
@@ -23,6 +37,8 @@ export function Suggestions({ label, heading, questions, onPick }: Props) {
             <button
               type="button"
               data-suggestion=""
+              data-boop="rise"
+              onPointerEnter={onHover}
               onClick={(event) => onPick(question, event.currentTarget.getBoundingClientRect())}
               className="min-h-11 rounded-full border-[1.5px] border-border bg-field px-4 py-2 text-left text-sm font-medium hover:border-accent"
             >
