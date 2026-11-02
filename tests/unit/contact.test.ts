@@ -6,9 +6,10 @@ import {
   type ContactDeps,
   type ContactEmail,
   handleContact,
+  TEST_SECRET,
 } from "../../src/lib/contact/send";
 import { CONTACT_DAILY_LIMIT, type ContactStore } from "../../src/lib/contact/store";
-import { TEST_SECRET, verifyTurnstile } from "../../src/lib/contact/turnstile";
+import { verifyTurnstile } from "../../src/lib/contact/turnstile";
 
 const TO = "julian@example.com";
 const VISITOR_EMAIL = "visitor@example.org";

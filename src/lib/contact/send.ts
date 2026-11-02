@@ -11,7 +11,14 @@ import { z } from "zod";
 import { type D1Like, isD1, utcDay, visitorHash } from "../bot/usage";
 import type { ContactInput, ContactResult } from "./schema";
 import { CONTACT_DAILY_LIMIT, type ContactStore, d1ContactStore } from "./store";
-import { TEST_SECRET, verifyTurnstile } from "./turnstile";
+import { verifyTurnstile } from "./turnstile";
+
+/**
+ * Cloudflare's documented test secret, which accepts only the test site key's
+ * dummy token. Public, but kept here, in a module only the server imports,
+ * like every secret: turnstile.ts is also imported by the page.
+ */
+export const TEST_SECRET = "1x0000000000000000000000000000000AA";
 
 /** The address messages come from, on the site's own domain. */
 export const CONTACT_FROM = "hello@julianpalomo.dev";

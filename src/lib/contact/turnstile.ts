@@ -9,12 +9,11 @@ import { z } from "zod";
 export const SITE_KEY = "0x4AAAAAAFs5zd5aOe5srtgl";
 
 /**
- * Cloudflare's documented test keys, which always pass, for previews and e2e.
- * The test site key gives a dummy token that only the test secret accepts,
- * and a production secret rejects it, so they can't open the real form.
+ * Cloudflare's documented always-passing test site key, for previews and e2e.
+ * It gives a dummy token that only the test secret in send.ts accepts, and a
+ * production secret rejects it, so it can't open the real form.
  */
 export const TEST_SITE_KEY = "1x00000000000000000000AA";
-export const TEST_SECRET = "1x0000000000000000000000000000000AA";
 
 const SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const TIMEOUT_MS = 10_000;
