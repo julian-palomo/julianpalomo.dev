@@ -738,6 +738,7 @@ Sounds are **on by default**, quiet, and one tap away from off.
 | Release a slider in the gear's panel       | A soft click                                          |
 | Heavy rain (7 or more)                     | A rain loop, very low, while it lasts                 |
 | Download the CV                            | A paper rustle                                        |
+| A contact message is sent                  | The moo, then the lick                                |
 
 Only the visitor's own answers make the answer sounds: the greeting that
 types itself out in the first visit's entrance is silent, and so is a theme
@@ -786,7 +787,7 @@ centred and the background left exactly as it is: no blur, no fade.
   and limited per visitor per day like the chat. The message goes to Julian's
   email from the server; his address is a secret and never appears in the
   repo or the page. Success: "Thanks! Julian will get back to you." and the
-  cow licks, satisfied.
+  cow moos (when sound is on, section 12) and licks, satisfied.
 
 ### Sharing
 

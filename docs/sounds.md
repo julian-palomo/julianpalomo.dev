@@ -17,6 +17,7 @@ builds them into what the site plays:
 | An answer ends (its last word)                     | `answer-end`      | a slice of the sprite                 |
 | Open the sources under an answer                   | `sources`         | a slice of the sprite                 |
 | Tap the cow, or end the entrance with a tap or key | `moo`             | a slice of the sprite                 |
+| A contact message is sent                          | `moo`             | a slice of the sprite                 |
 | Theme toggle                                       | `theme`           | a slice of the sprite                 |
 | Language toggle                                    | `language`        | a slice of the sprite                 |
 | Open the gear's panel                              | `panel-open`      | a slice of the sprite                 |
