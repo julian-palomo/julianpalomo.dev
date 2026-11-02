@@ -514,9 +514,12 @@ the tab is hidden, like the CSS ones, and the chase stops with the frames.
 ### Performance
 
 - The scene is server-rendered inline SVG. The first paint has the right
-  season, time and theme; JavaScript only adds the clock, the weather and the
-  gear.
-- Only `transform` and `opacity` animate, and only with CSS.
+  season, time and theme; JavaScript only adds the clock, the weather, the
+  gear and the valley's answers to the pointer.
+- Only `transform` and `opacity` animate: with CSS for the loops, the
+  touched loch's rings, the shooting star and Nessie, and with the Web
+  Animations API or one style a frame for what follows the pointer on a
+  spring (the midges, a cow's head, a brushed pine).
 - All animations pause (`animation-play-state: paused`) while the tab is
   hidden.
 - The hero has a fixed height, so nothing shifts when the weather or the fonts
@@ -948,7 +951,9 @@ from. Nothing in it is imported by the app.
 | `herd-cow.svg`            | One cow from the herd, grazing                                                                           |
 | `nessie.svg`              | Nessie as she shows above the loch, the waterline on y 0                                                 |
 
-Open the SVGs in a browser to see them animate.
+Open `highland-scene.svg`, `assistant-cow.svg` and `herd-cow.svg` in a browser
+to see them animate. `nessie.svg` is still: her rise and glide live only in
+`src/styles/landscape.css`.
 
 ## 17. Not in this design
 
