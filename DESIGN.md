@@ -704,21 +704,29 @@ text, in both languages, in the pull request that adds it.
 
 ## 11. Motion
 
-| What                                    | Duration                                                                                                       | Easing                                             |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| UI colours on a theme change            | 0.6s                                                                                                           | `ease`                                             |
-| Theme toggle (sunset or sunrise)        | 1.7s                                                                                                           | Section 6                                          |
-| Theme change at Glasgow's dusk          | about 6s                                                                                                       | Same choreography, stretched                       |
-| Landscape colours (time, weather)       | 1.1s                                                                                                           | `ease`                                             |
-| The visitor's bubble appears            | 0.5s                                                                                                           | `cubic-bezier(.3, 1.5, .5, 1)` (a small overshoot) |
-| Source chips rise                       | 0.45s, 80ms apart                                                                                              | `cubic-bezier(.3, 1.4, .5, 1)`                     |
-| A claim opens                           | 0.35s                                                                                                          | `ease`                                             |
-| Each word as an answer types itself out | 0.2s fade; about 150 characters a second, faster when more than about 0.6s behind                              | `ease`                                             |
-| Button press                            | 80ms                                                                                                           | `ease`                                             |
-| The gear spins in                       | 0.6s, 2s after the entrance                                                                                    | Spring-like overshoot, then 3 pulses               |
-| Clouds cross the sky                    | 1700 units in 120–190s, over a 2900-unit loop (205–324s)                                                       | `linear`                                           |
-| Particles, before the wind              | Leaves 7–11s, petals 8–12s, rain 0.6–0.9s and snow 6–10s a fall; midges buzz in 1.2–2s, glints twinkle in 2–4s | `linear` falls; sways and twinkles `ease-in-out`   |
-| The herd's loops                        | 11s, 16s, 19s                                                                                                  | `ease-in-out`                                      |
+| What                                                        | Duration                                                                                                       | Easing                                             |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| UI colours on a theme change                                | 0.6s                                                                                                           | `ease`                                             |
+| Theme toggle (sunset or sunrise)                            | 1.7s                                                                                                           | Section 6                                          |
+| Theme change at Glasgow's dusk                              | about 6s                                                                                                       | Same choreography, stretched                       |
+| Landscape colours (time, weather)                           | 1.1s                                                                                                           | `ease`                                             |
+| The visitor's bubble appears                                | 0.5s                                                                                                           | `cubic-bezier(.3, 1.5, .5, 1)` (a small overshoot) |
+| Source chips rise                                           | 0.45s, 80ms apart                                                                                              | `cubic-bezier(.3, 1.4, .5, 1)`                     |
+| A claim opens                                               | 0.35s                                                                                                          | `ease`                                             |
+| Each word as an answer types itself out                     | 0.2s fade; about 150 characters a second, faster when more than about 0.6s behind                              | `ease`                                             |
+| Button press                                                | 80ms                                                                                                           | `ease`                                             |
+| The gear spins in                                           | 0.6s, 2s after the entrance                                                                                    | Spring-like overshoot, then 3 pulses               |
+| Clouds cross the sky                                        | 1700 units in 120–190s, over a 2900-unit loop (205–324s)                                                       | `linear`                                           |
+| Particles, before the wind                                  | Leaves 7–11s, petals 8–12s, rain 0.6–0.9s and snow 6–10s a fall; midges buzz in 1.2–2s, glints twinkle in 2–4s | `linear` falls; sways and twinkles `ease-in-out`   |
+| The herd's loops                                            | 11s, 16s, 19s                                                                                                  | `ease-in-out`                                      |
+| A button's gesture on hover                                 | About 0.3s, back to rest                                                                                       | A spring (section 11, "Springs")                   |
+| The chat's cow and a herd cow's head turning to the pointer | About 0.4s to settle                                                                                           | A spring                                           |
+| The midges chasing the pointer                              | Up to 3s, then home in about 0.9s                                                                              | A spring                                           |
+| A pine brushed by the pointer                               | About 0.3s                                                                                                     | A spring                                           |
+| Rings where the loch is touched                             | 1.6s each, three 0.25s apart                                                                                   | `ease-out`                                         |
+| A shooting star                                             | 0.9s                                                                                                           | `ease-out`                                         |
+| Nessie rises, glides and sinks                              | About 4s                                                                                                       | `ease-in-out`                                      |
+| A window flickering like a candle                           | 0.8s                                                                                                           | `ease-in-out`                                      |
 
 ### Springs
 
@@ -801,7 +809,9 @@ With `prefers-reduced-motion: reduce`:
   instantly;
 - answer text appears as it arrives, without typing itself out or fading;
   sources appear without rising;
-- the gear appears without spinning or pulsing.
+- the gear appears without spinning or pulsing;
+- no gesture on hover, the cow doesn't follow the pointer, the valley
+  doesn't answer it, and Nessie never rises.
 
 ## 12. Sound
 
