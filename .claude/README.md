@@ -143,4 +143,4 @@ Exit 2 = blocked (reason on stderr), exit 0 with JSON = ask, exit 0 and nothing
 
 - **What instructions loaded?** `/memory` lists the instruction files and rules in play. `/context` shows what fills the window.
 - **Did my settings load?** `/status` shows the setting sources; `claude doctor` lists entries it rejected.
-- **Test the hooks:** `pnpm test:hooks`. CI's `hooks` job runs it on every pull request, where a missing jq or Biome fails it instead of skipping cases.
+- **Test the hooks:** `pnpm test:hooks`, which also tests `wait-for-reply.sh` and `create-check.sh`. CI's `hooks` job runs it on every pull request, where a missing jq or Biome fails it instead of skipping cases.
