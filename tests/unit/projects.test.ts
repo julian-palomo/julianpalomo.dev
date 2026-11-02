@@ -1,4 +1,6 @@
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { PROJECT_SHOTS, SHOTS } from "../../src/components/projects/shots";
 import { confirmedClaims } from "../../src/lib/claims";
 import { t } from "../../src/lib/i18n/t";
 
@@ -29,5 +31,29 @@ describe("the Projects page's copy", () => {
 
   it("puts Form:at first, then julianpalomo.dev", () => {
     expect(t("en", "projects").map((project) => project.id)).toEqual(["format", "site"]);
+  });
+});
+
+describe("the Projects page's screenshots", () => {
+  it("each has its AVIF, WebP and PNG, the PNG at the size the page declares", () => {
+    for (const [name, { width, height }] of Object.entries(SHOTS)) {
+      for (const type of ["avif", "webp", "png"]) {
+        expect(existsSync(`public/images/projects/${name}.${type}`), `${name}.${type}`).toBe(true);
+      }
+      // A PNG's width and height are the 4-byte numbers at bytes 16 and 20.
+      const png = readFileSync(`public/images/projects/${name}.png`);
+      expect([png.readUInt32BE(16), png.readUInt32BE(20)], name).toEqual([width, height]);
+    }
+  });
+
+  it("each shown one has alt text in both languages, and every project has some", () => {
+    for (const project of t("en", "projects")) {
+      const rows = PROJECT_SHOTS[project.id] ?? [];
+      expect(rows.flat().length, project.id).toBeGreaterThan(0);
+      for (const name of rows.flat()) {
+        expect(t("en", "projectShots")[name]).toBeTruthy();
+        expect(t("es", "projectShots")[name]).toBeTruthy();
+      }
+    }
   });
 });

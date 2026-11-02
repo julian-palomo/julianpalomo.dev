@@ -17,6 +17,12 @@ for (const [path, messages] of [
   test(`${path} renders both projects in its language`, async ({ page }) => {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(messages.projectsTitle);
+    // The hero's row of controls, the gear included once it has spun in.
+    await expect(
+      page.getByRole("button", { name: messages.playWithTheSky, exact: true }),
+    ).toBeVisible({
+      timeout: 6000,
+    });
     const cards = page.getByRole("article");
     await expect(cards).toHaveCount(2);
     for (const [index, project] of messages.projects.entries()) {
@@ -33,6 +39,20 @@ for (const [path, messages] of [
     }
   });
 }
+
+test("every screenshot loads, with its alt text and its size", async ({ page }) => {
+  await page.goto("/projects");
+  const images = page.getByRole("article").getByRole("img");
+  await expect(images).toHaveCount(Object.keys(en.projectShots).length);
+  for (const image of await images.all()) {
+    await image.scrollIntoViewIfNeeded();
+    await expect(image).toHaveAttribute("alt", /.+/);
+    await expect(image).toHaveAttribute("width", /^\d+$/);
+    await expect
+      .poll(() => image.evaluate((element) => (element as HTMLImageElement).naturalWidth))
+      .toBeGreaterThan(0);
+  }
+});
 
 test("the head carries the page's own canonical and language links", async ({ request }) => {
   const html = await (await request.get("/es/projects")).text();

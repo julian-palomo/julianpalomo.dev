@@ -225,6 +225,18 @@ export const en = {
   projectsTitle: "Projects",
   askTheCow: "← Ask the cow",
   anythingElse: "Anything else? Ask me",
+  // What each screenshot on the Projects page shows (src/components/projects/shots.ts).
+  projectShots: {
+    "format-player":
+      "Form:at's player on a phone: the set's artwork, its waveform and the play controls",
+    "format-sets":
+      "Form:at's sets on a phone, each with buttons to save it for listening offline, share it and play it",
+    "format-events": "Form:at's events on a phone: the next one, then the past ones",
+    "format-home": "Form:at's home page on a desktop",
+    "site-home":
+      "This site's home page on a desktop: the Highland landscape, the portrait and the chat with the cow",
+    "site-home-phone": "This site's home page on a phone, at night",
+  },
   // One card per project. Each point is taken from the confirmed claim it
   // names, shortened and adding nothing (tests/unit/projects.test.ts). The
   // "why" lines are Julian's own words.

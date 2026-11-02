@@ -199,6 +199,17 @@ export const es: Messages = {
   projectsTitle: "Proyectos",
   askTheCow: "← Pregunta a la vaca",
   anythingElse: "¿Algo más? Pregúntame",
+  projectShots: {
+    "format-player":
+      "El reproductor de Form:at en un móvil: la portada del set, su forma de onda y los controles",
+    "format-sets":
+      "Los sets de Form:at en un móvil, cada uno con botones para guardarlo y escucharlo sin conexión, compartirlo y reproducirlo",
+    "format-events": "Los eventos de Form:at en un móvil: el próximo y, debajo, los anteriores",
+    "format-home": "La página de inicio de Form:at en un ordenador",
+    "site-home":
+      "La página de inicio de esta web en un ordenador: el paisaje de las Highlands, el retrato y el chat con la vaca",
+    "site-home-phone": "La página de inicio de esta web en un móvil, de noche",
+  },
   // Las líneas "why" son las palabras de Julián, tal cual.
   projects: [
     {
