@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { t } from "../../lib/i18n/t";
+import { springs } from "../../lib/spring";
 import { useEntrance } from "../entrance/Entrance";
 import { useLocale } from "../i18n/useLocale";
 import { BubbleTail } from "../ui/BubbleTail";
+import { boopOnHover } from "../ui/boop";
 import { IconButton } from "../ui/IconButton";
 
 // The gear isn't there at first: it spins in this long after the entrance ends.
@@ -10,6 +12,17 @@ const GEAR_DELAY_MS = 2000;
 // The first-visit bubble goes away after this long, or on any tap.
 const BUBBLE_MS = 5000;
 const BUBBLE_SEEN = "julianpalomo.sky-bubble-seen";
+
+// On hover the gear turns a sixth of a turn and springs back a little past rest.
+const onHover = boopOnHover({
+  parts: [
+    {
+      part: "gear",
+      spring: springs.boop,
+      frame: (value) => ({ transform: `rotate(${60 * value}deg)` }),
+    },
+  ],
+});
 
 /** Whether the bubble was shown before. Storage that fails reads as "no", so it shows again. */
 function bubbleSeen(): boolean {
@@ -66,6 +79,7 @@ export function Gear({ onOpen }: { onOpen: (trigger: HTMLElement) => void }) {
           <IconButton
             look="accent"
             label={t(locale, "playWithTheSky")}
+            onPointerEnter={onHover}
             onClick={(event) => onOpen(event.currentTarget)}
           >
             <GearIcon />
@@ -98,6 +112,7 @@ function GearIcon() {
       aria-hidden="true"
       viewBox="0 0 24 24"
       className="size-5"
+      data-boop="gear"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"

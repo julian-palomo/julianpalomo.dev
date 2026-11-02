@@ -647,6 +647,23 @@ text, in both languages, in the pull request that adds it.
 | Particles, before the wind              | Leaves 7–11s, petals 8–12s, rain 0.6–0.9s and snow 6–10s a fall; midges buzz in 1.2–2s, glints twinkle in 2–4s | `linear` falls; sways and twinkles `ease-in-out`   |
 | The herd's loops                        | 11s, 16s, 19s                                                                                                  | `ease-in-out`                                      |
 
+### Springs
+
+What answers the pointer moves on a spring, not a fixed curve: it's pushed
+and springs back, as on Josh Comeau's blog, where the idea ("boop") comes
+from. The spring is our own small one (`src/lib/spring.ts`), with a
+stiffness, a damping and a mass. A gesture samples it into keyframes for the
+Web Animations API (`src/components/ui/boop.ts`), so it settles back to rest
+in about 0.3s, with a little overshoot where it says so; what follows the
+pointer steps the same spring once a frame.
+
+- **Only with a mouse.** A gesture on hover plays only for a pointer that
+  hovers (`(hover: hover) and (pointer: fine)`), never on a tap, and a
+  gesture still running isn't restarted. The loch's ripples, Nessie and the
+  shooting star answer a tap as well (section 7).
+- Only `transform` and `opacity` move, and no gesture makes a sound.
+- With reduced motion none of it plays.
+
 ### Entrance
 
 The first look builds attention in order: who Julian is, then the glen, then
