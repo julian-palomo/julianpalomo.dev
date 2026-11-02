@@ -65,12 +65,28 @@ test("on a phone the buttons are centred; from 1024px they keep the intro's left
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  const cv = await page.getByRole("link", { name: "Download CV" }).boundingBox();
-  const contact = await contactButton(page).boundingBox();
-  if (!cv || !contact) throw new Error("not on screen");
-  const left = cv.x;
-  const right = 390 - (contact.x + contact.width);
-  expect(Math.abs(left - right)).toBeLessThan(2);
+  // Every wrapped row of the row's items, left and right gaps within the page.
+  const gaps = await page
+    .getByRole("link", { name: "Download CV" })
+    .locator("..")
+    .evaluate((row) => {
+      const rows = new Map<number, { left: number; right: number }>();
+      for (const item of row.children) {
+        const at = item.getBoundingClientRect();
+        const top = Math.round(at.top);
+        const seen = rows.get(top) ?? { left: at.left, right: at.right };
+        rows.set(top, {
+          left: Math.min(seen.left, at.left),
+          right: Math.max(seen.right, at.right),
+        });
+      }
+      return [...rows.values()].map((each) => ({
+        left: each.left,
+        right: innerWidth - each.right,
+      }));
+    });
+  expect(gaps.length).toBeGreaterThan(0);
+  for (const gap of gaps) expect(Math.abs(gap.left - gap.right)).toBeLessThan(2);
 
   await page.setViewportSize({ width: 1280, height: 800 });
   const intro = await page.getByText(en.intro).boundingBox();

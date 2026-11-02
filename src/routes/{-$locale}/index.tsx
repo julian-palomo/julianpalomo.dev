@@ -1,33 +1,25 @@
-import { createFileRoute, getRouteApi, redirect, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { createFileRoute, getRouteApi } from "@tanstack/react-router";
+import { useRef, useState } from "react";
 import { z } from "zod";
-import { Analytics, useTrack } from "../../components/analytics/Analytics";
+import { Analytics } from "../../components/analytics/Analytics";
+import { useCleanUrl } from "../../components/analytics/useCleanUrl";
 import { CompactBar } from "../../components/bar/CompactBar";
 import { Chat } from "../../components/chat/Chat";
-import { useNow } from "../../components/clock/Clock";
 import { ContactProvider } from "../../components/contact/Contact";
 import { CvAndContact } from "../../components/contact/CvAndContact";
 import { Entrance } from "../../components/entrance/Entrance";
 import { HeroBubble } from "../../components/entrance/HeroBubble";
-import { LanguageToggle } from "../../components/i18n/LanguageToggle";
 import { useLocale } from "../../components/i18n/useLocale";
 import { HeroLandscape } from "../../components/landscape/HeroLandscape";
 import { useLiveWeather } from "../../components/landscape/useLiveWeather";
 import { useSceneOverride } from "../../components/landscape/useSceneOverride";
-import { WeatherChip } from "../../components/landscape/WeatherChip";
-import { Gear } from "../../components/play/Gear";
-import { usePlay } from "../../components/play/Play";
-import { SkyPanel } from "../../components/play/SkyPanel";
+import { HeroControls } from "../../components/page/HeroControls";
 import { SiteFooter } from "../../components/SiteFooter";
 import { SoundProvider } from "../../components/sound/Sound";
-import { SoundToggle } from "../../components/sound/SoundToggle";
-import { useTheme } from "../../components/theme/Theme";
-import { ThemeToggle } from "../../components/theme/ThemeToggle";
 import { parseRef } from "../../lib/analytics/events";
 import { localeFromParam } from "../../lib/i18n/locale";
-import { rootLanguage } from "../../lib/i18n/root-language";
+import { redirectToSpanish } from "../../lib/i18n/locale-route";
 import { t } from "../../lib/i18n/t";
-import { defaultSky, withWeather } from "../../lib/scene/sky-state";
 import { shareHead } from "../../lib/share";
 
 // `/` is English and `/es` is Spanish: one route, so switching language keeps
@@ -44,18 +36,7 @@ export const Route = createFileRoute("/{-$locale}/")({
     sky: z.string().optional().catch(undefined),
     ref: z.unknown().optional(),
   }),
-  beforeLoad: ({ params }) => {
-    if (params.locale !== undefined || rootLanguage() !== "es") return;
-    // 302, never cached: it depends on the visitor's cookie and country. The
-    // query string comes along, so a shared link keeps its parameters.
-    throw redirect({
-      to: "/{-$locale}",
-      params: { locale: "es" },
-      search: true,
-      statusCode: 302,
-      headers: { "Cache-Control": "private, no-store", Vary: "Cookie" },
-    });
-  },
+  beforeLoad: ({ params }) => redirectToSpanish("/{-$locale}", params.locale),
   head: ({ params }) => shareHead(localeFromParam(params.locale)),
   component: Home,
 });
@@ -78,8 +59,6 @@ const chatCard =
 
 const rootRoute = getRouteApi("__root__");
 
-type PanelState = { open: boolean; position: { top: number; left: number } | null };
-
 /**
  * The page, inside its analytics. The visit is read once, on mount: where it
  * came from (`?ref=`) and whether the `visited` cookie was there before the
@@ -90,6 +69,7 @@ function Home() {
   const { ref } = Route.useSearch();
   const [visit] = useState(() => ({
     name: "visit" as const,
+    page: "home" as const,
     ref: parseRef(ref),
     returning: entrance === "short",
   }));
@@ -101,41 +81,15 @@ function Home() {
   );
 }
 
-/**
- * Removes `?ref=` and `?notrack` from the address bar once the page has read
- * them, so a copied link doesn't carry them on. Through the router, never
- * history.replaceState: the language toggle navigates with `search: true`,
- * which copies the router's own location, and would put them back.
- */
-function useCleanUrl() {
-  const navigate = useNavigate();
-  const { ref } = Route.useSearch();
-  const { notrack } = rootRoute.useSearch();
-  const dirty = ref !== undefined || notrack !== undefined;
-  useEffect(() => {
-    if (!dirty) return;
-    void navigate({
-      to: ".",
-      search: (search) => ({ ...search, ref: undefined, notrack: undefined }),
-      replace: true,
-    });
-  }, [dirty, navigate]);
-}
-
 function Page() {
   const locale = useLocale();
   // Read once by Entrance, when the page mounts, so a language switch never replays it.
   const { entrance, sound, contactDemo } = rootRoute.useLoaderData();
-  const track = useTrack();
   const heroRef = useRef<HTMLDivElement>(null);
   const { sky } = Route.useSearch();
   const override = useSceneOverride(sky);
   // An override is a fixed scene, so it doesn't wait for the real weather.
   const weather = useLiveWeather(override === null);
-  const now = useNow();
-  const { state: play } = usePlay();
-  const { backToLive } = useTheme();
-  const [panel, setPanel] = useState<PanelState>({ open: false, position: null });
 
   // After the first question a phone gets the compact bar, and the page
   // scrolls so the chat fills the screen under it. The chat is at least a
@@ -150,14 +104,6 @@ function Page() {
     }
   }
 
-  // The gear and the chip open the panel, and the popover sits under
-  // whichever was pressed. Opening changes nothing: the first change in the
-  // panel starts playing, from the live sky on screen.
-  function openPanel(trigger: HTMLElement) {
-    const { bottom, left } = trigger.getBoundingClientRect();
-    setPanel({ open: true, position: { top: bottom + 8, left } });
-  }
-
   return (
     <SoundProvider initialOn={sound}>
       <ContactProvider demo={contactDemo}>
@@ -169,33 +115,7 @@ function Page() {
             >
               <HeroLandscape override={override} weather={weather} />
               <HeroBubble />
-              <div className="absolute inset-x-3 top-3 flex items-start justify-between gap-2">
-                <div className="flex items-start gap-2">
-                  <Gear onOpen={openPanel} />
-                  <div className="enter-control enter-control-1">
-                    <WeatherChip
-                      weather={weather}
-                      playingHour={play.status === "playing" ? play.hour : null}
-                      onOpen={openPanel}
-                      onBackToLive={() => {
-                        track({ name: "toy", which: "back_to_live" });
-                        backToLive();
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <div className="enter-control enter-control-2">
-                    <LanguageToggle />
-                  </div>
-                  <div className="enter-control enter-control-3">
-                    <SoundToggle />
-                  </div>
-                  <div className="enter-control enter-control-4">
-                    <ThemeToggle />
-                  </div>
-                </div>
-              </div>
+              <HeroControls override={override} weather={weather} />
             </div>
             <div className="flex flex-col px-4 sm:px-6 lg:col-start-2 lg:px-0">
               <img
@@ -226,12 +146,6 @@ function Page() {
           </main>
           <CvAndContact className="mt-10 justify-center px-4 sm:px-6 lg:hidden" />
           <SiteFooter className="lg:col-start-2 lg:col-end-4 lg:px-0" />
-          <SkyPanel
-            open={panel.open}
-            position={panel.position}
-            live={override ?? withWeather(defaultSky(now), weather)}
-            onClose={() => setPanel((current) => ({ ...current, open: false }))}
-          />
         </Entrance>
       </ContactProvider>
     </SoundProvider>
