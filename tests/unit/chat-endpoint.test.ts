@@ -1,8 +1,17 @@
-import { simulateReadableStream } from "ai";
+import {
+  parseJsonEventStream,
+  readUIMessageStream,
+  simulateReadableStream,
+  type UIMessageChunk,
+  uiMessageChunkSchema,
+} from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { answerOutcome, sourceCount } from "../../src/components/chat/chat-view";
+import type { CachedAnswer } from "../../src/lib/bot/cached-answer";
 import { handleChat } from "../../src/lib/bot/chat";
 import { STREAM_ERROR_TEXT } from "../../src/lib/bot/chat-error";
+import type { ChatUIMessage } from "../../src/lib/bot/chat-message";
 import { DAILY_BUDGET_MICRO_USD, type TokenUsage } from "../../src/lib/bot/limits";
 import { pageLanguageNote, SYSTEM_PROMPT } from "../../src/lib/bot/prompt";
 import type { UsageStore } from "../../src/lib/bot/usage";
@@ -35,10 +44,22 @@ const env = { ANTHROPIC_API_KEY: "test-key", VISITOR_SALT: "test-salt", DB: fake
 
 /** An in-memory UsageStore that records what the endpoint asked of it. */
 function fakeStore(today = { visitorMessages: 0, spentMicroUsd: 0 }) {
+  const answers = new Map<string, CachedAnswer>();
+  const key = (version: string, locale: string, question: string) =>
+    `${version}\n${locale}\n${question}`;
   return {
     readToday: vi.fn(async (_day: string, _visitor: string) => today),
     countMessage: vi.fn(async (_day: string, _visitor: string) => {}),
     addUsage: vi.fn(async (_day: string, _usage: TokenUsage, _cost: number) => {}),
+    cachedAnswer: vi.fn(async (version: string, locale: string, question: string) =>
+      answers.get(key(version, locale, question)),
+    ),
+    cacheAnswer: vi.fn(
+      async (version: string, locale: string, question: string, answer: CachedAnswer) => {
+        const at = key(version, locale, question);
+        if (!answers.has(at)) answers.set(at, answer);
+      },
+    ),
   } satisfies UsageStore;
 }
 
@@ -774,5 +795,242 @@ describe("usage", () => {
     expect(await response.text()).toContain("Hello");
     await Promise.all(waitedFor);
     expect(errorLog).toHaveBeenCalledWith("chat usage not recorded", expect.any(Error));
+  });
+});
+
+describe("the suggestion cache", () => {
+  const suggestion = "What is Form:at?";
+  const cited = `Form:at is a PWA [[${sentinel.id}]].`;
+
+  /** A model that looks the claims up, then answers with `second`. */
+  function lookupThen(second: () => ReturnType<ReturnType<typeof streamOf>>) {
+    let calls = 0;
+    return new MockLanguageModelV4({
+      doStream: () => {
+        calls += 1;
+        return calls === 1 ? getClaimsCall() : second();
+      },
+    });
+  }
+
+  async function ask(
+    text: string,
+    model: MockLanguageModelV4,
+    history: Record<string, unknown>[] = [],
+    request?: (body: unknown) => Request,
+  ) {
+    const body = { messages: [...history, userMessage(text, "q")], locale: "en" };
+    const response = await chat((request ?? chatRequest)(body), env, { createModel: () => model });
+    return response;
+  }
+
+  /** The answer a response streams, as the client's useChat would build it. */
+  async function messageOf(response: Response): Promise<ChatUIMessage | undefined> {
+    const body = response.body;
+    if (body === null) throw new Error("the response has no body");
+    const parsed = parseJsonEventStream({ stream: body, schema: uiMessageChunkSchema });
+    const chunks: UIMessageChunk[] = [];
+    const reader = parsed.getReader();
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value.success) chunks.push(value.value);
+    }
+    const stream = new ReadableStream<UIMessageChunk>({
+      start(controller) {
+        for (const chunk of chunks) controller.enqueue(chunk);
+        controller.close();
+      },
+    });
+    let message: ChatUIMessage | undefined;
+    for await (const state of readUIMessageStream<ChatUIMessage>({ stream })) message = state;
+    return message;
+  }
+
+  const textOfMessage = (message: ChatUIMessage | undefined) =>
+    (message?.parts ?? []).flatMap((part) => (part.type === "text" ? [part.text] : [])).join("");
+  const sourcesOf = (message: ChatUIMessage | undefined) =>
+    (message?.parts ?? []).flatMap((part) =>
+      part.type === "data-sources" ? [part.data.sources] : [],
+    );
+
+  it("answers a suggestion from the model the first time and stores the answer", async () => {
+    const response = await ask(suggestion, lookupThen(answer(cited)));
+    await response.text();
+    await Promise.all(waitedFor);
+
+    expect(store.cacheAnswer).toHaveBeenCalledTimes(1);
+    expect(store.cacheAnswer).toHaveBeenCalledWith(
+      expect.stringMatching(/^[0-9a-f]{64}$/),
+      "en",
+      suggestion,
+      {
+        text: cited,
+        sources: [
+          expect.objectContaining({ id: sentinel.id, confirmedOn: sentinel.confirmedByJulian }),
+        ],
+      },
+    );
+  });
+
+  it("replays a stored answer without calling the model, counting the message but adding no spend", async () => {
+    await (await ask(suggestion, lookupThen(answer(cited)))).text();
+    await Promise.all(waitedFor);
+    expect(store.addUsage).toHaveBeenCalledTimes(1);
+
+    const second = new MockLanguageModelV4({ doStream: answer("never called") });
+    const replay = await ask(suggestion, second);
+    expect(replay.status).toBe(200);
+    expect(textOfMessage(await messageOf(replay))).toBe(cited);
+    await Promise.all(waitedFor);
+
+    expect(second.doStreamCalls).toHaveLength(0);
+    expect(store.countMessage).toHaveBeenCalledTimes(2);
+    expect(store.addUsage).toHaveBeenCalledTimes(1);
+  });
+
+  it("replays an answer that reads like the model's: same text, sources, metadata and outcome", async () => {
+    const original = await messageOf(await ask(suggestion, lookupThen(answer(cited))));
+    await Promise.all(waitedFor);
+    const replayed = await messageOf(await ask(suggestion, new MockLanguageModelV4({})));
+
+    expect(textOfMessage(replayed)).toBe(textOfMessage(original));
+    expect(sourcesOf(replayed)).toEqual(sourcesOf(original));
+    expect(replayed?.metadata).toEqual(original?.metadata);
+    // What the chat's `answer` event sends: the outcome and the source count.
+    const done = answerOutcome({ error: undefined, stopped: false });
+    expect(done).toBe("done");
+    const [originalSources = []] = sourcesOf(original);
+    const [replayedSources = []] = sourcesOf(replayed);
+    expect(sourceCount(textOfMessage(replayed), replayedSources)).toBe(
+      sourceCount(textOfMessage(original), originalSources),
+    );
+    expect(sourceCount(textOfMessage(replayed), replayedSources)).toBe(1);
+  });
+
+  it("asks the model the suggestion alone when it follows other messages", async () => {
+    const model = lookupThen(answer(cited));
+    const history = [
+      userMessage("Hi", "h1"),
+      { id: "h2", role: "assistant", parts: [{ type: "text", text: "Hello!" }] },
+    ];
+    await (await ask(suggestion, model, history)).text();
+
+    const turns = model.doStreamCalls[0]?.prompt.filter((message) => message.role !== "system");
+    expect(turns).toHaveLength(1);
+    expect(turns?.[0]).toMatchObject({
+      role: "user",
+      content: [{ type: "text", text: suggestion }],
+    });
+  });
+
+  it("sends a message that isn't exactly a suggestion to the model as usual, and stores nothing", async () => {
+    const model = lookupThen(answer(cited));
+    await (await ask("What is Form:at, briefly?", model)).text();
+    await Promise.all(waitedFor);
+
+    expect(model.doStreamCalls.length).toBeGreaterThan(0);
+    expect(store.cachedAnswer).not.toHaveBeenCalled();
+    expect(store.cacheAnswer).not.toHaveBeenCalled();
+  });
+
+  it("never stores an answer with a citation no tool returned", async () => {
+    await (await ask(suggestion, lookupThen(answer("Form:at is a PWA [[made-up-claim]].")))).text();
+    await Promise.all(waitedFor);
+    expect(store.cacheAnswer).not.toHaveBeenCalled();
+  });
+
+  it("never stores an answer that failed", async () => {
+    const failing = streamOf([
+      { type: "text-start", id: "t1" },
+      { type: "text-delta", id: "t1", delta: "Form:at is" },
+      { type: "error", error: new Error("the model failed") },
+    ]);
+    await (await ask(suggestion, lookupThen(failing))).text();
+    await Promise.all(waitedFor);
+    expect(store.cacheAnswer).not.toHaveBeenCalled();
+  });
+
+  it("never stores an answer the visitor stopped", async () => {
+    const stop = new AbortController();
+    const slow = async () => ({
+      stream: simulateReadableStream<StreamPart>({
+        chunkDelayInMs: 10,
+        chunks: [
+          { type: "text-start", id: "t1" },
+          ...Array.from({ length: 30 }, () => ({
+            type: "text-delta" as const,
+            id: "t1",
+            delta: "word ",
+          })),
+          { type: "text-end", id: "t1" },
+          { type: "finish", finishReason: { unified: "stop", raw: undefined }, usage },
+        ],
+      }),
+    });
+    const response = await ask(
+      suggestion,
+      lookupThen(slow),
+      [],
+      (body) => new Request(chatRequest(body), { signal: stop.signal }),
+    );
+    const reader = response.body?.getReader();
+    if (reader === undefined) throw new Error("the response has no body");
+    const decoder = new TextDecoder();
+    let seen = "";
+    while (!seen.includes('"text-delta"')) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      seen += decoder.decode(value);
+    }
+    stop.abort();
+    await reader.cancel();
+    await vi.waitFor(() => expect(store.addUsage).toHaveBeenCalled());
+    await Promise.all(waitedFor);
+    expect(store.cacheAnswer).not.toHaveBeenCalled();
+  });
+
+  it("refuses a suggestion at the daily limit like any question, with no cache read", async () => {
+    store = fakeStore({ visitorMessages: 30, spentMicroUsd: 0 });
+    const model = lookupThen(answer(cited));
+    const response = await ask(suggestion, model);
+
+    expect(response.status).toBe(429);
+    expect(store.cachedAnswer).not.toHaveBeenCalled();
+    expect(store.cacheAnswer).not.toHaveBeenCalled();
+    expect(model.doStreamCalls).toHaveLength(0);
+  });
+
+  it("answers through the model when the cache can't be read, and logs it", async () => {
+    store.cachedAnswer.mockRejectedValueOnce(new Error("no such table: cached_answers"));
+    const model = lookupThen(answer(cited));
+    const response = await ask(suggestion, model);
+
+    expect(response.status).toBe(200);
+    expect(textOfMessage(await messageOf(response))).toBe(cited);
+    expect(errorLog).toHaveBeenCalledWith("chat cache not read", expect.any(Error));
+  });
+
+  it("still answers when the answer can't be stored, and logs it", async () => {
+    store.cacheAnswer.mockRejectedValueOnce(new Error("no such table: cached_answers"));
+    const response = await ask(suggestion, lookupThen(answer(cited)));
+
+    expect(textOfMessage(await messageOf(response))).toBe(cited);
+    await Promise.all(waitedFor);
+    expect(errorLog).toHaveBeenCalledWith("chat answer not cached", expect.any(Error));
+  });
+
+  it("never touches the cache in demo mode", async () => {
+    const createStore = vi.fn(() => store);
+    const response = await handleChat(
+      chatRequest({ messages: [userMessage(suggestion)], locale: "en" }),
+      { BOT_DEMO: "1" },
+      { createStore, waitUntil: () => {} },
+    );
+    await response.text();
+
+    expect(createStore).not.toHaveBeenCalled();
+    expect(store.cachedAnswer).not.toHaveBeenCalled();
+    expect(store.cacheAnswer).not.toHaveBeenCalled();
   });
 });

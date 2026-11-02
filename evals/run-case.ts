@@ -70,6 +70,10 @@ function runStore() {
       usage.cacheWrite += step.cacheWrite;
       costMicroUsd += cost;
     },
+    // No answer cache: an eval run always asks the model and never stores an
+    // answer, or it could measure a replay instead of the bot.
+    cachedAnswer: async () => undefined,
+    cacheAnswer: async () => {},
   };
   return { store, usage, cost: () => costMicroUsd };
 }
