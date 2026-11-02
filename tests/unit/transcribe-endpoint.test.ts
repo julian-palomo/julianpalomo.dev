@@ -76,6 +76,32 @@ describe("handleTranscribe", () => {
       expect(await response.json()).toEqual({ error: "too_large" });
     });
 
+    it("stops reading a body with no length once it passes the cap", async () => {
+      const chunk = new Uint8Array(256 * 1024);
+      let pulled = 0;
+      let cancelled = false;
+      // Endless unless the endpoint stops: 256 KB at a time, with no Content-Length.
+      const body = new ReadableStream<Uint8Array>({
+        pull(controller) {
+          pulled++;
+          controller.enqueue(chunk);
+        },
+        cancel() {
+          cancelled = true;
+        },
+      });
+      const request = new Request("https://julianpalomo.dev/api/transcribe", {
+        method: "POST",
+        headers: { "Content-Type": "audio/wav" },
+        body,
+        duplex: "half",
+      } as RequestInit);
+      const response = await run(request);
+      expect(response.status).toBe(413);
+      expect(cancelled).toBe(true);
+      expect(pulled).toBeLessThanOrEqual(Math.ceil(MAX_AUDIO_BYTES / chunk.byteLength) + 2);
+    });
+
     it("refuses another type, or a body that isn't a 16 kHz mono WAV", async () => {
       expect((await run(post(seconds(1), "audio/webm"))).status).toBe(415);
       expect((await run(post(new Uint8Array(1000)))).status).toBe(415);

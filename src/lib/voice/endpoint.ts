@@ -69,12 +69,35 @@ const defaultDeps: Deps = {
   wait: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 };
 
-/** The body, read only up to MAX_AUDIO_BYTES, or null when it's longer. */
+/**
+ * The body, or null when it's longer than MAX_AUDIO_BYTES. A declared length
+ * over the cap is refused unread; a body without one (chunked) is read only
+ * until it passes the cap, never whole, so a long upload can't fill memory.
+ */
 async function readBody(request: Request): Promise<Uint8Array | null> {
   const declared = Number(request.headers.get("Content-Length"));
   if (Number.isFinite(declared) && declared > MAX_AUDIO_BYTES) return null;
-  const bytes = new Uint8Array(await request.arrayBuffer());
-  return bytes.length > MAX_AUDIO_BYTES ? null : bytes;
+  if (request.body === null) return new Uint8Array(0);
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > MAX_AUDIO_BYTES) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
 }
 
 /** Answers a POST to /api/transcribe. `env` is the Worker's environment, unparsed. */
