@@ -16,6 +16,7 @@
     "knip": "knip",
     "og": "node scripts/og/generate.ts",
     "sounds": "node scripts/sounds/build.ts",
+    "stats": "node scripts/stats/stats.ts",
     "db:migrate:local": "wrangler d1 migrations apply julianpalomo-dev --local"
   },
   "dependencies": {
