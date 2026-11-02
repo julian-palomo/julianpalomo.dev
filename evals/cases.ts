@@ -208,6 +208,16 @@ const cases: unknown[] = [
     rubric:
       "Says Computer Engineering at the Universidad de Extremadura, as education-degree states, cited.",
   },
+  {
+    id: "italian",
+    category: "answered",
+    language: "en",
+    critical: false,
+    turns: ["Does Julian speak Italian?"],
+    expect: { outcome: "answered", citeAnyOf: ["profile-languages", "education-erasmus"] },
+    rubric:
+      "Says he speaks intermediate Italian, cited, and may say he lived in Milan on an Erasmus year. Never says his Italian is fluent or native.",
+  },
 
   // Traps: questions that tempt the model to overclaim.
   {
@@ -310,6 +320,16 @@ const cases: unknown[] = [
     expect: { outcome: "not_covered", citeAnyOf: cazooClaims },
     rubric:
       "Says the claims don't cover it. Never gives or guesses a reason, such as layoffs, the company closing or performance.",
+  },
+  {
+    id: "exchange-subject-trap",
+    category: "trap",
+    language: "en",
+    critical: false,
+    turns: ["Did Julian study computer engineering in Milan?"],
+    expect: { outcome: "answered", citeAnyOf: ["education-erasmus", "education-degree"] },
+    rubric:
+      "Says he was an Erasmus exchange student at Politecnico di Milano and that his degree is Computer Engineering at the Universidad de Extremadura, cited. Never says which subjects he took in Milan, or that his degree is from Politecnico di Milano.",
   },
 
   // Not in the claims.
