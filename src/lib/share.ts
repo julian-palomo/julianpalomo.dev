@@ -1,7 +1,7 @@
 /**
- * What the home page tells link previews and search engines (DESIGN.md,
- * "Sharing"): the Open Graph and Twitter card tags, the canonical and
- * language links, and a JSON-LD `Person`. Every URL is absolute and points at
+ * What a page tells link previews and search engines (DESIGN.md, "Sharing"):
+ * the Open Graph and Twitter card tags, the canonical and language links,
+ * and, on the home page only, a JSON-LD `Person`. Every URL is absolute and points at
  * production, never at a preview host, so a shared link always shows the
  * live site.
  */
@@ -14,16 +14,28 @@ export const OG_IMAGE = { width: 1200, height: 630 } as const;
 
 const OG_LOCALE: Record<Locale, string> = { en: "en_GB", es: "es_ES" };
 
-/** The home page's own URL: `/` in English, `/es` in Spanish. */
-export function pageUrl(locale: Locale): string {
+/** An inner page: its path after the language (`projects`) and its title. */
+type InnerPage = { path: string; title: string };
+
+/**
+ * A page's own URL: the home page is `/` in English and `/es` in Spanish; an
+ * inner page has the same slug in both languages, under `/es` in Spanish.
+ */
+export function pageUrl(locale: Locale, path?: string): string {
+  const prefix = locale === "es" ? "/es" : "";
+  if (path) return `${site.url}${prefix}/${path}`;
   return locale === "es" ? `${site.url}/es` : `${site.url}/`;
 }
 
-/** The home page's `head` in `locale`: its meta tags, links and JSON-LD. */
-export function shareHead(locale: Locale) {
-  const title = pageTitle(undefined, { name: t(locale, "name"), role: t(locale, "role") });
+/**
+ * A page's `head` in `locale`: its meta tags and links, and on the home page
+ * its JSON-LD. Inner pages share the home page's preview image for now.
+ */
+export function shareHead(locale: Locale, page?: InnerPage) {
+  const who = { name: t(locale, "name"), role: t(locale, "role") };
+  const title = pageTitle(page?.title, who);
   const description = t(locale, "metaDescription");
-  const url = pageUrl(locale);
+  const url = pageUrl(locale, page?.path);
   const image = `${site.url}/og/${locale}.png`;
   const alt = t(locale, "ogImageAlt");
   const other: Locale = locale === "es" ? "en" : "es";
@@ -32,7 +44,7 @@ export function shareHead(locale: Locale) {
       { title },
       { name: "description", content: description },
       { property: "og:site_name", content: site.name },
-      { property: "og:type", content: "profile" },
+      { property: "og:type", content: page ? "website" : "profile" },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
       { property: "og:url", content: url },
@@ -50,17 +62,20 @@ export function shareHead(locale: Locale) {
     ],
     links: [
       { rel: "canonical", href: url },
-      { rel: "alternate", hrefLang: "en", href: pageUrl("en") },
-      { rel: "alternate", hrefLang: "es", href: pageUrl("es") },
-      { rel: "alternate", hrefLang: "x-default", href: pageUrl("en") },
+      { rel: "alternate", hrefLang: "en", href: pageUrl("en", page?.path) },
+      { rel: "alternate", hrefLang: "es", href: pageUrl("es", page?.path) },
+      { rel: "alternate", hrefLang: "x-default", href: pageUrl("en", page?.path) },
     ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        // `<` escaped, so no text in it could ever close the script tag.
-        children: JSON.stringify(person()).replaceAll("<", "\\u003c"),
-      },
-    ],
+    // One Person, on the home page only, so search engines see one person.
+    scripts: page
+      ? []
+      : [
+          {
+            type: "application/ld+json",
+            // `<` escaped, so no text in it could ever close the script tag.
+            children: JSON.stringify(person()).replaceAll("<", "\\u003c"),
+          },
+        ],
   };
 }
 

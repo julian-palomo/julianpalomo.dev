@@ -11,6 +11,10 @@ import { MAX_VISITOR_TEXT } from "../bot/limits";
 /** At most this many events per page load: the client stops recording, and the server stops storing. */
 export const MAX_EVENTS_PER_LOAD = 100;
 
+/** The site's pages, for a visit's `page`. */
+const PAGES = ["home", "projects", "how_its_built"] as const;
+export type PageName = (typeof PAGES)[number];
+
 /** Where a visit came from, by its `?ref=`. */
 const REFS = ["linkedin", "cv", "github"] as const;
 type Ref = (typeof REFS)[number] | "other" | "none";
@@ -35,6 +39,9 @@ const toySchema = z.discriminatedUnion("which", [
 export const eventSchema = z.discriminatedUnion("name", [
   z.strictObject({
     name: z.literal("visit"),
+    // Which page was loaded. "home" when missing, so a tab opened before the
+    // field existed still sends valid visits.
+    page: z.enum(PAGES).default("home"),
     ref: z.enum([...REFS, "other", "none"]),
     referrer_host: z.string().min(1).max(253).nullable(),
     returning: z.boolean(),

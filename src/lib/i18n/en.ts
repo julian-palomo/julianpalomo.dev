@@ -219,6 +219,88 @@ export const en = {
       "The form isn't working right now. You can still reach Julian on LinkedIn or GitHub.",
     send: "Your message didn't go through. It's still here, so try again in a moment.",
   },
+
+  // The inner pages (DESIGN.md section 18) and the links to them.
+  pagesLabel: "Pages",
+  projectsTitle: "Projects",
+  askTheCow: "← Ask the cow",
+  anythingElse: "Anything else? Ask me",
+  // What each screenshot on the Projects page shows (src/components/projects/shots.ts).
+  projectShots: {
+    "format-player":
+      "Form:at's player on a phone: the set's artwork, its waveform and the play controls",
+    "format-sets":
+      "Form:at's sets on a phone, each with buttons to save it for listening offline, share it and play it",
+    "format-events": "Form:at's events on a phone: the next one, then the past ones",
+    "format-home": "Form:at's home page on a desktop",
+    "site-home":
+      "This site's home page on a desktop: the Highland landscape, the portrait and the chat with the cow",
+    "site-home-phone": "This site's home page on a phone, at night",
+  },
+  // One card per project. Each point is taken from the confirmed claim it
+  // names, shortened and adding nothing (tests/unit/projects.test.ts). The
+  // "why" lines are Julian's own words.
+  projects: [
+    {
+      id: "format",
+      name: "Form:at",
+      meta: "Personal project, built solo · May 2026 – present",
+      why: "I feel close to Form:at, a Glasgow music collective. To get away from the big platforms, many of them paid, like SoundCloud, YouTube and Mixcloud, we decided it would be great to have our own player. From there I kept adding features that other platforms charge for, and here they're free.",
+      points: [
+        {
+          claim: "format-offline",
+          text: "Saves 90-minute mixes (100–220MB each) to play with no signal: IndexedDB with a storage check first, a service worker that serves Range requests for seeking, and lock-screen playback.",
+        },
+        {
+          claim: "format-cloudflare",
+          text: "All on Cloudflare: TanStack Start on Pages/Workers, D1 for the catalogue and analytics, R2 for audio, presigned uploads straight to R2 for 220MB files, and Web Push from Workers.",
+        },
+        {
+          claim: "format-admin",
+          text: "An admin dashboard behind Cloudflare Access, with server-side JWT checks on every write.",
+        },
+        {
+          claim: "format-tooling",
+          text: "A pnpm and Turborepo monorepo with a shared design system (Storybook, Chromatic), Vitest and Playwright on Chromium and WebKit, and CI/CD on GitHub Actions; built with Claude Code.",
+        },
+      ],
+      links: [
+        { label: "formatglasgow.com", href: "https://formatglasgow.com/" },
+        { label: "Code on GitHub", href: "https://github.com/julian-palomo/form-at" },
+      ],
+    },
+    {
+      id: "site",
+      name: "julianpalomo.dev",
+      meta: "Personal project · October 2026 – present",
+      why: "I wanted one project that brought my CV together and showed that I can use and apply AI, both in how the product works and in how it's built. A CV bot fitted exactly what I was looking for. The Highland landscape is a nod, and a thank you, to the country that has welcomed me so well, where I live and which I enjoy.",
+      points: [
+        {
+          claim: "site-assistant",
+          text: "An assistant on Claude, through the Vercel AI SDK, whose read-only tools only return facts I've confirmed; every fact it cites must be one it looked up.",
+        },
+        {
+          claim: "site-limits",
+          text: "Daily limits in Cloudflare D1: 30 questions a visitor and a spend cap, with visitors counted by a hash that changes every day, never by their IP.",
+        },
+        {
+          claim: "site-evals",
+          text: "LLM evals in CI: the real assistant answers the cases, and a second model, calibrated before each run, judges every sentence.",
+        },
+        {
+          claim: "site-agent-setup",
+          text: "Built with Claude Code under a written agent setup: AGENTS.md, rules, hooks, skills and reviewer subagents.",
+        },
+        {
+          claim: "site-landscape",
+          text: "A live Highland glen whose season follows the date, its sky the sun over Glasgow, and its weather Glasgow's own.",
+        },
+      ],
+      links: [
+        { label: "Code on GitHub", href: "https://github.com/julian-palomo/julianpalomo.dev" },
+      ],
+    },
+  ],
 };
 
 export type Messages = typeof en;

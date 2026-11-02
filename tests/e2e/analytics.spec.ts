@@ -63,7 +63,13 @@ test("a question sends a visit, then the question, then its answer, as one page 
 
   await expect.poll(() => names(sent)).toEqual(["visit", "question", "answer"]);
   const [visit, question, answer] = sent.flatMap((body) => body.events);
-  expect(visit).toEqual({ name: "visit", ref: "none", referrer_host: null, returning: true });
+  expect(visit).toEqual({
+    name: "visit",
+    page: "home",
+    ref: "none",
+    referrer_host: null,
+    returning: true,
+  });
   expect(question).toEqual({
     name: "question",
     via: "typed",

@@ -6,7 +6,13 @@ import type { EventStore } from "../../src/lib/analytics/store";
 const VISIT_ID = "3f1c2a4e-8b7d-4c6e-9a5f-1d2e3f4a5b6c";
 const BROWSER =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
-const VISIT: AnalyticsEvent = { name: "visit", ref: "cv", referrer_host: null, returning: false };
+const VISIT: AnalyticsEvent = {
+  name: "visit",
+  page: "home",
+  ref: "cv",
+  referrer_host: null,
+  returning: false,
+};
 
 function post({
   host = "julianpalomo.dev",

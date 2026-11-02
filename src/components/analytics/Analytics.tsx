@@ -33,7 +33,8 @@ type Props = {
  * on mount and kept in memory only, never in a cookie or storage, so a page
  * load's events join into a funnel without following anyone across visits.
  * Events wait in a queue, at most 100 per page load, and go to /api/events
- * with navigator.sendBeacon when the page is hidden or left. A chunk the
+ * with navigator.sendBeacon when the page is hidden or left, or when moving
+ * to another of the site's pages unmounts it. A chunk the
  * browser refuses stays queued for the next flush.
  */
 export function Analytics({ on, visit, children }: Props) {
@@ -87,6 +88,9 @@ export function Analytics({ on, visit, children }: Props) {
     return () => {
       window.removeEventListener("pagehide", flush);
       document.removeEventListener("visibilitychange", onVisibility);
+      // Moving to another page without a reload unmounts this one: its
+      // events go now, or they'd be lost with it.
+      flush();
     };
   }, [enabled, firstVisit, track]);
 

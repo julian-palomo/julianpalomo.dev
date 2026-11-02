@@ -97,3 +97,45 @@ describe("person", () => {
     for (const key of ["email", "telephone", "address"]) expect(keys).not.toContain(key);
   });
 });
+
+describe("shareHead for an inner page", () => {
+  const page = (locale: "en" | "es") => ({ path: "projects", title: t(locale, "projectsTitle") });
+
+  it.each([
+    ["en", "https://julianpalomo.dev/projects"],
+    ["es", "https://julianpalomo.dev/es/projects"],
+  ] as const)("in %s, has its own URL, title and language links", (locale, url) => {
+    const { meta, links, scripts } = shareHead(locale, page(locale));
+    expect(content(meta, "og:url")).toBe(url);
+    expect(links).toContainEqual({ rel: "canonical", href: url });
+    expect(links).toContainEqual({
+      rel: "alternate",
+      hrefLang: "en",
+      href: "https://julianpalomo.dev/projects",
+    });
+    expect(links).toContainEqual({
+      rel: "alternate",
+      hrefLang: "es",
+      href: "https://julianpalomo.dev/es/projects",
+    });
+    expect(links).toContainEqual({
+      rel: "alternate",
+      hrefLang: "x-default",
+      href: "https://julianpalomo.dev/projects",
+    });
+    const title = pageTitle(t(locale, "projectsTitle"), {
+      name: t(locale, "name"),
+      role: t(locale, "role"),
+    });
+    expect(meta).toContainEqual({ title });
+    expect(content(meta, "og:type")).toBe("website");
+    // The home page's preview image for now, and no second Person.
+    expect(content(meta, "og:image")).toBe(`https://julianpalomo.dev/og/${locale}.png`);
+    expect(scripts).toEqual([]);
+  });
+
+  it("builds inner pages' URLs under /es in Spanish only", () => {
+    expect(pageUrl("en", "projects")).toBe("https://julianpalomo.dev/projects");
+    expect(pageUrl("es", "projects")).toBe("https://julianpalomo.dev/es/projects");
+  });
+});
