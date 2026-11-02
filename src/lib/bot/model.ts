@@ -4,7 +4,7 @@
  */
 import { type AnthropicLanguageModelOptions, createAnthropic } from "@ai-sdk/anthropic";
 
-export const MODEL_ID = "claude-sonnet-5-5";
+export const MODEL_ID = "claude-haiku-5-5";
 
 /**
  * The bot's model, the one `handleChat` answers with. The evals use this same

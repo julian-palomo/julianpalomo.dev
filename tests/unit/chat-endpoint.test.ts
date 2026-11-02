@@ -3,7 +3,7 @@ import { MockLanguageModelV4 } from "ai/test";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { handleChat } from "../../src/lib/bot/chat";
 import { STREAM_ERROR_TEXT } from "../../src/lib/bot/chat-error";
-import type { TokenUsage } from "../../src/lib/bot/limits";
+import { estimateCostMicroUsd, type TokenUsage } from "../../src/lib/bot/limits";
 import { pageLanguageNote, SYSTEM_PROMPT } from "../../src/lib/bot/prompt";
 import type { UsageStore } from "../../src/lib/bot/usage";
 import { type Claim, confirmedClaims } from "../../src/lib/claims";
@@ -579,12 +579,9 @@ describe("limits", () => {
     expect(day).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(visitor).toMatch(/^[0-9a-f]{64}$/);
     expect(JSON.stringify(store.countMessage.mock.calls)).not.toContain("203.0.113.7");
-    // The mock reports 1 input and 1 output token: (2,000,000 + 10,000,000) / 1,000,000.
-    expect(store.addUsage).toHaveBeenCalledWith(
-      day,
-      { input: 1, output: 1, cacheRead: 0, cacheWrite: 0 },
-      12,
-    );
+    // The mock reports 1 input and 1 output token, priced by the table in limits.ts.
+    const usage = { input: 1, output: 1, cacheRead: 0, cacheWrite: 0 };
+    expect(store.addUsage).toHaveBeenCalledWith(day, usage, estimateCostMicroUsd(usage));
   });
 
   it("doesn't count a request that fails validation", async () => {
@@ -687,12 +684,13 @@ describe("usage", () => {
     await response.text();
     await Promise.all(waitedFor);
 
-    // Two steps of 1 + 1 tokens: (2 × 2,000,000 + 2 × 10,000,000) / 1,000,000.
+    // Two steps of 1 + 1 tokens, summed before they're priced.
+    const usage = { input: 2, output: 2, cacheRead: 0, cacheWrite: 0 };
     expect(store.addUsage).toHaveBeenCalledTimes(1);
     expect(store.addUsage).toHaveBeenCalledWith(
       expect.any(String),
-      { input: 2, output: 2, cacheRead: 0, cacheWrite: 0 },
-      24,
+      usage,
+      estimateCostMicroUsd(usage),
     );
   });
 
@@ -707,7 +705,11 @@ describe("usage", () => {
     await Promise.all(waitedFor);
 
     expect(store.addUsage).toHaveBeenCalledTimes(1);
-    expect(store.addUsage).toHaveBeenCalledWith(expect.any(String), oneStep, 12);
+    expect(store.addUsage).toHaveBeenCalledWith(
+      expect.any(String),
+      oneStep,
+      estimateCostMicroUsd(oneStep),
+    );
   });
 
   it("records the finished step once when the visitor presses Stop, and cancels the model call", async () => {
@@ -727,7 +729,11 @@ describe("usage", () => {
     await vi.waitFor(() => expect(store.addUsage).toHaveBeenCalled());
     await Promise.all(waitedFor);
     expect(store.addUsage).toHaveBeenCalledTimes(1);
-    expect(store.addUsage).toHaveBeenCalledWith(expect.any(String), oneStep, 12);
+    expect(store.addUsage).toHaveBeenCalledWith(
+      expect.any(String),
+      oneStep,
+      estimateCostMicroUsd(oneStep),
+    );
     expect(model.doStreamCalls.at(-1)?.abortSignal?.aborted).toBe(true);
   });
 
@@ -746,11 +752,12 @@ describe("usage", () => {
     // the answer to its end and both steps are recorded.
     await vi.waitFor(() => expect(store.addUsage).toHaveBeenCalled());
     await Promise.all(waitedFor);
+    const usage = { input: 2, output: 2, cacheRead: 0, cacheWrite: 0 };
     expect(store.addUsage).toHaveBeenCalledTimes(1);
     expect(store.addUsage).toHaveBeenCalledWith(
       expect.any(String),
-      { input: 2, output: 2, cacheRead: 0, cacheWrite: 0 },
-      24,
+      usage,
+      estimateCostMicroUsd(usage),
     );
   });
 
