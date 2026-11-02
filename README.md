@@ -40,7 +40,10 @@ everyone else English, and the language toggle always wins. Under the intro,
 "Download CV" gets my CV as a PDF, with no phone number or email address in
 it, and "Contact" opens a form that emails me. The form is protected by
 Cloudflare Turnstile and a limit of 5 messages a day per visitor, and the
-message is never stored ([`docs/contact.md`](docs/contact.md)).
+message is never stored ([`docs/contact.md`](docs/contact.md)). A Projects
+page (`/projects`, `/es/projects`) shows Form:at and this site, each with why
+I made it and what it does, taken from the facts I've confirmed; the home
+page and every footer link to it.
 
 The weather comes from [Open-Meteo](https://open-meteo.com/) through our
 Worker, at `GET /api/weather`, so the visitor's IP never reaches Open-Meteo.
@@ -61,7 +64,7 @@ and are followed by more questions to ask. On a phone the chat gets a compact
 bar and a composer fixed above the keyboard; screen readers hear each answer
 once, whole. A shared link shows a preview card in its language, the tab shows
 the cow's head, and search engines get a sitemap and a schema.org `Person`. Every question goes through two daily limits kept in Cloudflare
-D1: 30 questions per visitor, and about $1 of model spend across everyone.
+D1: 30 questions per visitor, and about $3 of model spend across everyone.
 Visitors are counted by a hash that changes every day, never by their IP.
 The live site has its API key and its limits in place, so the chat answers on
 [julianpalomo.dev](https://julianpalomo.dev); without a key it says it isn't

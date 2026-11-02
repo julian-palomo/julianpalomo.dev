@@ -2,6 +2,7 @@ import { t } from "../../lib/i18n/t";
 import { springs } from "../../lib/spring";
 import { useTrack } from "../analytics/Analytics";
 import { useLocale } from "../i18n/useLocale";
+import { PageLinks } from "../page/PageLinks";
 import { useSoundEffects } from "../sound/Sound";
 import { boopOnHover } from "../ui/boop";
 import { useContact } from "./Contact";
@@ -35,8 +36,13 @@ const onContactHover = boopOnHover({
   ],
 });
 
+// The inner pages' links: text links beside the pills, the same height.
+const textLink =
+  "inline-flex min-h-11 items-center px-2 font-display font-bold text-accent hover:underline";
+
 /**
- * "Download CV" and "Contact" (DESIGN.md section 14). The caller places the
+ * "Download CV" and "Contact" (DESIGN.md section 14), and the links to the
+ * inner pages (section 18). The caller places the
  * row and sets its alignment with a `justify-*` class: left under the intro
  * from 1024px, centred above the footer below it.
  */
@@ -62,6 +68,7 @@ export function CvAndContact({ className }: { className: string }) {
         <EnvelopeIcon />
         {t(locale, "contactOpen")}
       </button>
+      <PageLinks className={textLink} />
     </div>
   );
 }

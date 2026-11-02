@@ -21,6 +21,7 @@ import {
   nextBeatIn,
   SHORT_MS,
 } from "../../lib/entrance";
+import { pageRenderedBefore } from "../../lib/page-load";
 import { useReveal } from "../chat/use-reveal";
 import { useSoundEffects } from "../sound/Sound";
 
@@ -89,17 +90,24 @@ const mooes = (event: Event) =>
  * the first paint. This half does what CSS can't: it joins the CSS clock at
  * whatever beat it has reached when JavaScript starts, moves the cow and types
  * the greeting, waits for a background tab to be shown, and ends the entrance
- * at once on any tap, key, wheel or touch. A tap, click or key also makes the
+ * at once on any tap, key, wheel or touch. It plays only on the page load's
+ * first page, never after a client navigation. A tap, click or key also makes the
  * cow moo, the entrance's only sound, since browsers allow none before it.
  * With reduced motion there is none.
  */
 export function Entrance({ kind, greeting, hero, className, children }: Props) {
   const root = useRef<HTMLDivElement>(null);
-  const [stage, setStage] = useState<Stage>({ status: "starting" });
+  // Only the page load's first page plays the entrance: the home page reached
+  // later by a client navigation starts at rest. Read once, on mount.
+  const [first] = useState(() => !pageRenderedBefore());
+  const [stage, setStage] = useState<Stage>(() =>
+    first ? { status: "starting" } : { status: "over" },
+  );
   const { play } = useSoundEffects();
   const moo = useEffectEvent(() => play("moo"));
 
   useEffect(() => {
+    if (!first) return;
     const element = root.current;
     const clock = element ? cssClock(element) : undefined;
     if (!element || !clock || reducedMotion()) {
@@ -155,7 +163,7 @@ export function Entrance({ kind, greeting, hero, className, children }: Props) {
       document.removeEventListener("visibilitychange", show);
       for (const type of SKIP_EVENTS) window.removeEventListener(type, skip, { capture: true });
     };
-  }, [kind]);
+  }, [kind, first]);
 
   // The greeting types itself out at the answers' pace, from the greeting's beat.
   const full = stage.status === "full" ? stage : null;

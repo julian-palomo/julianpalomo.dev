@@ -13,6 +13,7 @@ const visit = (
   returning = false,
 ): AnalyticsEvent => ({
   name: "visit",
+  page: "home",
   ref,
   referrer_host: ref === "linkedin" ? "www.linkedin.com" : null,
   returning,
@@ -134,8 +135,33 @@ describe("the stats report", () => {
 
   it("prints couldn't read it for rows of the wrong shape", async () => {
     const text = await report(async () => [{ surprise: true }], NOW);
-    expect(text).toContain(`Funnel (page loads that got this far, % of visits)\n  ${COULDNT_READ}`);
+    expect(text).toContain(
+      `Funnel (home page loads that got this far, % of visits)\n  ${COULDNT_READ}`,
+    );
     expect(text).not.toContain("  0");
+  });
+
+  it("counts visits by page, older visits without one as home, and the funnel from home only", async () => {
+    const db = await fixtures();
+    const store = d1EventStore(asD1(db));
+    const projects: AnalyticsEvent = {
+      name: "visit",
+      page: "projects",
+      ref: "none",
+      referrer_host: null,
+      returning: false,
+    };
+    await store.record(id(6), [projects, { name: "toy", which: "theme" }], NOW - DAY);
+    // A visit recorded before visits had a page.
+    db.prepare("INSERT INTO events (at, visit_id, name, data) VALUES (?, ?, 'visit', ?)").run(
+      NOW - DAY,
+      id(7),
+      JSON.stringify({ ref: "none", referrer_host: null, returning: false }),
+    );
+    const text = await report(runOn(db), NOW);
+    const week = text.slice(text.indexOf("== Last 7 days =="), text.indexOf("== Last 30 days =="));
+    expect(week).toContain("Visits by page\n  home      5\n  projects  1");
+    expect(week).toContain("  visit            5\n  first question   3  60%");
   });
 
   it("only ever reads", () => {

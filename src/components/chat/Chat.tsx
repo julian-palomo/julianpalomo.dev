@@ -1,4 +1,5 @@
 import { useChat } from "@ai-sdk/react";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
 import { type RefObject, useEffect, useRef, useState } from "react";
 import type { ChatUIMessage } from "../../lib/bot/chat-message";
@@ -50,6 +51,7 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
   const [composerFocused, setComposerFocused] = useState(false);
   const [stopped, setStopped] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  useAskFromLink(inputRef);
   const requesting = status === "submitted" || status === "streaming";
   const last = messages.at(-1);
   const latestAnswer = messages.filter((message) => message.role === "assistant").at(-1);
@@ -293,4 +295,20 @@ function useAtEnd(end: RefObject<HTMLElement | null>): boolean {
     };
   }, [end]);
   return atEnd;
+}
+
+/**
+ * "← Ask the cow" on an inner page lands here with `#ask`: the composer takes
+ * focus, then the hash goes, so a reload or going back doesn't focus it
+ * again. Dropped through the router, like `?ref=` (useCleanUrl), so its own
+ * location never brings it back.
+ */
+function useAskFromLink(input: RefObject<HTMLTextAreaElement | null>) {
+  const hash = useLocation({ select: (location) => location.hash });
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (hash !== "ask") return;
+    input.current?.focus();
+    void navigate({ to: ".", search: true, replace: true });
+  }, [hash, input, navigate]);
 }

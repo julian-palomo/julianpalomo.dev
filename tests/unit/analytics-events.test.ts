@@ -18,7 +18,7 @@ import { chunkBodies, EMPTY_QUEUE, enqueue, MAX_CHUNK_BYTES } from "../../src/li
 const VISIT_ID = "3f1c2a4e-8b7d-4c6e-9a5f-1d2e3f4a5b6c";
 
 const EVERY_EVENT: AnalyticsEvent[] = [
-  { name: "visit", ref: "cv", referrer_host: "www.linkedin.com", returning: false },
+  { name: "visit", page: "home", ref: "cv", referrer_host: "www.linkedin.com", returning: false },
   { name: "question", via: "suggestion", suggestion: 2, nth: 1, text: "Is Julian open to remote?" },
   { name: "answer", nth: 1, sources: 0, outcome: "visitor_limit" },
   { name: "sources_opened" },
@@ -43,11 +43,30 @@ describe("batchSchema", () => {
     ["an extra field on a visit", { ...EVERY_EVENT[0], user_agent: "Mozilla/5.0" }],
     ["a slider without its name", { name: "toy", which: "slider" }],
     ["a slider name on another toy", { name: "toy", which: "moo", slider: "wind" }],
-    ["an unknown ref", { name: "visit", ref: "twitter", referrer_host: null, returning: true }],
+    [
+      "an unknown ref",
+      { name: "visit", page: "home", ref: "twitter", referrer_host: null, returning: true },
+    ],
     ["a question over 1,000 characters", { ...EVERY_EVENT[1], text: "a".repeat(1001) }],
     ["an unknown outcome", { name: "answer", nth: 1, sources: 2, outcome: "maybe" }],
   ])("rejects %s", (_, event) => {
     expect(batchSchema.safeParse(batch([event])).success).toBe(false);
+  });
+
+  it("takes a visit's page, and reads a visit without one as the home page's", () => {
+    const withPage = {
+      name: "visit",
+      page: "projects",
+      ref: "none",
+      referrer_host: null,
+      returning: false,
+    };
+    const { page: _, ...withoutPage } = withPage;
+    const parsed = batchSchema.safeParse(batch([withPage, withoutPage]));
+    expect(
+      parsed.success && parsed.data.events.map((event) => "page" in event && event.page),
+    ).toEqual(["projects", "home"]);
+    expect(batchSchema.safeParse(batch([{ ...withPage, page: "blog" }])).success).toBe(false);
   });
 
   it("rejects an empty batch, one over the cap, a bad id and extra top-level fields", () => {

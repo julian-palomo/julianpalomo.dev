@@ -44,6 +44,9 @@ function counts(title: string, sql: (since: number) => string): Section {
 
 const field = (path: string) => `json_extract(data, '$.${path}')`;
 
+// A visit's page; visits recorded before the field existed were all the home page's.
+const page = `COALESCE(${field("page")}, 'home')`;
+
 const percent = (part: number, whole: number) =>
   whole === 0 ? "–" : `${Math.round((part / whole) * 100)}%`;
 
@@ -59,6 +62,11 @@ const funnelRow = z.array(
 const noSourcesRow = z.array(z.object({ answered: z.number(), no_sources: z.number() }));
 
 const SECTIONS: Section[] = [
+  counts(
+    "Visits by page",
+    (since) => `SELECT ${page} AS label, COUNT(*) AS count FROM events
+      WHERE name = 'visit' AND at >= ${since} GROUP BY label ORDER BY count DESC, label`,
+  ),
   counts(
     "Visits by ref",
     (since) => `SELECT ${field("ref")} AS label, COUNT(*) AS count FROM events
@@ -77,9 +85,11 @@ const SECTIONS: Section[] = [
       GROUP BY label ORDER BY label`,
   ),
   {
-    title: "Funnel (page loads that got this far, % of visits)",
+    title: "Funnel (home page loads that got this far, % of visits)",
+    // Only the home page has the chat, the CV and the contact form.
     sql: (since) => `WITH
-      visits AS (SELECT DISTINCT visit_id FROM events WHERE name = 'visit' AND at >= ${since}),
+      visits AS (SELECT DISTINCT visit_id FROM events
+        WHERE name = 'visit' AND ${page} = 'home' AND at >= ${since}),
       asked AS (SELECT visit_id, COUNT(*) AS n FROM events
         WHERE name = 'question' AND at >= ${since} GROUP BY visit_id),
       reached AS (SELECT DISTINCT visit_id FROM events

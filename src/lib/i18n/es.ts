@@ -194,4 +194,82 @@ export const es: Messages = {
       "El formulario no funciona ahora mismo. Aún puedes encontrar a Julián en LinkedIn o GitHub.",
     send: "Tu mensaje no se ha enviado. Sigue aquí: vuelve a intentarlo en un momento.",
   },
+
+  pagesLabel: "Páginas",
+  projectsTitle: "Proyectos",
+  askTheCow: "← Pregunta a la vaca",
+  anythingElse: "¿Algo más? Pregúntame",
+  projectShots: {
+    "format-player":
+      "El reproductor de Form:at en un móvil: la portada del set, su forma de onda y los controles",
+    "format-sets":
+      "Los sets de Form:at en un móvil, cada uno con botones para guardarlo y escucharlo sin conexión, compartirlo y reproducirlo",
+    "format-events": "Los eventos de Form:at en un móvil: el próximo y, debajo, los anteriores",
+    "format-home": "La página de inicio de Form:at en un ordenador",
+    "site-home":
+      "La página de inicio de esta web en un ordenador: el paisaje de las Highlands, el retrato y el chat con la vaca",
+    "site-home-phone": "La página de inicio de esta web en un móvil, de noche",
+  },
+  // Las líneas "why" son las palabras de Julián, tal cual.
+  projects: [
+    {
+      id: "format",
+      name: "Form:at",
+      meta: "Proyecto personal, hecho en solitario · mayo de 2026 – actualidad",
+      why: "Teniendo una afinidad con el colectivo de música Form:at, para salir del monopolio de las plataformas más usadas y de pago como SoundCloud, YouTube, Mixcloud etc, decidimos que sería una idea genial tener un reproductor propio, a partir de ahí le fui añadiendo funcionalidades que en el resto de plataformas son de pago, y en esa es gratis.",
+      points: [
+        {
+          claim: "format-offline",
+          text: "Guarda sesiones de 90 minutos (100–220 MB cada una) para escucharlas sin cobertura: IndexedDB con una comprobación previa del espacio, un service worker que atiende peticiones Range para avanzar y retroceder, y reproducción desde la pantalla de bloqueo.",
+        },
+        {
+          claim: "format-cloudflare",
+          text: "Todo en Cloudflare: TanStack Start en Pages/Workers, D1 para el catálogo y la analítica, R2 para el audio, subidas prefirmadas directas a R2 para archivos de 220 MB y Web Push desde Workers.",
+        },
+        {
+          claim: "format-admin",
+          text: "Un panel de administración tras Cloudflare Access, con verificación JWT en el servidor en cada escritura.",
+        },
+        {
+          claim: "format-tooling",
+          text: "Un monorepo con pnpm y Turborepo, con un sistema de diseño compartido (Storybook, Chromatic), Vitest y Playwright en Chromium y WebKit, y CI/CD en GitHub Actions; hecho con Claude Code.",
+        },
+      ],
+      links: [
+        { label: "formatglasgow.com", href: "https://formatglasgow.com/" },
+        { label: "Código en GitHub", href: "https://github.com/julian-palomo/form-at" },
+      ],
+    },
+    {
+      id: "site",
+      name: "julianpalomo.dev",
+      meta: "Proyecto personal · octubre de 2026 – actualidad",
+      why: "Estuve pensando en una forma de fusionar en un proyecto mi currículum y que se viera que sé utilizar y aplicar inteligencia artificial al funcionamiento y al proceso de implementación. Así que un CV bot era una idea que cuadraba perfectamente con lo que buscaba. El paisaje de las Highlands es perfecto en referencia y como agradecimiento a la tierra que tan bien me ha acogido y en la que vivo y disfruto.",
+      points: [
+        {
+          claim: "site-assistant",
+          text: "Un asistente sobre Claude, con el Vercel AI SDK, cuyas herramientas de solo lectura devuelven únicamente datos que he confirmado; cada dato que cita tiene que haberlo consultado.",
+        },
+        {
+          claim: "site-limits",
+          text: "Límites diarios en Cloudflare D1: 30 preguntas por visitante y un tope de gasto, contando a los visitantes por un hash que cambia cada día, nunca por su IP.",
+        },
+        {
+          claim: "site-evals",
+          text: "Evals de LLM en CI: el asistente real responde a los casos y un segundo modelo, calibrado antes de cada ejecución, juzga cada frase.",
+        },
+        {
+          claim: "site-agent-setup",
+          text: "Hecho con Claude Code bajo una configuración de agentes escrita: AGENTS.md, reglas, hooks, skills y subagentes revisores.",
+        },
+        {
+          claim: "site-landscape",
+          text: "Un valle de las Highlands en directo: la estación sigue la fecha, el cielo el sol sobre Glasgow, y el tiempo es el de Glasgow.",
+        },
+      ],
+      links: [
+        { label: "Código en GitHub", href: "https://github.com/julian-palomo/julianpalomo.dev" },
+      ],
+    },
+  ],
 };
