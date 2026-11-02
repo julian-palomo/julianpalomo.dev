@@ -709,8 +709,9 @@ mobile; desktop is the same inside the right-hand card.
 
 A microphone button sits next to Send, "Ask by voice" ("Pregunta por voz"). It
 shows only where the browser can record (`MediaRecorder` and `getUserMedia`),
-and it's disabled whenever Send can't send: while an answer arrives, or once
-the chat's own daily limit is reached.
+and it's disabled while an answer arrives, or once the chat's own daily limit
+is reached, when no question could be sent. An empty box doesn't disable it:
+filling one is what it's for.
 
 1. **Pressing it** asks for the microphone, then records for at most 30s. The
    button becomes "Stop recording", a pill with a stop square and the time so
