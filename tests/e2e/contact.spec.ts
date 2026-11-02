@@ -38,6 +38,27 @@ test("Download CV points to the PDF, which is served", async ({ page, request })
   expect(pdf.headers()["content-type"]).toContain("application/pdf");
 });
 
+test("from 1024px the buttons sit under the intro, and on a phone above the footer", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.getByRole("banner").getByRole("link", { name: "Download CV" })).toBeVisible();
+  await expect(page.getByRole("banner").getByRole("button", { name: "Contact" })).toBeVisible();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const link = page.getByRole("link", { name: "Download CV" });
+  await expect(link).toHaveCount(1);
+  await expect(page.getByRole("banner").getByRole("link", { name: "Download CV" })).toHaveCount(0);
+  // After the chat and before the footer.
+  const chat = await page.getByRole("main").boundingBox();
+  const at = await link.boundingBox();
+  const footer = await page.getByRole("contentinfo").boundingBox();
+  if (!chat || !at || !footer) throw new Error("not on screen");
+  expect(at.y).toBeGreaterThanOrEqual(chat.y + chat.height);
+  expect(at.y + at.height).toBeLessThanOrEqual(footer.y);
+});
+
 test("Turnstile loads only when the form opens", async ({ page }) => {
   const turnstile: string[] = [];
   page.on("request", (request) => {

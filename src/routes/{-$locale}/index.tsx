@@ -157,7 +157,9 @@ function Home() {
                 {t(locale, "role")}
               </p>
               <p className="enter-intro enter-intro-3 mt-3 text-muted">{t(locale, "intro")}</p>
-              <CvAndContact className="enter-intro enter-intro-3 mt-5" />
+              {/* From 1024px under the intro; on a phone above the footer, so the
+                chat's first suggestions still show above the fixed composer. */}
+              <CvAndContact className="enter-intro enter-intro-3 mt-5 max-lg:hidden" />
             </div>
           </header>
           {started && <CompactBar />}
@@ -167,6 +169,7 @@ function Home() {
           >
             <Chat onStarted={start} />
           </main>
+          <CvAndContact className="mt-10 px-4 sm:px-6 lg:hidden" />
           <SiteFooter className="lg:col-start-2 lg:col-end-4 lg:px-0" />
           <SkyPanel
             open={panel.open}
