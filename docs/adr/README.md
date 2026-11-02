@@ -43,3 +43,4 @@ files are the answer, written down at the time instead of remembered later.
 | 2026-10-31 | [An answer's sources fold behind a "Check sources" link](2026-10-31-sources-behind-a-link.md)             |
 | 2026-11-02 | [Contact email through `send_email`](2026-11-02-email-routing-for-the-contact-form.md)                    |
 | 2026-11-02 | [First-party events in D1, with question text kept for 90 days](2026-11-02-first-party-events-in-d1.md)   |
+| 2026-11-02 | [Ask by voice through Workers AI, not the browser's speech API](2026-11-02-voice-through-workers-ai.md)   |
