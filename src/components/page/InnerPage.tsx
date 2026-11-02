@@ -2,6 +2,7 @@ import { getRouteApi, useSearch } from "@tanstack/react-router";
 import { type ReactNode, useState } from "react";
 import { type PageName, parseRef } from "../../lib/analytics/events";
 import { t } from "../../lib/i18n/t";
+import { useMarkPageRendered } from "../../lib/page-load";
 import { Analytics } from "../analytics/Analytics";
 import { useCleanUrl } from "../analytics/useCleanUrl";
 import { useLocale } from "../i18n/useLocale";
@@ -41,6 +42,7 @@ export function InnerPage({ page, title, children }: Props) {
     returning: entrance === "short",
   }));
   useCleanUrl();
+  useMarkPageRendered();
   return (
     <Analytics on={track} visit={visit}>
       <SoundProvider initialOn={sound}>

@@ -123,3 +123,35 @@ for (const theme of ["light", "dark"] as const) {
     });
   }
 }
+
+// The entrance plays only on a page load's first page (src/lib/page-load.ts):
+// the home page reached by a client navigation starts at rest, chat and all.
+async function backToTheChat(page: Page) {
+  await expect(async () => {
+    await page.getByRole("link", { name: en.askTheCow }).click();
+    await expect(page).toHaveURL(/\/$/, { timeout: 1000 });
+  }).toPass({ timeout: 5000 });
+  // At once: even the short entrance would still be playing 300ms in.
+  await expect(page.locator("[data-entrance]")).toHaveCount(0, { timeout: 300 });
+  await expect(page.getByText(en.greeting, { exact: true })).toBeVisible({ timeout: 500 });
+  await expect(page.getByRole("list", { name: en.suggestionsLabel })).toBeVisible({ timeout: 500 });
+}
+
+test("home, Projects, then back home: the entrance doesn't play again", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("[data-entrance]")).toHaveCount(0, { timeout: 5000 });
+  await expect(async () => {
+    await page.getByRole("contentinfo").getByRole("link", { name: en.projectsTitle }).click();
+    await expect(page).toHaveURL(/\/projects$/, { timeout: 1000 });
+  }).toPass({ timeout: 5000 });
+  await backToTheChat(page);
+});
+
+test.describe("a first visit that starts on Projects", () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test("going to the chat shows it at rest, with no first-visit entrance", async ({ page }) => {
+    await page.goto("/projects");
+    await backToTheChat(page);
+  });
+});

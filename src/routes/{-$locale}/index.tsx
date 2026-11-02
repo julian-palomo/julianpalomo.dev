@@ -20,6 +20,7 @@ import { parseRef } from "../../lib/analytics/events";
 import { localeFromParam } from "../../lib/i18n/locale";
 import { redirectToSpanish } from "../../lib/i18n/locale-route";
 import { t } from "../../lib/i18n/t";
+import { useMarkPageRendered } from "../../lib/page-load";
 import { shareHead } from "../../lib/share";
 
 // `/` is English and `/es` is Spanish: one route, so switching language keeps
@@ -74,6 +75,7 @@ function Home() {
     returning: entrance === "short",
   }));
   useCleanUrl();
+  useMarkPageRendered();
   return (
     <Analytics on={track} visit={visit}>
       <Page />
