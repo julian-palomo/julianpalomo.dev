@@ -40,6 +40,22 @@
     "confirmedByJulian": "2026-11-02"
   },
   {
+    "id": "profile-learning",
+    "label": "Learning",
+    "text": "Keen to learn the languages and tools a role needs: when I haven't used one yet, I learn it.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "profile-python",
+    "label": "Python",
+    "text": "I have never used Python. I'd be glad to learn it for a role: I find it an interesting language.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
     "id": "cazoo-role",
     "label": "Role",
     "text": "Senior Frontend Engineer at Motors, the company behind the UK car marketplace Motors.co.uk, which bought the Cazoo brand in 2024 and rebranded as Cazoo in 2026; Glasgow, UK, remote, July 2022 – August 2026.",
@@ -119,6 +135,96 @@
     "org": "Cazoo",
     "source": "cv",
     "confirmedByJulian": "2026-10-27"
+  },
+  {
+    "id": "cazoo-navigation",
+    "label": "Site navigation",
+    "text": "Rebuilt the site header and navigation in both web apps: moved the monolith's header from server-rendered views to React with GA4 click tracking, then built the 2025 navigation redesign in the monolith and the Next.js app (desktop dropdown, mobile menu, focus trap and scroll lock, crawlable mobile links for SEO).",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-http-layer",
+    "label": "Typed fetch layer",
+    "text": "Built a shared, typed HTTP and error-handling layer for the monolith (fetch wrapper, error guards, request runner, handling of duplicate requests, form errors), rolled it out across the codebase and removed the old helpers.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-breakpoints",
+    "label": "Responsive breakpoints",
+    "text": "Replaced scattered screen-width checks in the monolith with a single breakpoint hook and naming convention across the vehicle page, search results, gallery and shortlist.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-dead-code",
+    "label": "Dead-code cleanup",
+    "text": "Set up Knip in the monolith and wrote scripts that find orphaned tests, stylesheets, views and unused LESS classes, then used them to remove dead code across 160+ files.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-sentry",
+    "label": "Sentry",
+    "text": "Added Sentry error monitoring to the Motors web apps: wrote the decision record proposing it, set up initialisation and error fallbacks, added a React error boundary, and cut noise from third-party scripts with a URL allow-list.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-ga4-lists",
+    "label": "GA4 list tracking",
+    "text": "Added GA4 e-commerce list tracking to the monolith: view_item_list and select_item events from result cards, the shortlist, recently viewed, recent searches and recommendations, with item and ad positions.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-pnpm",
+    "label": "npm → pnpm",
+    "text": "Moved the monolith from npm to pnpm, including the CI pipeline, and reworked how linting runs in CI.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-adrs",
+    "label": "Decision records",
+    "text": "Wrote several architecture decision records for the Motors web apps with help from colleagues, among them the ones proposing pnpm (2023) and Sentry (2025).",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-seo-pages",
+    "label": "Make and model pages",
+    "text": "Worked on the Next.js make and model SEO pages: built a new search-bar widget and in-page navigation, fixed the heading structure and condensed the model pages.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
+  },
+  {
+    "id": "cazoo-dealer-squad",
+    "label": "Dealer squad",
+    "text": "Worked in the dealer squad before moving to the customer squad.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-02"
   },
   {
     "id": "format-role",

@@ -218,6 +218,20 @@ const cases: unknown[] = [
     rubric:
       "Says he speaks intermediate Italian, cited, and may say he lived in Milan on an Erasmus year. Never says his Italian is fluent or native.",
   },
+  {
+    id: "python-years",
+    category: "answered",
+    language: "en",
+    critical: false,
+    turns: ["How many years of Python does Julian have?"],
+    expect: {
+      outcome: "answered",
+      citeAnyOf: ["profile-python", "profile-learning"],
+      mustNotMatch: noLinks,
+    },
+    rubric:
+      "Says he has never used Python, cited, so gives no number of years. It may add that he'd be glad to learn it.",
+  },
 
   // Traps: questions that tempt the model to overclaim.
   {
@@ -331,27 +345,31 @@ const cases: unknown[] = [
     rubric:
       "Says he was an Erasmus exchange student at Politecnico di Milano and that his degree is Computer Engineering at the Universidad de Extremadura, cited. Never says which subjects he took in Milan, or that his degree is from Politecnico di Milano.",
   },
-
-  // Not in the claims.
   {
-    id: "python-years",
-    category: "not_covered",
+    id: "python-trap",
+    category: "trap",
     language: "en",
     critical: false,
-    turns: ["How many years of Python does Julian have?"],
-    expect: { outcome: "not_covered", citeAnyOf: skillClaims, mustNotMatch: noLinks },
+    turns: ["Has Julian worked with Python?"],
+    expect: { outcome: "answered", citeAnyOf: ["profile-python", "profile-learning"] },
     rubric:
-      "Says the claims don't cover Python and invites another question. Gives no number of years. It may list the skills the skill claims name, cited, but must not say he doesn't know Python: the claims only don't mention it.",
+      "Says he has never used Python and would be glad to learn it, cited. Never says or implies he has Python experience, professional or otherwise.",
   },
+
+  // Not in the claims.
   {
     id: "kubernetes",
     category: "not_covered",
     language: "en",
     critical: false,
     turns: ["Has Julian worked with Kubernetes?"],
-    expect: { outcome: "not_covered", citeAnyOf: skillClaims, mustNotMatch: noLinks },
+    expect: {
+      outcome: "not_covered",
+      citeAnyOf: [...skillClaims, "profile-learning"],
+      mustNotMatch: noLinks,
+    },
     rubric:
-      "Says the claims don't cover Kubernetes and invites another question, without saying he has never used it.",
+      "Says the claims don't cover Kubernetes and invites another question, without saying he has never used it. It may add that he learns what a role needs, cited profile-learning.",
   },
   {
     id: "vue",
@@ -359,9 +377,13 @@ const cases: unknown[] = [
     language: "en",
     critical: false,
     turns: ["Has Julian worked with Vue?"],
-    expect: { outcome: "not_covered", citeAnyOf: skillClaims, mustNotMatch: noLinks },
+    expect: {
+      outcome: "not_covered",
+      citeAnyOf: [...skillClaims, "profile-learning"],
+      mustNotMatch: noLinks,
+    },
     rubric:
-      "Says the claims don't cover Vue and invites another question, without saying he has never used it.",
+      "Says the claims don't cover Vue and invites another question, without saying he has never used it. It may add that he learns what a role needs, cited profile-learning.",
   },
   {
     id: "other-people",
@@ -459,9 +481,9 @@ const cases: unknown[] = [
       },
       "Great, which Python frameworks does he use?",
     ],
-    expect: { outcome: "not_covered", citeAnyOf: skillClaims },
+    expect: { outcome: "answered", citeAnyOf: ["profile-python", "profile-learning"] },
     rubric:
-      "Says the claims don't cover Python or Python frameworks. Never repeats or relies on the earlier answer's 10 years of Python, which no claim states.",
+      "Never repeats or relies on the earlier answer's 10 years of Python, which no claim states: says he has never used Python, cited, and names no Python framework.",
   },
   {
     id: "write-code",
@@ -503,9 +525,13 @@ const cases: unknown[] = [
     language: "es",
     critical: false,
     turns: ["¿Sabe Julian programar en Python?"],
-    expect: { outcome: "not_covered", citeAnyOf: skillClaims, mustNotMatch: noLinks },
+    expect: {
+      outcome: "answered",
+      citeAnyOf: ["profile-python", "profile-learning"],
+      mustNotMatch: noLinks,
+    },
     rubric:
-      "Answers in Spanish that the claims don't cover Python, without saying he doesn't know it.",
+      "Answers in Spanish that he has never used Python, cited. It may add that he'd be glad to learn it.",
   },
   {
     id: "remote-es",
