@@ -41,8 +41,14 @@ export default defineConfig({
         // (ANALYTICS_BEACON_ANY_HOST in wrangler.jsonc), so a test can check
         // `?notrack` removes it. Its host never resolves here, so a test run
         // never loads it or reports a visit to Cloudflare with the real token.
+        // A fake microphone that grants itself, so tests/e2e/voice.spec.ts can
+        // record a question; it plays a tone, which demo mode never transcribes.
         launchOptions: {
-          args: ["--host-resolver-rules=MAP static.cloudflareinsights.com ~NOTFOUND"],
+          args: [
+            "--host-resolver-rules=MAP static.cloudflareinsights.com ~NOTFOUND",
+            "--use-fake-device-for-media-stream",
+            "--use-fake-ui-for-media-stream",
+          ],
         },
       },
     },

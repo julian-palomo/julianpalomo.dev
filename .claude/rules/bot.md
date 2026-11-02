@@ -73,7 +73,7 @@ must keep doing; the ADRs say why.
 ## The key and the endpoint
 
 - **The API key is read only on the server**, in `chat.ts` through the route. Without it, and without demo mode, the endpoint answers `503 { "error": "unavailable" }` and never creates a model.
-- `/api/chat` is the one internal route the browser calls with `fetch`, from `useChat` in `src/components/chat/Chat.tsx`; everything else goes through `createServerFn` (`react-and-typescript.md`).
+- `/api/chat` is the bot's one internal route the browser calls with `fetch`, from `useChat` in `src/components/chat/Chat.tsx`. The chat's microphone posts to `/api/transcribe` too (`src/components/chat/use-voice.ts`), which isn't the bot: it never reaches the model or the claims, and its text goes into the composer to be sent like a typed question. The other exceptions are in `react-and-typescript.md`.
 - Errors reach the client as `{ "error": ... }` (built in `chat-error.ts`) or a fixed stream message, never a stack trace or the provider's message. The real error goes to `console.error` once, from `streamText`'s own `onError` (without it the SDK logs it too), and Workers observability keeps it. The UI stream's `onError` only maps it to the fixed message. That message, `STREAM_ERROR_TEXT` in `chat-error.ts`, is never shown: `useChat` turns the error chunk into its `error`, and `chatErrorMessage` shows `errorGeneric` in the page's language, so never translate it on the server. `tests/e2e/chat.spec.ts` checks this on `/es`.
 - `tests/e2e/bundle.spec.ts` fails if the browser bundle contains `ANTHROPIC_API_KEY` or `confirmedByJulian`.
 

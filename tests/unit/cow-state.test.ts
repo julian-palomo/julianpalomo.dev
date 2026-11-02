@@ -191,3 +191,31 @@ describe("followTilt", () => {
     expect(followTilt(160, true)).toBeGreaterThan(followTilt(160, false));
   });
 });
+
+describe("a question asked by voice", () => {
+  const ready: CowSituation = {
+    status: "ready",
+    answerHasText: false,
+    revealing: false,
+    stopped: false,
+    composer: { hasText: false, focused: false },
+    entrance: null,
+  };
+
+  it("hears while it records, thinks while it's transcribed, and is sorry when it fails", () => {
+    expect(nextCowState("idle", { ...ready, voice: "recording" })).toBe("hearing");
+    expect(nextCowState("hearing", { ...ready, voice: "transcribing" })).toBe("thinking");
+    expect(nextCowState("thinking", { ...ready, voice: "error" })).toBe("sorry");
+  });
+
+  it("goes back to listening when the words are in the focused composer", () => {
+    const filled = { ...ready, composer: { hasText: true, focused: true }, voice: null };
+    expect(nextCowState("thinking", filled)).toBe("listening");
+  });
+
+  it("lets the entrance win", () => {
+    expect(nextCowState("idle", { ...ready, voice: "recording", entrance: "talking" })).toBe(
+      "talking",
+    );
+  });
+});

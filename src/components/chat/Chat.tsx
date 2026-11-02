@@ -6,6 +6,7 @@ import type { ChatUIMessage } from "../../lib/bot/chat-message";
 import { MAX_MESSAGES } from "../../lib/bot/limits";
 import { LICK_MS } from "../../lib/cow-state";
 import { t } from "../../lib/i18n/t";
+import { withTranscript } from "../../lib/voice/insert";
 import { useTrack } from "../analytics/Analytics";
 import { useContact } from "../contact/Contact";
 import { useCowState } from "../cow/use-cow-state";
@@ -14,7 +15,7 @@ import { useLocale } from "../i18n/useLocale";
 import { type AnswerTyping, useSoundEffects } from "../sound/Sound";
 import { ChatEdge } from "./ChatEdge";
 import { ChatErrorNotice } from "./ChatErrorNotice";
-import { Composer } from "./Composer";
+import { Composer, voiceErrorText } from "./Composer";
 import {
   answerAsText,
   answerOutcome,
@@ -29,6 +30,7 @@ import { Greeting } from "./Greeting";
 import { MessageList } from "./MessageList";
 import { Suggestions } from "./Suggestions";
 import { useReveal } from "./use-reveal";
+import { useVoice } from "./use-voice";
 
 // Posts to /api/chat, the default endpoint, with the body the transport sends
 // by default except that only the latest MAX_MESSAGES messages go, so a long
@@ -52,6 +54,23 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
   const [stopped, setStopped] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   useAskFromLink(inputRef);
+
+  // A question asked by voice lands in the box, after what's typed, with the
+  // caret at its end and the box focused, for the visitor to edit and send.
+  const voice = useVoice((text) => {
+    setInput((typed) => withTranscript(typed, text).value);
+    requestAnimationFrame(() => {
+      const box = inputRef.current;
+      if (!box) return;
+      box.focus();
+      box.setSelectionRange(box.value.length, box.value.length);
+    });
+  });
+  const voiceStatus = voice.voice.status;
+  let voiceSituation: "recording" | "transcribing" | "error" | null = null;
+  if (voiceStatus === "recording" || voiceStatus === "transcribing" || voiceStatus === "error") {
+    voiceSituation = voiceStatus;
+  }
   const requesting = status === "submitted" || status === "streaming";
   const last = messages.at(-1);
   const latestAnswer = messages.filter((message) => message.role === "assistant").at(-1);
@@ -109,6 +128,7 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
     composer: { hasText: input.length > 0, focused: composerFocused },
     entrance: entrance.cow,
     cheering,
+    voice: voiceSituation,
   });
 
   // Sending swaps Send for Stop, a suggestion removes its own button, and
@@ -174,6 +194,16 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
   if (status !== seenStatus) {
     setSeenStatus(status);
     if (status === "submitted") setAnnouncement(t(locale, "answering"));
+  }
+  // A voice question is announced as it records, as it's transcribed, and when it fails.
+  const [seenVoice, setSeenVoice] = useState(voice.voice);
+  if (voice.voice.status !== seenVoice.status) {
+    setSeenVoice(voice.voice);
+    if (voice.voice.status === "recording") setAnnouncement(t(locale, "listening"));
+    if (voice.voice.status === "transcribing") setAnnouncement(t(locale, "transcribing"));
+    if (voice.voice.status === "error") {
+      setAnnouncement(voiceErrorText(locale, voice.voice.error));
+    }
   }
   const [wasRevealing, setWasRevealing] = useState(false);
   if (reveal.revealing !== wasRevealing) {
@@ -257,13 +287,21 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
           {error && <ChatErrorNotice error={error} />}
           <Composer
             value={input}
-            onChange={setInput}
+            onChange={(value) => {
+              setInput(value);
+              voice.clearError();
+            }}
             onSend={() => send(input)}
             onStop={stopAnswer}
             onFocus={() => setComposerFocused(true)}
             onBlur={() => setComposerFocused(false)}
             busy={busy}
             closed={outOfQuestions(error)}
+            voice={
+              voice.supported
+                ? { state: voice.voice, onStart: voice.start, onStop: voice.stop }
+                : undefined
+            }
             ref={inputRef}
           />
           {/* The end of the chat, which following keeps in view, clear of the

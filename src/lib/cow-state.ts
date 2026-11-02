@@ -4,7 +4,14 @@
  */
 import type { ChatStatus } from "ai";
 
-export type CowState = "idle" | "listening" | "thinking" | "talking" | "satisfied" | "sorry";
+export type CowState =
+  | "idle"
+  | "listening"
+  | "hearing"
+  | "thinking"
+  | "talking"
+  | "satisfied"
+  | "sorry";
 
 /** Everything in the chat the cow reacts to. */
 export type CowSituation = {
@@ -20,6 +27,8 @@ export type CowSituation = {
   entrance: CowState | null;
   /** A message to Julian just went through the contact form. */
   cheering?: boolean;
+  /** A question asked by voice: recording it, transcribing it, or what went wrong; null otherwise. */
+  voice?: "recording" | "transcribing" | "error" | null;
 };
 
 /** How long the one lick of `satisfied`, and of a pat, lasts. Keep in step with cow.css. */
@@ -35,8 +44,14 @@ export const LICK_MS = 1600;
  * LICK_MS. Applying it twice to the same situation gives the same state.
  */
 export function nextCowState(previous: CowState, situation: CowSituation): CowState {
-  const { status, answerHasText, revealing, stopped, composer, entrance, cheering } = situation;
+  const { status, answerHasText, revealing, stopped, composer, entrance, cheering, voice } =
+    situation;
   if (entrance !== null) return entrance;
+  // A voice question: it hears while it records, chews while the words come
+  // back, as it thinks, and is sorry when it couldn't.
+  if (voice === "recording") return "hearing";
+  if (voice === "transcribing") return "thinking";
+  if (voice === "error") return "sorry";
   // A sent contact message licks too, unless an answer is on its way.
   const answering = status === "submitted" || status === "streaming" || revealing;
   if (cheering && !answering) return "satisfied";

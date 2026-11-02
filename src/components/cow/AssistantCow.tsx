@@ -119,10 +119,13 @@ function CowDrawing({ size, className }: { size: number; className: string | und
           d="M68 80 C 50 76 36 88 40 102 C 42 110 46 104 48 114 C 52 106 56 116 60 108 C 64 114 68 104 72 102 Z"
           fill={cow.ear}
         />
-        <path
-          d="M132 80 C 150 76 164 88 160 102 C 158 110 154 104 152 114 C 148 106 144 116 140 108 C 136 114 132 104 128 102 Z"
-          fill={cow.ear}
-        />
+        {/* ear-r: the ear Hearing raises (cow.css). */}
+        <g className="ear-r">
+          <path
+            d="M132 80 C 150 76 164 88 160 102 C 158 110 154 104 152 114 C 148 106 144 116 140 108 C 136 114 132 104 128 102 Z"
+            fill={cow.ear}
+          />
+        </g>
         <path
           d="M64 78 C 72 64 128 64 136 78 C 142 98 138 118 128 136 C 120 150 80 150 72 136 C 62 118 58 98 64 78 Z"
           fill={cow.face}

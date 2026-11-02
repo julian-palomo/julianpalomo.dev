@@ -31,7 +31,7 @@ describe("the assistant cow's drawing", () => {
   });
 
   it("keeps the reference's part groups, in the same order", () => {
-    const groups = /class(?:Name)?="(tilt|jaw|talk|licks|lick-r|lick-l|lick-mouth)"/g;
+    const groups = /class(?:Name)?="(tilt|ear-r|jaw|talk|licks|lick-r|lick-l|lick-mouth)"/g;
     expect(matches(component, groups)).toEqual(matches(reference, groups));
   });
 

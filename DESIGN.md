@@ -161,6 +161,7 @@ in `.claude/rules/styling.md`. UI components still never use a colour literal.
   | Language (EN/ES)    | The letters flip half over, like an airport board's flap, and back                                                   |
   | Weather chip        | Its icon moves with the weather: the sun turns, a cloud drifts, the drop falls, the snowflake turns, the haar slides |
   | Send                | The arrow nudges up 3px                                                                                              |
+  | Ask by voice        | The microphone tilts 15° and springs back, as if picked up                                                           |
   | Suggested questions | Rise 2px and settle; the chat's cow tilts towards the one under the pointer                                          |
   | Download CV         | The sheet's corner folds out, as if the CV were coming out                                                           |
   | Contact             | The envelope's flap opens                                                                                            |
@@ -593,7 +594,8 @@ artwork: [`docs/design/assistant-cow.svg`](docs/design/assistant-cow.svg).
 It's a flat illustration in the landscape's style: ginger fringe hiding the
 eyes, messy tips, short trimmed chin hair, horns that go out and bend up,
 pale muzzle. Its parts are grouped so each animation moves only what it
-should: `tilt` (the whole head), `jaw` (chin and mouth line), `talk` (the open
+should: `tilt` (the whole head), `ear-r` (the right ear, which Hearing
+raises), `jaw` (chin and mouth line), `talk` (the open
 mouth), `licks` with `lick-r`, `lick-l` and `lick-mouth` (the tongue to either
 side). Only the mouth opens; nothing else separates and no background shows
 through.
@@ -604,6 +606,7 @@ through.
 | -------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | Idle                 | Nothing is happening                                             | A 12s loop: tilts one way (18–26%), licks to the right (44–58%), tilts the other way (66–70%), licks to the left (76–90%) |
 | Listening            | The visitor is typing                                            | Holds its head tilted, as if listening                                                                                    |
+| Hearing              | A question is being recorded (section 10)                        | Holds its head tilted, as Listening does, with its right ear raised 14°                                                   |
 | Thinking             | A question was sent and no word is on screen yet                 | Chews (the jaw moves side to side every 0.55s) with a slight thoughtful tilt                                              |
 | Talking              | The answer is typing itself out, from its first word to its last | The mouth opens and closes, irregularly, every 1.8s                                                                       |
 | Satisfied            | The answer just finished typing                                  | Licks once (1.6s), then goes back to idle                                                                                 |
@@ -693,13 +696,52 @@ mobile; desktop is the same inside the right-hand card.
   full answer once when it has finished typing, never piece by piece. This settles the
   VoiceOver check left open in phase 4.
 - **Keyboard:** Enter sends, Shift+Enter adds a line, Escape stops an answer
-  that's still arriving or typing when focus is in the composer.
+  that's still arriving or typing when focus is in the composer. The
+  microphone is a button like Send, so Space and Enter start and stop it.
 - **Mobile:** the composer is fixed to the bottom above the keyboard, with
   the safe-area inset; its "Your question" label is hidden visually there, to
   save height, and stays as the box's accessible name. Every button is at
   least 44px.
 - **Greeting:** "Hi! Ask me about Julian's experience. I only answer with
   facts he has confirmed, and I show where each one comes from."
+
+### Ask by voice
+
+A microphone button sits next to Send, "Ask by voice" ("Pregunta por voz"). It
+shows only where the browser can record (`MediaRecorder` and `getUserMedia`),
+and it's disabled whenever Send can't send: while an answer arrives, or once
+the chat's own daily limit is reached.
+
+1. **Pressing it** asks for the microphone, then records for at most 30s. The
+   button becomes "Stop recording", a pill with a stop square and the time so
+   far (0:07). The cow is **Hearing** (section 9), and a status pill and the
+   screen-reader announcer say "Listening…" ("Escuchando…").
+2. **Pressing it again, or reaching 30s,** stops it. The cow chews, as when it
+   thinks, and the pill says "Transcribing…" ("Transcribiendo…") for the
+   second or two it takes.
+3. **The words go into the composer,** after anything already typed, with the
+   caret at their end and the box focused. The visitor edits them and presses
+   Send. Nothing is ever sent on its own.
+4. **When it can't,** one line under the composer says why, in `muted` text,
+   with the cow sorry; a keystroke or the next press clears it:
+   - "The microphone wasn't allowed. You can type your question instead."
+   - "I didn't hear anything. Try again a little closer to the microphone."
+   - "That's today's 20 voice questions. You can still type." (the number is
+     `MAX_TRANSCRIPTIONS_PER_DAY`)
+   - "Voice questions are resting until tomorrow. You can still type."
+   - "I couldn't make that out. Try again, or type your question."
+
+**Where the audio goes.** The browser records, turns the recording into a
+16 kHz mono WAV itself, and sends it to our Worker, which passes it to
+Whisper on Cloudflare's Workers AI, the platform the site already runs on, and
+answers with the text
+([`docs/adr/2026-11-02-voice-through-workers-ai.md`](docs/adr/2026-11-02-voice-through-workers-ai.md)).
+It goes nowhere else: not to Google, as the browser's own speech API would in
+Chrome. Neither the audio nor its text is stored or logged; the question is
+recorded only when it's sent, as a typed one is (`docs/analytics.md`). Each
+visitor gets 20 transcriptions a day, and the whole site 150 minutes of audio.
+The microphone is turned off on every way out: a stop, the 30s cap, an error,
+leaving the chat or the page.
 
 The copy in this file is the starting point. Julian approves every visible
 text, in both languages, in the pull request that adds it.
@@ -728,6 +770,8 @@ text, in both languages, in the pull request that adds it.
 | A shooting star                                             | 0.9s                                                                                                           | `ease-out`                                         |
 | Nessie rises, glides and sinks                              | About 4s                                                                                                       | `ease-in-out`                                      |
 | A window flickering like a candle                           | 0.8s                                                                                                           | `ease-in-out`                                      |
+| The cow raising its ear while it hears (section 10)         | 0.3s                                                                                                           | `ease`                                             |
+| The time on the recording button                            | Every 0.25s, up to 0:30                                                                                        | None                                               |
 
 ### Springs
 
@@ -832,7 +876,9 @@ Sounds are **on by default**, quiet, and one tap away from off.
   stored in a cookie (`sound=on|off`, a year), so the server renders the
   right icon.
 - All sounds are short and quiet (the loudest at about half volume), and no
-  sound plays more than once every 150ms. Nothing makes a sound on hover.
+  sound plays more than once every 150ms. Nothing makes a sound on hover,
+  and asking by voice is silent: no sound starts or stops a recording, so
+  none ends up in it.
 
 | Moment                                     | Sound                                                 |
 | ------------------------------------------ | ----------------------------------------------------- |

@@ -10,11 +10,16 @@ import {
 } from "react";
 import { QUESTION_TEXT_DAYS } from "../../lib/analytics/events";
 import { MAX_VISITOR_TEXT } from "../../lib/bot/limits";
+import type { Locale } from "../../lib/i18n/locale";
 import { t } from "../../lib/i18n/t";
 import { springs } from "../../lib/spring";
+import { MAX_TRANSCRIPTIONS_PER_DAY } from "../../lib/voice/limits";
 import { useLocale } from "../i18n/useLocale";
 import { boopOnHover } from "../ui/boop";
 import { IconButton } from "../ui/IconButton";
+import { StatusPill } from "./StatusPill";
+import type { Voice, VoiceError } from "./use-voice";
+import { VoiceButton } from "./VoiceButton";
 
 // On hover Send's arrow nudges up and springs back.
 const onSendHover = boopOnHover({
@@ -37,6 +42,12 @@ type Props = {
   busy: boolean;
   /** No more questions today: the box is disabled and says when they're back. */
   closed: boolean;
+  /** Asking by voice, when the browser can record; absent otherwise. */
+  voice?: {
+    state: Voice;
+    onStart: () => void;
+    onStop: () => void;
+  };
   ref?: Ref<HTMLTextAreaElement>;
 };
 
@@ -60,6 +71,7 @@ export function Composer({
   onBlur,
   busy,
   closed,
+  voice,
   ref,
 }: Props) {
   const locale = useLocale();
@@ -111,6 +123,12 @@ export function Composer({
     }
   }
 
+  const voiceState = voice?.state.status;
+  let voiceStatus: string | undefined;
+  if (voiceState === "recording") voiceStatus = t(locale, "listening");
+  if (voiceState === "transcribing") voiceStatus = t(locale, "transcribing");
+  const voiceError = voice?.state.status === "error" ? voice.state.error : undefined;
+
   const showCounter = length >= COUNTER_FROM;
   const describedBy = showCounter ? `${hintId} ${counterId}` : hintId;
 
@@ -128,6 +146,7 @@ export function Composer({
         <label htmlFor={inputId} className="text-[12.5px] font-semibold text-muted max-lg:sr-only">
           {t(locale, "questionLabel")}
         </label>
+        {voiceStatus && <StatusPill text={voiceStatus} />}
         {/* The box, not the textarea, shows focus: its border turns accent with a
           glow, in place of the outline ring. */}
         <div className="flex items-end gap-2 rounded-[24px] border-2 border-field-border bg-field p-1.5 pl-4 focus-within:border-accent focus-within:ring-4 focus-within:ring-accent/22">
@@ -151,6 +170,14 @@ export function Composer({
             aria-describedby={describedBy}
             className="min-w-0 flex-1 resize-none self-center bg-transparent py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-transparent"
           />
+          {voice && (
+            <VoiceButton
+              voice={voice.state}
+              disabled={busy || closed}
+              onStart={voice.onStart}
+              onStop={voice.onStop}
+            />
+          )}
           {busy ? (
             <IconButton look="accent" label={t(locale, "stop")} onClick={onStop}>
               <StopIcon />
@@ -167,6 +194,11 @@ export function Composer({
             </IconButton>
           )}
         </div>
+        {voiceError && (
+          <p className="text-[12.5px] text-muted" data-testid="voice-error">
+            {voiceErrorText(locale, voiceError)}
+          </p>
+        )}
         <div className="flex items-baseline justify-between gap-3 text-[12.5px]">
           {/* Touch screens have no Enter or Shift, so the hint is hidden there. */}
           <p id={hintId} className="text-muted [@media(hover:none)]:hidden">
@@ -188,6 +220,27 @@ export function Composer({
       </p>
     </>
   );
+}
+
+/** What went wrong with a voice question, in the page's language. */
+export function voiceErrorText(locale: Locale, error: VoiceError): string {
+  const errors = t(locale, "voiceErrors");
+  switch (error) {
+    case "denied":
+      return errors.denied;
+    case "noSpeech":
+      return errors.noSpeech;
+    case "visitorLimit":
+      return errors.visitorLimit(MAX_TRANSCRIPTIONS_PER_DAY);
+    case "dailyLimit":
+      return errors.dailyLimit;
+    case "failed":
+      return errors.failed;
+    default: {
+      const unhandled: never = error;
+      throw new Error(String(unhandled));
+    }
+  }
 }
 
 /**

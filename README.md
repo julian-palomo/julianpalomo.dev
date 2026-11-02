@@ -69,6 +69,12 @@ once, whole. A shared link shows a preview card in its language, the tab shows
 the cow's head, and search engines get a sitemap and a schema.org `Person`. Every question goes through two daily limits kept in Cloudflare
 D1: 30 questions per visitor, and about $3 of model spend across everyone.
 Visitors are counted by a hash that changes every day, never by their IP.
+A question can also be asked by voice, with the microphone next to Send: the
+browser records it, our Worker transcribes it with Whisper on Cloudflare's
+Workers AI at `POST /api/transcribe`, and the words land in the box for the
+visitor to check and send. The audio and its text are never stored, and each
+visitor gets 20 a day, the site 150 minutes
+([`docs/adr/2026-11-02-voice-through-workers-ai.md`](docs/adr/2026-11-02-voice-through-workers-ai.md)).
 The live site has its API key and its limits in place, so the chat answers on
 [julianpalomo.dev](https://julianpalomo.dev); without a key it says it isn't
 available.
@@ -147,7 +153,9 @@ random string (the salt for the visitor hash). Then run `pnpm db:migrate:local`
 once to create the tables in the local D1. With a key but no salt, `/api/chat`
 answers "not available", so the model is never called without its limits.
 Without a key it answers "not available" too; with `BOT_DEMO=1` instead of a
-key, it answers in demo mode, as on previews. `pnpm test:e2e` never uses your key: it builds with
+key, it answers in demo mode, as on previews. With `BOT_DEMO=1`,
+`/api/transcribe` answers a fixed sentence too, so a local Worker never calls
+Workers AI, which bills even from there. `pnpm test:e2e` never uses your key: it builds with
 `wrangler.jsonc`'s `e2e` environment, which loads no secrets and runs in demo
 mode.
 
