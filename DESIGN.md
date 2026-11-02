@@ -550,6 +550,11 @@ through.
 - Its two front hooves are part of its drawing on the edge: two rounded
   shapes, 17 × 11px, in its darkest brown (`strand`), 26px in from each side
   and 17px up from its bottom at 132px, scaled with it on a phone.
+- **It notices the pointer.** With a mouse anywhere on the page, it tilts a
+  little towards it, up to 5°, around its chin as its own tilts turn, and
+  without ever turning its head; over a suggested question, towards that
+  question, up to 8°. A spring moves it (section 11), on top of whatever
+  its state is doing, except when it's sorry, when its head stays down.
 - It's a button labelled "Pat the cow", for the tap. The tap and hover are
   extras; nothing depends on them.
 - With reduced motion it's a still drawing in every state.

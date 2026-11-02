@@ -19,8 +19,10 @@ export function Suggestions({ label, heading, questions, onPick }: Props) {
       <ul aria-label={label} className="flex flex-wrap justify-center gap-2">
         {questions.map((question) => (
           <li key={question}>
+            {/* data-suggestion: the chat's cow tilts towards the one under the pointer. */}
             <button
               type="button"
+              data-suggestion=""
               onClick={(event) => onPick(question, event.currentTarget.getBoundingClientRect())}
               className="min-h-11 rounded-full border-[1.5px] border-border bg-field px-4 py-2 text-left text-sm font-medium hover:border-accent"
             >

@@ -62,3 +62,18 @@ export function nextCowState(previous: CowState, situation: CowSituation): CowSt
     }
   }
 }
+
+/** How far the chat's cow tilts towards the pointer, in degrees, and towards a suggestion under it. */
+export const FOLLOW_DEGREES = { pointer: 5, suggestion: 8 } as const;
+// The pointer this far to one side, in px, gets the whole tilt.
+const FOLLOW_REACH_PX = 320;
+
+/**
+ * The chat's cow's tilt towards a point `dx` px to the right of its chin
+ * (negative: to the left), around its chin, as its own tilts turn. Further
+ * away tilts more, up to the limit; it never turns its head away.
+ */
+export function followTilt(dx: number, overSuggestion: boolean): number {
+  const most = overSuggestion ? FOLLOW_DEGREES.suggestion : FOLLOW_DEGREES.pointer;
+  return most * Math.max(-1, Math.min(1, dx / FOLLOW_REACH_PX));
+}

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { type CowSituation, type CowState, nextCowState } from "../../src/lib/cow-state";
+import {
+  type CowSituation,
+  type CowState,
+  FOLLOW_DEGREES,
+  followTilt,
+  nextCowState,
+} from "../../src/lib/cow-state";
 
 const quiet: CowSituation = {
   status: "ready",
@@ -164,5 +170,24 @@ describe("nextCowState", () => {
         expect(nextCowState(once, now)).toBe(once);
       }
     }
+  });
+});
+
+describe("followTilt", () => {
+  it("leans towards the side the pointer is on", () => {
+    expect(followTilt(100, false)).toBeGreaterThan(0);
+    expect(followTilt(-100, false)).toBeLessThan(0);
+    expect(followTilt(0, false)).toBe(0);
+  });
+
+  it("leans further the further away the pointer is, up to its limit", () => {
+    expect(followTilt(200, false)).toBeGreaterThan(followTilt(100, false));
+    expect(followTilt(5000, false)).toBe(FOLLOW_DEGREES.pointer);
+    expect(followTilt(-5000, false)).toBe(-FOLLOW_DEGREES.pointer);
+  });
+
+  it("leans a little more towards a suggestion under the pointer", () => {
+    expect(followTilt(5000, true)).toBe(FOLLOW_DEGREES.suggestion);
+    expect(followTilt(160, true)).toBeGreaterThan(followTilt(160, false));
   });
 });
