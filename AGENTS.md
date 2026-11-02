@@ -84,11 +84,11 @@ wrangler commands that change Cloudflare.
 
 - `src/routes/`: file-based routes: the home page (`{-$locale}/index.tsx`) and the inner pages (`{-$locale}/projects.tsx`, `{-$locale}/how-its-built.tsx`), each at `/…` and `/es/…`. `src/routeTree.gen.ts` is generated; never edit it by hand.
 - `src/lib/`: plain TypeScript modules, such as `site.ts`.
-- `src/lib/bot/`: the assistant: model settings, the system prompt, the read-only tools, the citation parser, demo mode, the daily limits and the chat logic. `src/routes/api/chat.ts` is its endpoint, `POST /api/chat`.
+- `src/lib/bot/`: the assistant: model settings, the system prompt, the read-only tools, the citation parser, demo mode, the daily limits, the suggested questions' answer cache and the chat logic. `src/routes/api/chat.ts` is its endpoint, `POST /api/chat`.
 - `src/lib/analytics/`: the site's own analytics (`docs/analytics.md`): the closed list of events, who is never counted, the page's queue, the D1 store with its retention, and the endpoint's logic. `src/routes/api/events.ts` is its endpoint, `POST /api/events`; `src/components/analytics/` records the events in the page.
 - `src/lib/weather/`: Glasgow's live weather: the Open-Meteo request, its mapping to the landscape's levels and the endpoint's logic, with the 30-minute cache. `src/routes/api/weather.ts` is its endpoint, `GET /api/weather`.
 - `src/lib/contact/`: the contact form's logic: the schema the form and the server share, Turnstile's check, the daily count in D1 and the email (`docs/contact.md`). `server.ts` is its server function, `sendContact`.
-- `migrations/`: D1 migrations for the daily limits, the chat's and the contact form's, and for the analytics events. `pnpm db:migrate:local` applies them locally; only Julián applies them to production.
+- `migrations/`: D1 migrations for the daily limits, the chat's and the contact form's, the analytics events, and the suggested questions' answer cache. `pnpm db:migrate:local` applies them locally; only Julián applies them to production.
 - `src/components/`: React components, one folder per feature, such as `chat/` (the chat on the home page) and `page/` (the hero's row of controls every page shares, and the inner pages' shell); shared pieces such as `IconButton` live in `ui/`.
 - `src/content/`: personal content, such as `claims.json`. It isn't MIT (`LICENSE`, section 2), and in `src/` only `src/lib/claims.ts` reads it.
 - `src/styles/tokens.css`: the only place colours are defined.

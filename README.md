@@ -89,8 +89,9 @@ What exists around it:
 - A data file with those facts (claims), a Zod schema that validates it, and a
   filter that hands out only the facts I've confirmed
 - The chat endpoint, with three read-only tools that hand the model those
-  confirmed facts and nothing else, the daily limits in D1, and a demo mode
-  for previews and tests
+  confirmed facts and nothing else, the daily limits in D1, a cache in D1
+  that answers a suggested question asked again at once, and a demo mode for
+  previews and tests
 - Vitest for unit tests, and Playwright for the home page, the chat (in demo
   mode) and a check that the browser bundle holds no API key or claims data
 - Evals: questions asked to the real assistant through the same code as the
