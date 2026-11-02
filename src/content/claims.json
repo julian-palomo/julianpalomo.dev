@@ -585,5 +585,95 @@
     "org": "julianpalomo.dev",
     "source": "julian",
     "confirmedByJulian": "2026-10-29"
+  },
+  {
+    "id": "site-citations",
+    "label": "Citations",
+    "text": "Every fact an answer uses shows as a numbered citation that opens the claim as I confirmed it, with the date I confirmed it. A citation only counts if the assistant looked that fact up while answering, and the model never sees the confirmation date.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": null
+  },
+  {
+    "id": "site-bilingual",
+    "label": "English and Spanish",
+    "text": "In English at / and in Spanish at /es, with Spanish by default for visitors in Spain. Each claim is written once, in English, and the assistant answers in the visitor's language, or in the page's when the question doesn't make it clear.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": null
+  },
+  {
+    "id": "site-prompt-caching",
+    "label": "Prompt caching",
+    "text": "The system prompt and the tools are cached with one prompt-cache breakpoint; the page's language goes in a second, uncached system message, so visitors in English and Spanish share the same cached prompt.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": null
+  },
+  {
+    "id": "site-weather-proxy",
+    "label": "Weather through the Worker",
+    "text": "Glasgow's live weather comes from Open-Meteo through the site's own Worker, so a visitor's IP never reaches Open-Meteo. The forecast is cached for 30 minutes, and it needs no API key and no cron.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": null
+  },
+  {
+    "id": "site-no-key-in-browser",
+    "label": "No key in the browser",
+    "text": "The Anthropic API key is read only on the server. A Playwright test checks that neither the key's variable name nor the claims' confirmation field appears in the browser bundle, and the end-to-end tests run against a production build in demo mode, so they never call the model.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": null
+  },
+  {
+    "id": "site-accessibility",
+    "label": "Accessibility",
+    "text": "The chat works from the keyboard: citations and the sources list are buttons with aria-expanded. Screen readers hear each answer once, whole, and with prefers-reduced-motion nothing moves that does not have to: no entrance, no herd or cow animation, no typing effect.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": null
+  },
+  {
+    "id": "site-cow",
+    "label": "The Highland cow",
+    "text": "The assistant is an animated Highland cow that follows the chat: it listens while you type, chews while it looks things up, talks while the answer types itself out and lowers its head when something goes wrong. On a first visit the page introduces itself in order: who I am, the glen waking up, then the cow.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": null
+  },
+  {
+    "id": "site-decisions",
+    "label": "Decision records",
+    "text": "Every decision that shapes the project is written down as an architecture decision record, and every visual change starts in a design document (DESIGN.md).",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": null
+  },
+  {
+    "id": "site-agent-workflow",
+    "label": "Parallel agent sessions",
+    "text": "Several Claude Code sessions work in parallel, each in its own git worktree. GitHub issues are the spec, each plan is posted on its issue and reviewed before any code, a second Claude session reviews the pull requests, and only I merge.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": null
+  },
+  {
+    "id": "site-sharing",
+    "label": "Link previews",
+    "text": "A shared link shows a preview card in its language, drawn with the site's own components; search engines get a sitemap and a schema.org Person.",
+    "area": "project",
+    "org": "julianpalomo.dev",
+    "source": "julian",
+    "confirmedByJulian": null
   }
 ]
