@@ -151,6 +151,11 @@ it prints:
 Then it lists the last 30 days' questions whose finished answer showed no
 source: what the assistant had no claim for.
 
+Every number counts page loads, not people. Someone who goes from the home
+page to Projects and back makes two home page loads, so the funnel's
+percentages are per home page load: a drop between steps can be a visitor who
+came back, not one who left.
+
 A section whose query fails prints "couldn't read it" and the rest carry on. It
 never prints 0 for a number it couldn't read.
 
