@@ -5,6 +5,7 @@ import type { Season } from "../../lib/scene/season";
 import type { SkyState } from "../../lib/scene/sky-state";
 import { useNow } from "../clock/Clock";
 import { useLocale } from "../i18n/useLocale";
+import { useSoundEffects } from "../sound/Sound";
 import { Button } from "../ui/Button";
 import { IconButton } from "../ui/IconButton";
 import { usePlay } from "./Play";
@@ -38,13 +39,28 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
   const change = (control: PanelControl) => dispatch({ ...control, from: live });
 
   // The dialog is outside React's model: opening and closing it is syncing
-  // with the DOM.
+  // with the DOM. Its opening sound goes with it, since the gear and the chip
+  // open it from outside this component.
+  const { play } = useSoundEffects();
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the sound plays once, when the dialog opens.
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      play("panelOpen");
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
+
+  // Every way out comes through here: the close button, the backdrop, Escape
+  // (the dialog's own close event) and "Back to live Glasgow". The close
+  // event also fires when the effect above closes the dialog, by which time
+  // `open` is false, so the sound plays once.
+  const close = () => {
+    if (open) play("panelClose");
+    onClose();
+  };
 
   const place = position
     ? ({
@@ -60,12 +76,12 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
       className="sky-panel"
       aria-labelledby={titleId}
       style={place}
-      onClose={onClose}
+      onClose={close}
       // A click on the backdrop lands on the dialog itself; clicks inside land
       // on its content. Keyboards close it with Escape, which the modal dialog
       // handles natively.
       onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (event.target === event.currentTarget) close();
       }}
     >
       {open && (
@@ -77,7 +93,7 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
               </h2>
               <p className="text-[13px] text-muted">{t(locale, "playSubtitle")}</p>
             </div>
-            <IconButton look="tint" label={t(locale, "close")} onClick={onClose}>
+            <IconButton look="tint" label={t(locale, "close")} onClick={close}>
               <CloseIcon />
             </IconButton>
           </div>
@@ -138,7 +154,7 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
               look="primary"
               onClick={() => {
                 dispatch({ type: "backToLive" });
-                onClose();
+                close();
               }}
             >
               <span aria-hidden="true" className="size-2 rounded-full bg-live" />
@@ -207,8 +223,21 @@ type SliderProps = {
   onChange: (value: number) => void;
 };
 
+// The keys that move a range input, whose release plays the slider's click.
+const RANGE_KEYS = new Set([
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "Home",
+  "End",
+  "PageUp",
+  "PageDown",
+]);
+
 function Slider({ label, track, min, max, value, word, ends, onChange }: SliderProps) {
   const id = useId();
+  const { play } = useSoundEffects();
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline justify-between gap-3">
@@ -226,6 +255,11 @@ function Slider({ label, track, min, max, value, word, ends, onChange }: SliderP
         value={value}
         aria-valuetext={word}
         onChange={(event) => onChange(Number(event.target.value))}
+        // A soft click when the slider is let go, not on every step.
+        onPointerUp={() => play("slider")}
+        onKeyUp={(event) => {
+          if (RANGE_KEYS.has(event.key)) play("slider");
+        }}
         className={`sky-range ${track}`}
       />
       {ends && (

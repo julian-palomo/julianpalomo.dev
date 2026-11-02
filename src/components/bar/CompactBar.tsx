@@ -3,12 +3,13 @@ import { land } from "../../lib/scene/palette";
 import { seasonOf } from "../../lib/scene/season";
 import { useNow } from "../clock/Clock";
 import { useLocale } from "../i18n/useLocale";
+import { SoundToggle } from "../sound/SoundToggle";
 import { useTheme } from "../theme/Theme";
 import { ThemeToggle } from "../theme/ThemeToggle";
 
 /**
  * The compact bar on a phone, once the chat has started (DESIGN.md section
- * 5): the square portrait, the name, the sound toggle's place and the theme
+ * 5): the square portrait, the name, the sound toggle and the theme
  * toggle, 58px tall, with a strip of hills along its bottom in the season's
  * land colours. Fixed to the top below 1024px; the hero has scrolled away.
  */
@@ -30,8 +31,7 @@ export function CompactBar() {
       <p className="min-w-0 flex-1 truncate font-display text-[17px] font-extrabold">
         {t(locale, "name")}
       </p>
-      {/* The sound toggle's place. */}
-      <span aria-hidden="true" className="size-11 shrink-0" />
+      <SoundToggle look="tint" />
       <ThemeToggle look="tint" />
       <svg
         aria-hidden="true"

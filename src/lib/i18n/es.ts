@@ -20,6 +20,8 @@ export const es: Messages = {
   switchLanguage: { short: "EN", label: "View in English" },
   themeToDark: "Cambiar al tema oscuro",
   themeToLight: "Cambiar al tema claro",
+  muteSounds: "Silenciar sonidos",
+  turnSoundsOn: "Activar sonidos",
 
   chatLabel: "Chat",
   chatHeading: "Pregúntame por Julián",

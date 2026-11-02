@@ -3,6 +3,7 @@ import type { ChatUIMessage } from "../../lib/bot/chat-message";
 import { chipLabel, type Source } from "../../lib/bot/citations";
 import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
+import { useSoundEffects } from "../sound/Sound";
 import {
   answerAsText,
   confirmationLine,
@@ -56,7 +57,13 @@ export function AssistantMessage({ message, typed }: Props) {
   const fades = boundaries.length > 0;
 
   const [view, setView] = useState(SOURCES_CLOSED);
-  const tap = (event: SourcesEvent) => setView(nextSources(view, event));
+  const { play } = useSoundEffects();
+  // Opening the sources clicks; closing them is silent.
+  const tap = (event: SourcesEvent) => {
+    const next = nextSources(view, event);
+    if (next.list && !view.list) play("sources");
+    setView(next);
+  };
   const open = view.claim;
   const opened = chips.find(({ number }) => number === open);
   const linkLabel = streaming ? undefined : sourcesLinkLabel(chips.length, view.list, locale);

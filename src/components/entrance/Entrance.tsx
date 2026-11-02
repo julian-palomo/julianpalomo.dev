@@ -4,6 +4,7 @@ import {
   type RefObject,
   useContext,
   useEffect,
+  useEffectEvent,
   useRef,
   useState,
 } from "react";
@@ -21,6 +22,7 @@ import {
   SHORT_MS,
 } from "../../lib/entrance";
 import { useReveal } from "../chat/use-reveal";
+import { useSoundEffects } from "../sound/Sound";
 
 type Stage =
   // The server's HTML and the first client render: the CSS plays on its own.
@@ -73,6 +75,13 @@ type Props = {
 };
 
 const SKIP_EVENTS = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
+// The skips that are a tap, a click or a key: browsers allow sound from them,
+// so the cow moos as the entrance ends, unless the press is on a control
+// marked `data-silent-press`, such as the mute button.
+const MOO_EVENTS = new Set<string>(["pointerdown", "keydown"]);
+const mooes = (event: Event) =>
+  MOO_EVENTS.has(event.type) &&
+  !(event.target instanceof Element && event.target.closest("[data-silent-press]"));
 
 /**
  * The page's entrance (DESIGN.md section 11). It renders the page's root with
@@ -80,11 +89,15 @@ const SKIP_EVENTS = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
  * the first paint. This half does what CSS can't: it joins the CSS clock at
  * whatever beat it has reached when JavaScript starts, moves the cow and types
  * the greeting, waits for a background tab to be shown, and ends the entrance
- * at once on any tap, key, wheel or touch. With reduced motion there is none.
+ * at once on any tap, key, wheel or touch. A tap, click or key also makes the
+ * cow moo, the entrance's only sound, since browsers allow none before it.
+ * With reduced motion there is none.
  */
 export function Entrance({ kind, greeting, hero, className, children }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const [stage, setStage] = useState<Stage>({ status: "starting" });
+  const { play } = useSoundEffects();
+  const moo = useEffectEvent(() => play("moo"));
 
   useEffect(() => {
     const element = root.current;
@@ -94,6 +107,12 @@ export function Entrance({ kind, greeting, hero, className, children }: Props) {
       return;
     }
     const end = () => setStage({ status: "over" });
+    // The listeners stay after the entrance ends, so only a skip while the
+    // root still has `data-entrance` moos.
+    const skip = (event: Event) => {
+      if (mooes(event) && element.hasAttribute("data-entrance")) moo();
+      end();
+    };
     let timer: ReturnType<typeof setTimeout> | undefined;
     let join: Join | undefined;
 
@@ -129,12 +148,12 @@ export function Entrance({ kind, greeting, hero, className, children }: Props) {
     else document.addEventListener("visibilitychange", show);
 
     for (const type of SKIP_EVENTS) {
-      window.addEventListener(type, end, { capture: true, passive: true });
+      window.addEventListener(type, skip, { capture: true, passive: true });
     }
     return () => {
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", show);
-      for (const type of SKIP_EVENTS) window.removeEventListener(type, end, { capture: true });
+      for (const type of SKIP_EVENTS) window.removeEventListener(type, skip, { capture: true });
     };
   }, [kind]);
 

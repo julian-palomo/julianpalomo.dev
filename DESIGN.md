@@ -156,7 +156,8 @@ From top to bottom:
 1. **The hero** (230px tall): the landscape fills it edge to edge. On top of
    it, a row of controls 12px from the edges:
    - left: the gear (section 8), 44px round in `accent`, and the weather chip
-     ("9°C · Drizzle", in `glass`);
+     ("9°C · Drizzle", in `glass`; only "9°C" below 400px, so the row fits a
+     320px phone in both languages);
    - right: the language toggle ("ES" / "EN"), the sound toggle and the theme
      toggle, 44px round buttons in `glass`, the size of every icon button on the site.
 2. **The portrait** (96 × 120px), overlapping the hero's bottom edge by half
@@ -389,9 +390,10 @@ come from Glasgow (below); the gear lets visitors set them (section 8).
   - the chip's temperature: rounded to a whole degree.
 - **Attribution:** Open-Meteo's terms ask for a credit under CC BY 4.0. The
   footer says "Weather data by Open-Meteo.com" with a link.
-- **The weather chip** reads "Glasgow · 15:04 · 9°C · Drizzle" on desktop and
-  "9°C · Drizzle" on mobile, in Glasgow's time. It's a button that opens the
-  gear's panel.
+- **The weather chip** reads "Glasgow · 15:04 · 9°C · Drizzle" on desktop,
+  "9°C · Drizzle" on mobile and "9°C" below 400px, in Glasgow's time. Its
+  accessible name always holds the whole weather. It's a button that opens
+  the gear's panel.
 
 ### Particles
 
@@ -492,7 +494,9 @@ Comeau's blog. It's a toy, and it's honest about being one.
   toggle then is an ordinary toggle.
 - **While playing**, the slider's time also drives the theme (night is dark),
   the chip turns `accent` and reads "Your sky · 15:00 · tap to reset" ("Your
-  sky · 15:00" on a phone), and tapping it goes back to live. A season other
+  sky · 15:00" on a phone, "15:00" below 400px, where its accent colour and
+  its accessible name still say it's the visitor's sky), and tapping it goes
+  back to live. A season other
   than today's moves the date to the 15th of its middle month, as `?sky=`
   does, so summer's evenings stay light. Pressing the theme toggle while
   playing moves the time to 13:00 (light) or 22:00 (dark); on a summer day
@@ -702,31 +706,49 @@ With `prefers-reduced-motion: reduce`:
 Sounds are **on by default**, quiet, and one tap away from off.
 
 - They play through [use-sound](https://github.com/joshwcomeau/use-sound)
-  from a single audio sprite. The sounds issue checks that it works with
-  React 19 before relying on it.
+  from a single audio sprite (WebM, with MP3 for browsers without it), which
+  loads once the page is idle, or at the first tap, click or key if that
+  comes first, never on the critical path. Each loop (the rain, the typing)
+  is a file of its own, since a looping slice of a sprite clicks at its
+  seams, and loads only the first time it's needed. `docs/sounds.md` lists
+  each file's source and licence, and how to replace one.
 - Browsers block audio until the first interaction with the page. That's
   fine: every sound here answers something the visitor did.
 - **The sound toggle** is always visible (in the hero, and in the compact bar
-  on mobile). The choice is stored in a cookie (`sound=on|off`), so the
-  server renders the right icon.
+  on mobile), labelled "Mute sounds" or "Turn sounds on". The choice is
+  stored in a cookie (`sound=on|off`, a year), so the server renders the
+  right icon.
 - All sounds are short and quiet (the loudest at about half volume), and no
-  sound plays more than once every 150ms.
+  sound plays more than once every 150ms. Nothing makes a sound on hover.
 
-| Moment                               | Sound                                 |
-| ------------------------------------ | ------------------------------------- |
-| Send a question                      | A "pop"                               |
-| An answer starts                     | A soft brush                          |
-| An answer ends                       | A short chime                         |
-| Tap the cow                          | A soft "moo" (at most once every 3s)  |
-| Theme toggle                         | A switch click                        |
-| Language toggle                      | A soft tick                           |
-| Release a slider in the gear's panel | A soft click                          |
-| Heavy rain (7 or more)               | A rain loop, very low, while it lasts |
-| Download the CV                      | A paper rustle                        |
+| Moment                                     | Sound                                                 |
+| ------------------------------------------ | ----------------------------------------------------- |
+| Send a question                            | A "pop"                                               |
+| Press a suggested question                 | A soft click, in place of the pop                     |
+| An answer types itself out                 | A soft, low keyboard-typing loop, until its last word |
+| An answer ends (its last word)             | A short chime                                         |
+| Open the sources under an answer           | A soft click                                          |
+| Tap the cow                                | A soft "moo" (at most once every 3s)                  |
+| A tap, click or key that ends the entrance | The same moo, under the same 3s rule                  |
+| Theme toggle                               | A switch click                                        |
+| Language toggle                            | A soft tick                                           |
+| Open or close the gear's panel             | A soft tick                                           |
+| Release a slider in the gear's panel       | A soft click                                          |
+| Heavy rain (7 or more)                     | A rain loop, very low, while it lasts                 |
+| Download the CV                            | A paper rustle                                        |
 
-Which sounds: Julian's own (made with his synths) or a CC0 pack such as
-Kenney's Interface Sounds, plus a CC0 moo. The sounds issue asks Julian before
-it starts, and records each file's source and licence in `docs/sounds.md`.
+Only the visitor's own answers make the answer sounds: the greeting that
+types itself out in the first visit's entrance is silent, and so is a theme
+change that Glasgow's dusk or dawn brings. With reduced motion an answer
+shows at once, so there's no typing loop, only the chime. The entrance is
+otherwise silent, since browsers allow no sound before the first
+interaction: the moo that ends it answers that interaction. Pressing the
+mute button never makes a sound, so a press on it ends the entrance
+silently.
+
+The sounds are CC0 for now: Kenney's Interface Sounds and four sounds from
+Freesound; Julian will replace them one by one with his own, made with his
+synths, each one a file swap.
 
 ## 13. The portrait
 

@@ -29,7 +29,10 @@ its lips when it's done and lowers its head when something goes wrong. It rests
 on the chat's edge. On a first visit the page introduces itself in order: who I
 am, the glen waking up, then the cow, which says hello big in the hero and flies
 down to the chat; later visits that week get a 2s version, and any tap ends
-it. The site is in
+it. Quiet CC0 sounds answer what the visitor does, such as a pop when they ask,
+a soft typing loop while the answer types itself out, a chime when it ends and
+a moo when they pat the cow; they're on by default, and a mute button in the
+hero turns them off. The site is in
 English at `/` and Spanish at `/es`: visitors in Spain get Spanish by default,
 everyone else English, and the language toggle always wins.
 
@@ -114,6 +117,7 @@ pnpm dev
 | `pnpm knip`             | Reports unused files, exports and dependencies.                                                                                                                           |
 | `pnpm db:migrate:local` | Applies the D1 migrations to the local database in `.wrangler/state`.                                                                                                     |
 | `pnpm og`               | Rewrites the link preview images and the icons in `public/` from a card drawn with the site's own components (`scripts/og/`). Run it after changing the name or the role. |
+| `pnpm sounds`           | Builds the sound sprite in `public/sounds/` from one file per sound in `sounds/` (`docs/sounds.md`). Needs ffmpeg.                                                        |
 
 To try the assistant locally, copy `.dev.vars.example` to `.dev.vars` (it's
 gitignored), put an Anthropic API key in it, and set `VISITOR_SALT` to any long
@@ -202,6 +206,8 @@ Each decision is recorded as it's made, one file each, in `docs/adr/`.
   through the limits, the model, its tools and the citation check.
 - [`DESIGN.md`](DESIGN.md): how the site looks, moves and sounds: colours,
   type, the live Highland landscape, the cow and the chat.
+- [Sounds](docs/sounds.md): where each sound came from, its licence, and how
+  to replace one and rebuild the sprite.
 - [Evals](docs/evals.md): how the assistant is tested against its claims,
   and the score of every baseline.
 - [Architecture decision records](docs/adr/README.md): what was decided,

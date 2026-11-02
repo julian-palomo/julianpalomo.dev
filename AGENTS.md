@@ -63,6 +63,7 @@ blocks something, change course; don't look for another way to run it.
 | `pnpm test:hooks`       | Tests for the Claude Code hooks.                              |
 | `pnpm db:migrate:local` | Applies the D1 migrations to the local database only.         |
 | `pnpm og`               | Rewrites the link preview images and icons in `public/`.      |
+| `pnpm sounds`           | Builds the sound sprite from `sounds/` (needs ffmpeg).        |
 
 Run `pnpm build` and `pnpm test:e2e` without asking when the change touches
 routes, components, styles, the landscape, the build or CI, and say so in one
@@ -92,6 +93,7 @@ wrangler commands that change Cloudflare.
 - `tests/unit/`: Vitest. `tests/e2e/`: Playwright, against a production build of the `e2e` environment, in demo mode (`.claude/rules/tests.md`).
 - `.github/workflows/ci.yml`: CI on every pull request to `main`; the evals only on the `run-evals` label. Deploys aren't here: Cloudflare Workers Builds deploys `main` and comments a preview URL on every PR.
 - `docs/adr/`: one file per decision. `docs/tech-debt.md`: shortcuts taken on purpose.
+- `sounds/`: one source file per sound; `scripts/sounds/` builds them into `public/sounds/` and `src/lib/sound/sprite.json` (`docs/sounds.md`).
 - `scripts/og/`: the card and the icon that `pnpm og` draws with the site's own components and screenshots into `public/` (the link preview images and the icons). It never reaches the site's bundle.
 - `.claude/`: rules, hooks, skills and subagents for Claude Code; `.claude/README.md` explains them.
 
@@ -103,5 +105,6 @@ wrangler commands that change Cloudflare.
 - `docs/evals.md`: what the evals do, the thresholds and why, and a row per baseline. Add a row after every run that changes the prompt, the model or its settings; never edit one.
 - `docs/adr/README.md`: the index of decisions. Records are history; a change of mind is a new ADR.
 - `docs/tech-debt.md`: add a row when you take a shortcut.
+- `docs/sounds.md`: each sound's file, source and licence, and how to replace one and rebuild the sprite with `pnpm sounds`.
 - `.claude/rules/*.md`: per-area rules. Each starts with a `paths:` list; before editing a file, read every rule whose paths match it.
 - `.claude/skills/*/SKILL.md`: step-by-step procedures (handoff, opening a PR, implementing an issue).

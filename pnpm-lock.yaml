@@ -234,6 +234,9 @@ importers:
       react-dom:
         specifier: ^19.3.1
         version: 19.3.1(react@19.3.1)
+      use-sound:
+        specifier: ^5.0.0
+        version: 5.0.0(react@19.3.1)
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -2673,6 +2676,12 @@ packages:
         integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==,
       }
 
+  howler@2.2.4:
+    resolution:
+      {
+        integrity: sha512-iARIBPgcQrwtEr+tALF+rapJ8qSc+Set2GJQl7xT1MQzWaVkFebdJhR3alVlSiUf5U7nAANKuj3aWpwerocD5w==,
+      }
+
   isbot@5.2.2:
     resolution:
       {
@@ -3504,6 +3513,14 @@ packages:
     hasBin: true
     peerDependencies:
       browserslist: ">= 4.21.0"
+
+  use-sound@5.0.0:
+    resolution:
+      {
+        integrity: sha512-MNHT3FFC5HxNCrgZtrnpIMJI2cw/0D2xismcrtyht8BTuF5FhFhb57xO/jlQr2xJaFrc/0btzRQvGyHQwB7PVA==,
+      }
+    peerDependencies:
+      react: ">=16.8"
 
   use-sync-external-store@1.7.0:
     resolution:
@@ -4962,6 +4979,8 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
+  howler@2.2.4: {}
+
   isbot@5.2.2: {}
 
   isexe@2.0.0: {}
@@ -5435,6 +5454,11 @@ snapshots:
       browserslist: 4.29.4
       escalade: 3.2.0
       picocolors: 1.1.1
+
+  use-sound@5.0.0(react@19.3.1):
+    dependencies:
+      howler: 2.2.4
+      react: 19.3.1
 
   use-sync-external-store@1.7.0(react@19.3.1):
     dependencies:
