@@ -897,8 +897,12 @@ language toggle goes to the same page in the other language.
 - **Every point is taken from one of Julian's confirmed claims,** shortened
   and adding nothing: no figure, purpose or result the claim doesn't state.
   Julian approves the copy in both languages.
-- **Screenshots:** optimised (AVIF and WebP, with a PNG fallback), with their
-  width and height so nothing shifts, lazy below the fold, and with alt text
-  that says what each shows.
+- **Screenshots:** under the "why", in rows whose shots share one height,
+  with a 12px radius and a 1px `border`. Form:at shows its player, its sets
+  and its events on a phone, side by side, with its home page on a desktop
+  under them; julianpalomo.dev shows its home page on a desktop and on a
+  phone at night, side by side. They're optimised (AVIF and WebP, with a PNG
+  fallback, phone shots at 400px wide), with their width and height so
+  nothing shifts, lazy, and with alt text that says what each shows.
 - The page renders fully on the server; nothing on it is fetched on the
   client.
