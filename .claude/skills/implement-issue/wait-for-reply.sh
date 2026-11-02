@@ -6,6 +6,12 @@
 # is skipped, even when it is the only new one: the repo is public. Match the
 # owner by association, never by login: a renamed account keeps OWNER.
 #
+# <since> is the time of the newest owner comment or review already read, never
+# the caller's own later message: a reply posted between the two would be older
+# than <since> and missed. The first check runs before the first sleep, so
+# such a reply ends the wait at once. Keep the time filter a strict ">": with
+# ">=" the comment at <since>, already read, would end every wait at once.
+#
 # Exit 0 prints "<time> <url>" for each reply found. A reply isn't an OK: the
 # skill reads it and acts on it. Exit 1 means the time ran out; exit 2, bad
 # arguments. A failed gh call counts as no reply, so a network blip doesn't end

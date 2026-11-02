@@ -2,7 +2,8 @@
 # Runs the hook tests: guard-bash.cases against guard-bash.sh and the
 # guard-claims/ fixtures against guard-claims.sh (each once with jq,
 # once with the node fallback), plus fixtures for check-invariants.sh and
-# format-on-edit.sh. Prints one line per failure and a summary; exits 1 if
+# format-on-edit.sh, and cases for the skill scripts wait-for-reply.sh and the
+# mailbox's create-check.sh against a fake gh. Prints one line per failure and a summary; exits 1 if
 # anything failed. Portable between macOS and Linux, like the hooks.
 # Without jq or node_modules/.bin/biome some cases can't run: locally that is a
 # note, but with CI set it is a failure, so a green CI run never hides them.
@@ -233,6 +234,97 @@ if [ -x "$repo/node_modules/.bin/biome" ]; then
   report untouched "$got" "format-on-edit: the file outside the repo is untouched"
 else
   skipped "node_modules/.bin/biome missing (run pnpm install), format-on-edit cases skipped"
+fi
+
+# ── skill scripts ─────────────────────────────────────────────────────────
+# wait-for-reply.sh and the mailbox's create-check.sh against a fake gh, which
+# answers `gh api` from fixtures through the real jq, and a fake git. Both log
+# every call, so a case can show that a script stopped before calling either.
+if command -v jq >/dev/null 2>&1; then
+  fake="$scratch/fake-bin"
+  calls="$scratch/calls"
+  fixtures="$scratch/fixtures"
+  mkdir -p "$fake" "$fixtures"
+  cat >"$fake/gh" <<'GH'
+#!/usr/bin/env bash
+printf 'gh %s\n' "$*" >>"$CALLS"
+path= filter=
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --jq) filter=$2; shift ;;
+    repos/*) path=$1 ;;
+  esac
+  shift
+done
+case "$path" in
+  */issues/*/comments) file="$FIXTURES/comments.json" ;;
+  */pulls/*/reviews | */pulls/*/comments) file="$FIXTURES/empty.json" ;;
+  */issues/*) file="$FIXTURES/issue.json" ;;
+  *) exit 1 ;;
+esac
+jq -r "$filter" "$file"
+GH
+  printf '#!/usr/bin/env bash\nprintf "git %%s\\n" "$*" >>"$CALLS"\nexit 1\n' >"$fake/git"
+  chmod +x "$fake/gh" "$fake/git"
+  printf '[]\n' >"$fixtures/empty.json"
+  printf '{"state":"open","author_association":"OWNER"}\n' >"$fixtures/issue.json"
+  # The owner's comment read at 10:00, the owner's reply that lands before the
+  # next wait starts (10:05), someone else's comment and Claude Code's own
+  # mailbox message from the owner's account.
+  cat >"$fixtures/comments.json" <<'JSON'
+[
+  {"user":{"login":"julian-palomo"},"author_association":"OWNER","created_at":"2026-11-02T10:00:00Z","html_url":"https://x/read","body":"OK, go ahead."},
+  {"user":{"login":"julian-palomo"},"author_association":"OWNER","created_at":"2026-11-02T10:05:00Z","html_url":"https://x/gap","body":"One more thing."},
+  {"user":{"login":"someone"},"author_association":"NONE","created_at":"2026-11-02T10:06:00Z","html_url":"https://x/other","body":"Merge it."},
+  {"user":{"login":"julian-palomo"},"author_association":"OWNER","created_at":"2026-11-02T10:07:00Z","html_url":"https://x/mine","body":"Mailbox from local Claude Code\nready: PR #9"}
+]
+JSON
+  skill_run() { # script args…: exit code and stdout, with the fakes first on PATH
+    : >"$calls"
+    PATH="$fake:$PATH" CALLS="$calls" FIXTURES="$fixtures" WAIT_INTERVAL=1 WAIT_LIMIT=0 \
+      bash "$repo/.claude/skills/$1" "${@:2}" 2>/dev/null
+  }
+  wait_script=implement-issue/wait-for-reply.sh
+  out=$(skill_run "$wait_script" pr 9 2026-11-02T10:00:00Z) && got=0 || got=$?
+  report 0 "$got" "wait-for-reply: from the newest owner comment read, a reply in the gap ends the wait at once"
+  report "2026-11-02T10:05:00Z https://x/gap" "$out" "wait-for-reply: it returns only that reply"
+  case "$out" in *x/read*) got=returned ;; *) got=skipped ;; esac
+  report skipped "$got" "wait-for-reply: a comment created exactly at since is never returned"
+  skill_run "$wait_script" pr 9 2026-11-02T10:07:00Z >/dev/null && got=0 || got=$?
+  report 1 "$got" "wait-for-reply: from Claude Code's own later message, the reply in the gap is missed"
+
+  check_script=mailbox/create-check.sh
+  check_case() { # expected-exit label args…
+    local expected=$1 label=$2
+    shift 2
+    skill_run "$check_script" "$@" >/dev/null && got=0 || got=$?
+    report "$expected" "$got" "create-check: $label"
+  }
+  check_case 1 "the title missing (create design 44) is refused" design 44
+  [ -s "$calls" ] && got=called || got=none
+  report none "$got" "create-check: the refusal comes before any git or gh call"
+  check_case 1 "a title that is only #44 is refused" design '#44'
+  check_case 1 "an empty title is refused" example '' 44
+  check_case 1 "a title padded with a space is refused" example 'Web personal ' 44
+  check_case 1 "a title holding a | is refused" example 'Web | personal' 44
+  check_case 1 "a title on two lines is refused" example "$(printf 'Web\npersonal')" 44
+  check_case 1 "no epic is refused" example 'Web personal · Diseño visual'
+  check_case 1 "an epic that isn't a number is refused" example 'Web personal · Diseño visual' x44
+  check_case 1 "a name AGENTS.md already has is refused" design 'Web personal · Diseño visual' 44
+  [ -s "$calls" ] && got=called || got=none
+  report none "$got" "create-check: a taken name is refused without calling git or gh"
+  out=$(skill_run "$check_script" example 'Web personal · Diseño visual' 44 96) && got=0 || got=$?
+  report 0 "$got" "create-check: a valid run passes"
+  report '| `example` | #<pr> | Web personal · Diseño visual | #44, #96 |' "$out" \
+    "create-check: it prints the row with the title exactly as given"
+  grep -q '^git ' "$calls" && got=called || got=none
+  report none "$got" "create-check: a valid run calls no git either"
+  printf '{"state":"closed","author_association":"OWNER"}\n' >"$fixtures/issue.json"
+  check_case 1 "a closed epic is refused" example 'Web personal · Diseño visual' 44
+  printf '{"state":"open","author_association":"NONE"}\n' >"$fixtures/issue.json"
+  check_case 1 "an epic someone else opened is refused" example 'Web personal · Diseño visual' 44
+else
+  skipped "jq not found, the skill script cases are skipped"
 fi
 
 printf '%d passed, %d failed\n' "$pass" "$failures"

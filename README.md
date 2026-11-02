@@ -34,7 +34,11 @@ a soft typing loop while the answer types itself out, a chime when it ends and
 a moo when they pat the cow; they're on by default, and a mute button in the
 hero turns them off. The site is in
 English at `/` and Spanish at `/es`: visitors in Spain get Spanish by default,
-everyone else English, and the language toggle always wins.
+everyone else English, and the language toggle always wins. Under the intro,
+"Download CV" gets my CV as a PDF, with no phone number or email address in
+it, and "Contact" opens a form that emails me. The form is protected by
+Cloudflare Turnstile and a limit of 5 messages a day per visitor, and the
+message is never stored ([`docs/contact.md`](docs/contact.md)).
 
 The weather comes from [Open-Meteo](https://open-meteo.com/) through our
 Worker, at `GET /api/weather`, so the visitor's IP never reaches Open-Meteo.
@@ -121,7 +125,7 @@ pnpm dev
 | `pnpm check`            | Runs Biome (lint and format), then `tsc`.                                                                                                                                 |
 | `pnpm test`             | Runs the unit tests once with Vitest.                                                                                                                                     |
 | `pnpm test:e2e`         | Builds, serves and runs the Playwright tests in Chromium.                                                                                                                 |
-| `pnpm test:hooks`       | Runs the tests for the Claude Code hooks in `.claude/hooks/`.                                                                                                             |
+| `pnpm test:hooks`       | Runs the tests for the Claude Code hooks in `.claude/hooks/` and two skill scripts, `wait-for-reply.sh` and `create-check.sh`.                                            |
 | `pnpm eval`             | Asks the real assistant the eval cases and has a second model judge the answers. Costs money: about $0.09, then $0.01–0.02 a case. `-t <case-id>` runs one.               |
 | `pnpm knip`             | Reports unused files, exports and dependencies.                                                                                                                           |
 | `pnpm db:migrate:local` | Applies the D1 migrations to the local database in `.wrangler/state`.                                                                                                     |
@@ -138,6 +142,12 @@ Without a key it answers "not available" too; with `BOT_DEMO=1` instead of a
 key, it answers in demo mode, as on previews. `pnpm test:e2e` never uses your key: it builds with
 `wrangler.jsonc`'s `e2e` environment, which loads no secrets and runs in demo
 mode.
+
+The contact form needs two more secrets in production: `TURNSTILE_SECRET_KEY`,
+the Turnstile widget's secret, and `CONTACT_TO`, the verified Email Routing
+address that messages go to. Locally and on previews, `CONTACT_DEMO=1` checks
+Turnstile with Cloudflare's test keys and sends nothing
+([`docs/contact.md`](docs/contact.md)).
 
 `pnpm eval` reads the API key from `.dev.vars` too, asks the assistant every
 case in [`evals/`](evals/) through the same code as `/api/chat`, checks each
@@ -224,6 +234,8 @@ Each decision is recorded as it's made, one file each, in `docs/adr/`.
   and the score of every baseline.
 - [Architecture decision records](docs/adr/README.md): what was decided,
   what else was considered, and why.
+- [The contact form](docs/contact.md): how a message reaches me, what is
+  checked on the way, and what is never kept.
 - [Tech debt](docs/tech-debt.md): shortcuts taken on purpose, and their status.
 
 ## Licence

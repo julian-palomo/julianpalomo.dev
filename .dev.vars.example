@@ -1,2 +1,9 @@
 ANTHROPIC_API_KEY=
 VISITOR_SALT=
+
+# The contact form (docs/contact.md). In production, TURNSTILE_SECRET_KEY and
+# CONTACT_TO are Worker secrets. Set CONTACT_DEMO=1 to use Turnstile's test
+# keys and send nothing.
+TURNSTILE_SECRET_KEY=
+CONTACT_TO=
+CONTACT_DEMO=

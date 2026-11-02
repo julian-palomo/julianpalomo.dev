@@ -63,8 +63,6 @@ it.
 
 ```bash
 gh issue comment $ARGUMENTS --body-file <file>
-# The plan's created_at, from the comment id at the end of the URL it printed
-gh api 'repos/{owner}/{repo}/issues/comments/<id>' --jq .created_at
 ```
 
 Plan mode isn't used here: it allows only read-only actions, so it can't post
@@ -74,13 +72,25 @@ Then `/mailbox post <name> "plan: #$ARGUMENTS"`, and wait for a reply with one
 bounded background command:
 
 ```bash
-bash .claude/skills/implement-issue/wait-for-reply.sh issue $ARGUMENTS <plan's created_at>
+bash .claude/skills/implement-issue/wait-for-reply.sh issue $ARGUMENTS <since>
 ```
+
+**Where a wait starts.** `<since>` is the time of the newest owner comment or
+review already read on that issue or PR: the newest of all the times the
+step-1 or step-6 filter printed, which already leave out Claude Code's marker
+comments. When none has been read there yet, it's the issue's or PR's own
+creation time (`gh issue view <N> --json createdAt`, `gh pr view <N> --json
+createdAt`). It's never the time of Claude Code's own plan, reply or mailbox
+message. An owner reply posted after the last one read but before that message
+would then be older than `<since>`, and missed. And never an older owner comment
+than the newest, or the wait would end at once on one already handled. The
+script checks before its first sleep, so a reply that is already there ends
+the wait at once: act on it.
 
 Start it with `run_in_background` and `timeout: 3900000`. Unattended sessions
 stop a background command after 30 minutes unless its timeout says otherwise,
 and the script checks every 2 minutes for up to 60. It counts only a comment
-whose author association is `OWNER`, created after the plan, whose first line
+whose author association is `OWNER`, created after `<since>`, whose first line
 isn't one of Claude Code's three; anyone else's never ends it. The session is
 woken when it exits:
 
@@ -102,11 +112,12 @@ into commits that each pass `pnpm check` on their own.
 
 Run `/handoff`, then `/ship-pr` with `Closes #$ARGUMENTS` (and `Part of #M`).
 Never merge. Once `/ship-pr` reports CI green, `/mailbox post <name> "ready: PR #<number>"`,
-then wait for the review in the background as in step 3, from the message's
-`created_at` (with no mailbox, the PR's: `gh pr view <number> --json createdAt`):
+then wait for the review in the background as in step 3. `<since>` is the
+newest owner comment or review already read on the PR, or, when there is none
+yet, the PR's creation time (`gh pr view <number> --json createdAt`):
 
 ```bash
-bash .claude/skills/implement-issue/wait-for-reply.sh pr <number> <created_at>
+bash .claude/skills/implement-issue/wait-for-reply.sh pr <number> <since>
 ```
 
 ## 6. Review
@@ -134,6 +145,8 @@ gh pr comment <number> --body-file <file>
 ```
 
 Then `/mailbox post <name> "replied: PR #<number>"` and wait again as in step
-5, from the message's `created_at` (with no mailbox, the reply's). When the wait times out, tell Julián: the PR is his to merge or review.
+5. `<since>` is the newest owner time the filters above printed, not the reply's
+or the message's. When the wait times out, tell Julián: the PR is his to merge
+or review.
 
 If the exemplar's shape has changed, update this skill.

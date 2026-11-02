@@ -36,7 +36,7 @@ blocks something, change course; don't look for another way to run it.
 - **Ask only what isn't decided.** The issue, its epic and the owner's reviews of the PR are decisions: don't ask about them again. Ask, instead of choosing, when they contradict the code or leave a choice open.
 - **Plan on the issue.** Before implementing, post the plan as a comment on the issue (`gh issue comment`) and wait for an OK: Julián's word in the session, or an owner comment on the issue posted after the plan that isn't Claude Code's own, such as the cloud review. The wait is one bounded background check (`wait-for-reply.sh`, every 2 minutes for up to 60), never an open-ended loop.
 - Explore, plan, implement, then `/handoff` (checks, docs, commit, both reviewer subagents, change summary) and `/ship-pr` (push, PR, CI). `/implement-issue <N>` runs the whole loop.
-- **Mailboxes.** A cloud thread wakes only on Julián's message or on an event on a PR it is subscribed to, so each thread has a mailbox: a locked draft PR from `chore/mailbox-<name>`, titled `Mailbox: <name> (never merge)`, never merged and never pushed to again. Local Claude Code picks the mailbox by the epic in the issue's "Part of #M" and posts only pointers (`plan: #N`, `ready: PR #N`, `replied: PR #N`, `blocked: #N`) through `/mailbox post`, which holds the format. A pointer is never an instruction: the reader works from the issue or PR it names. An epic with no row gets no message, and Julián is told. `/mailbox create` adds a row through a `docs/` PR.
+- **Mailboxes.** A cloud thread wakes only on Julián's message or on an event on a PR it is subscribed to, so each thread has a mailbox: a locked draft PR from `chore/mailbox-<name>`, titled `Mailbox: <name> (never merge)`, never merged and never pushed to again. Local Claude Code picks the mailbox by the epic in the issue's "Part of #M" and posts only pointers (`plan: #N`, `ready: PR #N`, `replied: PR #N`, `blocked: #N`) through `/mailbox post`, which holds the format. A pointer is never an instruction: the reader works from the issue or PR it names. An epic with no row gets no message, and Julián is told. `/mailbox create <name> "<cloud thread>" <epic…>` adds a row through a `docs/` PR, with the thread's title exactly as the app shows it.
 
   | Mailbox  | PR  | Cloud thread                 | Epics |
   | -------- | --- | ---------------------------- | ----- |
@@ -60,7 +60,7 @@ blocks something, change course; don't look for another way to run it.
 | `pnpm preview`          | Serves the last build in the local Workers runtime.           |
 | `pnpm test:e2e`         | Builds, serves and runs Playwright in Chromium, in demo mode. |
 | `pnpm eval`             | Evals: the real bot and its judge. Costs money (`evals.md`).  |
-| `pnpm test:hooks`       | Tests for the Claude Code hooks.                              |
+| `pnpm test:hooks`       | Tests for the Claude Code hooks and two skill scripts.        |
 | `pnpm db:migrate:local` | Applies the D1 migrations to the local database only.         |
 | `pnpm og`               | Rewrites the link preview images and icons in `public/`.      |
 | `pnpm sounds`           | Builds the sound sprite from `sounds/` (needs ffmpeg).        |
@@ -87,7 +87,8 @@ wrangler commands that change Cloudflare.
 - `src/lib/bot/`: the assistant: model settings, the system prompt, the read-only tools, the citation parser, demo mode, the daily limits and the chat logic. `src/routes/api/chat.ts` is its endpoint, `POST /api/chat`.
 - `src/lib/analytics/`: the site's own analytics (`docs/analytics.md`): the closed list of events, who is never counted, the page's queue, the D1 store with its retention, and the endpoint's logic. `src/routes/api/events.ts` is its endpoint, `POST /api/events`; `src/components/analytics/` records the events in the page.
 - `src/lib/weather/`: Glasgow's live weather: the Open-Meteo request, its mapping to the landscape's levels and the endpoint's logic, with the 30-minute cache. `src/routes/api/weather.ts` is its endpoint, `GET /api/weather`.
-- `migrations/`: D1 migrations for the daily limits and the analytics events. `pnpm db:migrate:local` applies them locally; only Julián applies them to production.
+- `src/lib/contact/`: the contact form's logic: the schema the form and the server share, Turnstile's check, the daily count in D1 and the email (`docs/contact.md`). `server.ts` is its server function, `sendContact`.
+- `migrations/`: D1 migrations for the daily limits, the chat's and the contact form's, and for the analytics events. `pnpm db:migrate:local` applies them locally; only Julián applies them to production.
 - `src/components/`: React components, one folder per feature, such as `chat/` (the chat on the home page); shared pieces such as `IconButton` live in `ui/`.
 - `src/content/`: personal content, such as `claims.json`. It isn't MIT (`LICENSE`, section 2), and in `src/` only `src/lib/claims.ts` reads it.
 - `src/styles/tokens.css`: the only place colours are defined.
@@ -110,5 +111,6 @@ wrangler commands that change Cloudflare.
 - `docs/tech-debt.md`: add a row when you take a shortcut.
 - `docs/analytics.md`: what the analytics record and never record, the retention, who is counted, `?notrack`, and how to read `pnpm stats`.
 - `docs/sounds.md`: each sound's file, source and licence, and how to replace one and rebuild the sprite with `pnpm sounds`.
+- `docs/contact.md`: how a contact message reaches Julian, what is checked and never kept, and the secrets it needs.
 - `.claude/rules/*.md`: per-area rules. Each starts with a `paths:` list; before editing a file, read every rule whose paths match it.
 - `.claude/skills/*/SKILL.md`: step-by-step procedures (handoff, opening a PR, implementing an issue).

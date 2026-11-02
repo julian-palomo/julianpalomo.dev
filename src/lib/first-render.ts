@@ -23,6 +23,7 @@ import { parseThemeCookie, THEME_COOKIE } from "./theme";
 // off the production host, so a test can check that `?notrack` removes it.
 const envSchema = z.object({
   SCENE_OVERRIDE: z.string().optional().catch(undefined),
+  CONTACT_DEMO: z.string().optional().catch(undefined),
   ANALYTICS_BEACON_ANY_HOST: z.string().optional().catch(undefined),
 });
 
@@ -32,14 +33,14 @@ const inputSchema = z.object({ notrack: z.unknown().optional() });
 /**
  * What the first render depends on, read on the server: the visitor's stored
  * theme and sound choice, the request's time, whether `?sky=` may set the
- * landscape, which entrance the page plays, and whether this browser is
- * counted. The client's clock starts from this `now`, so its first render
- * matches the server's HTML. The entrance's cookie is refreshed
- * here on every visit, so the first HTML already knows the entrance. A theme
- * cookie that no longer holds a choice (over, or the old one-year format) is
- * deleted in the same response, and so is the `notrack` cookie on
- * `?notrack=0`; `?notrack` sets it, so the very first HTML already leaves the
- * beacon out.
+ * landscape, which entrance the page plays, whether the contact form uses
+ * Turnstile's test keys, and whether this browser is counted. The client's
+ * clock starts from this `now`, so its first render matches the server's
+ * HTML. The entrance's cookie is refreshed here on every visit, so the first
+ * HTML already knows the entrance. A theme cookie that no longer holds a
+ * choice (over, or the old one-year format) is deleted in the same response,
+ * and so is the `notrack` cookie on `?notrack=0`; `?notrack` sets it, so the
+ * very first HTML already leaves the beacon out.
  */
 export const getFirstRender = createServerFn({ method: "GET" })
   .validator(inputSchema)
@@ -67,6 +68,7 @@ export const getFirstRender = createServerFn({ method: "GET" })
       now,
       sceneOverride: vars.SCENE_OVERRIDE === "1",
       entrance,
+      contactDemo: vars.CONTACT_DEMO === "1",
       track,
       beacon: track && (isProductionHost(host) || vars.ANALYTICS_BEACON_ANY_HOST === "1"),
     };
