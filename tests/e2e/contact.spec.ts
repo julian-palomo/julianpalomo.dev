@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 import { chatErrorBody } from "../../src/lib/bot/chat-error";
+import { en } from "../../src/lib/i18n/en";
 
 // The CV and the contact form (DESIGN.md section 14). The e2e build sets
 // CONTACT_DEMO (wrangler.jsonc), so the form renders Turnstile with
@@ -57,6 +58,28 @@ test("from 1024px the buttons sit under the intro, and on a phone above the foot
   if (!chat || !at || !footer) throw new Error("not on screen");
   expect(at.y).toBeGreaterThanOrEqual(chat.y + chat.height);
   expect(at.y + at.height).toBeLessThanOrEqual(footer.y);
+});
+
+test("on a phone the buttons are centred; from 1024px they keep the intro's left edge", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const cv = await page.getByRole("link", { name: "Download CV" }).boundingBox();
+  const contact = await contactButton(page).boundingBox();
+  if (!cv || !contact) throw new Error("not on screen");
+  const left = cv.x;
+  const right = 390 - (contact.x + contact.width);
+  expect(Math.abs(left - right)).toBeLessThan(2);
+
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const intro = await page.getByText(en.intro).boundingBox();
+  const atIntro = await page
+    .getByRole("banner")
+    .getByRole("link", { name: "Download CV" })
+    .boundingBox();
+  if (!intro || !atIntro) throw new Error("not on screen");
+  expect(Math.abs(atIntro.x - intro.x)).toBeLessThan(1);
 });
 
 test("Turnstile loads only when the form opens", async ({ page }) => {
