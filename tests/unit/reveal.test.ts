@@ -52,11 +52,12 @@ describe("advanceReveal", () => {
   const stops = revealStops(words, false);
 
   it("types at a steady pace", () => {
-    // 200 characters arrived: within MAX_LAG_S of typing, so no catching up.
-    const near = stops.filter((stop) => stop <= 200);
-    const { reveal } = run(start, near, 1000);
-    expect(reveal.shown).toBeGreaterThanOrEqual(REVEAL_CPS - 5);
-    expect(reveal.shown).toBeLessThanOrEqual(REVEAL_CPS);
+    // 90 characters arrived: within MAX_LAG_S of typing, so no catching up.
+    // In 0.4s it types about 60 of them.
+    const near = stops.filter((stop) => stop <= REVEAL_CPS * MAX_LAG_S);
+    const { reveal } = run(start, near, 400);
+    expect(reveal.shown).toBeGreaterThanOrEqual(REVEAL_CPS * 0.4 - 5);
+    expect(reveal.shown).toBeLessThanOrEqual(REVEAL_CPS * 0.4);
   });
 
   it("reveals whole words only, one tick at a time", () => {
@@ -69,7 +70,7 @@ describe("advanceReveal", () => {
     const { reveal } = run(start, stops, 1000);
     expect(reveal.shown).toBeGreaterThan(REVEAL_CPS * 3);
     // The lag shrinks with a MAX_LAG_S time constant: from about 1,000
-    // characters behind, it's within MAX_LAG_S of typing after about 3.6s.
+    // characters behind, it's within MAX_LAG_S of typing after about 1.5s.
     const after = run(start, stops, 4000).reveal;
     expect((stops.at(-1) ?? 0) - after.shown).toBeLessThanOrEqual(REVEAL_CPS * MAX_LAG_S);
   });

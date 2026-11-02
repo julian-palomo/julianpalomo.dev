@@ -573,7 +573,7 @@ mobile; desktop is the same inside the right-hand card.
 3. **Answering.** The answer types itself out. What has arrived waits in a
    buffer and appears word by word at a steady pace, whatever pace the
    stream has: about 150 characters a second, faster when it falls more than
-   about 1.5s behind, so a long answer never lags far. Each word fades in
+   about 0.6s behind, so a long answer never lags far. Each word fades in
    over 0.2s; earlier text never re-animates and the page never jumps. A
    citation appears whole, with the word before it, as a small green
    number. The cow talks from the first word to the last, even after the
@@ -640,7 +640,7 @@ text, in both languages, in the pull request that adds it.
 | The visitor's bubble appears            | 0.5s                                                                                                           | `cubic-bezier(.3, 1.5, .5, 1)` (a small overshoot) |
 | Source chips rise                       | 0.45s, 80ms apart                                                                                              | `cubic-bezier(.3, 1.4, .5, 1)`                     |
 | A claim opens                           | 0.35s                                                                                                          | `ease`                                             |
-| Each word as an answer types itself out | 0.2s fade; about 150 characters a second, faster when more than about 1.5s behind                              | `ease`                                             |
+| Each word as an answer types itself out | 0.2s fade; about 150 characters a second, faster when more than about 0.6s behind                              | `ease`                                             |
 | Button press                            | 80ms                                                                                                           | `ease`                                             |
 | The gear spins in                       | 0.6s, 2s after the entrance                                                                                    | Spring-like overshoot, then 3 pulses               |
 | Clouds cross the sky                    | 1700 units in 120–190s, over a 2900-unit loop (205–324s)                                                       | `linear`                                           |
