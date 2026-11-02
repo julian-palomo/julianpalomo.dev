@@ -157,7 +157,7 @@ export function Entrance({ kind, greeting, hero, className, children }: Props) {
 
     // A background tab starts the entrance when it's first shown, from the beginning.
     const show = () => {
-      if (document.visibilityState !== "visible") return;
+      if (ended || document.visibilityState !== "visible") return;
       document.removeEventListener("visibilitychange", show);
       restartEntrance(element);
       tick();
