@@ -60,7 +60,10 @@ own statements after the insert, so a failure there can't lose the visitor's
 events. A day with no visits deletes nothing until the next one.
 
 The composer says it, in both languages: "Questions are kept anonymously for
-90 days to improve the assistant."
+90 days to improve the assistant." So does the How it's built page. Both read
+the number from `QUESTION_TEXT_DAYS` in
+[`src/lib/analytics/events.ts`](../src/lib/analytics/events.ts), the same
+constant the store clears question text by.
 
 ## Who is counted
 

@@ -40,8 +40,11 @@ it, and "Contact" opens a form that emails me. The form is protected by
 Cloudflare Turnstile and a limit of 5 messages a day per visitor, and the
 message is never stored ([`docs/contact.md`](docs/contact.md)). A Projects
 page (`/projects`, `/es/projects`) shows Form:at and this site, each with why
-I made it and what it does, taken from the facts I've confirmed; the home
-page and every footer link to it.
+I made it and what it does, taken from the facts I've confirmed. A How it's
+built page (`/how-its-built`, `/es/how-its-built`) explains, for people who
+don't program, how the assistant is kept from making up my experience and
+how I built the site with Claude Code. The home page and every footer link to
+both.
 
 The weather comes from [Open-Meteo](https://open-meteo.com/) through our
 Worker, at `GET /api/weather`, so the visitor's IP never reaches Open-Meteo.

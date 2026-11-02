@@ -164,7 +164,7 @@ From top to bottom:
    its height, 20px from the left, with a 4px ring in `background`.
 3. **Name, role and one line** ("Ask about my experience. Answers come only
    from facts I've confirmed, with their sources."). On a phone, **"Download
-   CV"** and **"Contact"**, with the **"Projects"** text link beside them,
+   CV"** and **"Contact"**, with the inner pages' text links beside them,
    sit at the end of the page, above the footer, so the chat's first
    suggestions still show above the fixed composer (sections 14 and 18).
 4. **The chat** (section 10). At its top, the cow (100 × 79px on a phone) rests
@@ -191,8 +191,9 @@ the on-screen keyboard.
   example).
 - **Two columns** under the hero: on the left (about 300px) the portrait at
   120 × 150px overlapping the hero, the name, the role, the line, the two
-  buttons and the "Projects" link (section 18); on the right, the chat in a card with a 2px `border` and a 20px
-  radius. The card's top border is the cow's edge: the cow sits on it, 28px
+  buttons and the inner pages' links (section 18); on the right, the chat in
+  a card with a 2px `border` and a 20px radius. The card's top border is the
+  cow's edge: the cow sits on it, 28px
   from its left edge, overlapping it from above, with the heading beside it,
   so the card starts about 7.5rem lower to make room.
 - The gear's panel opens as a popover under the gear (section 8).
@@ -857,7 +858,8 @@ Open the SVGs in a browser to see them animate.
 ## 18. Inner pages
 
 Besides the home page, the site has inner pages, each in both languages at the
-same slug: `/projects` and `/es/projects`. The language rules are section 5's:
+same slug: `/projects` and `/how-its-built`, and `/es/projects` and
+`/es/how-its-built`. The language rules are section 5's:
 a visitor in Spain without a `lang` cookie gets `/es/projects`, and the
 language toggle goes to the same page in the other language.
 
@@ -884,8 +886,9 @@ language toggle goes to the same page in the other language.
 ### Navigation
 
 - **On the home page,** the inner pages' text links ("Projects",
-  "Proyectos") sit beside "Download CV" and "Contact", in `accent`, as tall
-  as the buttons, wherever the row sits (section 14).
+  "Proyectos"; "How it's built", "Cómo está hecha") sit beside "Download
+  CV" and "Contact", in `accent`, as tall as the buttons, wherever the row
+  sits (section 14).
 - **In the footer,** the same links, on every page.
 
 ### Projects
@@ -906,3 +909,28 @@ language toggle goes to the same page in the other language.
   nothing shifts, lazy, and with alt text that says what each shows.
 - The page renders fully on the server; nothing on it is fetched on the
   client.
+
+### How it's built
+
+- **For people who don't program:** a recruiter, Julian's family. In the
+  first person, in short sentences with no jargon, and every acronym said in
+  plain words. Its story: AI assistants sometimes make things up, and this
+  one is built so it can't make up Julian's experience.
+- **Part 1, "What it does":** five short sections (only checked facts, the
+  sources it shows, the exam before every change, the limits and what isn't
+  kept, the live valley). The numbers (questions a day, days a question is
+  kept) come from the code, so the page stays true if they change.
+- **Part 2, "How I built it":** a drawing of the way of working (a plan,
+  small tasks, programming sessions, two AI reviewers, a mailbox, a
+  supervisor, and Julian deciding), then seven short steps. The drawing is
+  decoration, with a text alternative for screen readers; the steps carry the
+  meaning.
+- **Part 3, "For developers":** the only technical part, a `<details>`
+  closed by default, so a phone's reader never scrolls past it. It holds a
+  diagram of how a question is answered, with its accessible name and its
+  steps as a list under it, and links to the repository's documents.
+- **The drawings** are inline SVGs in the site's tokens (boxes in `tint` with
+  a `border` outline, arrows in `muted`, the last box in `accent`), so they
+  follow both themes. They're at most 340px wide, centred.
+- "Claude" and "Claude Code" are named once, with what they are, at their
+  first mention.

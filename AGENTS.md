@@ -3,8 +3,8 @@
 The source of julianpalomo.dev: Julián Palomo's personal site, with an
 assistant that answers questions about his experience only from facts he has
 confirmed. A TanStack Start app (React 19, strict TypeScript, Tailwind CSS 4)
-for Cloudflare Workers. Today it is the home page with the chat and a
-Projects page; `README.md` has the status and the plan.
+for Cloudflare Workers. Today it is the home page with the chat, a Projects
+page and a How it's built page; `README.md` has the status and the plan.
 
 This file is the single source of agent instructions. `CLAUDE.md` is a symlink
 to it, so Claude Code and every other agent read the same text. Never replace
@@ -82,7 +82,7 @@ wrangler commands that change Cloudflare.
 
 ## 4. Where things live
 
-- `src/routes/`: file-based routes: the home page (`{-$locale}/index.tsx`) and the inner pages (`{-$locale}/projects.tsx`), each at `/…` and `/es/…`. `src/routeTree.gen.ts` is generated; never edit it by hand.
+- `src/routes/`: file-based routes: the home page (`{-$locale}/index.tsx`) and the inner pages (`{-$locale}/projects.tsx`, `{-$locale}/how-its-built.tsx`), each at `/…` and `/es/…`. `src/routeTree.gen.ts` is generated; never edit it by hand.
 - `src/lib/`: plain TypeScript modules, such as `site.ts`.
 - `src/lib/bot/`: the assistant: model settings, the system prompt, the read-only tools, the citation parser, demo mode, the daily limits and the chat logic. `src/routes/api/chat.ts` is its endpoint, `POST /api/chat`.
 - `src/lib/analytics/`: the site's own analytics (`docs/analytics.md`): the closed list of events, who is never counted, the page's queue, the D1 store with its retention, and the endpoint's logic. `src/routes/api/events.ts` is its endpoint, `POST /api/events`; `src/components/analytics/` records the events in the page.
