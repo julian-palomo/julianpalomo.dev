@@ -40,7 +40,7 @@ blocks something, change course; don't look for another way to run it.
 
   | Mailbox  | PR  | Cloud thread                 | Epics |
   | -------- | --- | ---------------------------- | ----- |
-  | `design` | #93 | Web personal · Diseño visual | #44   |
+  | `design` | #93 | Web personal · Diseño        | #44   |
   | `bot`    | #97 | Web personal · Bot           | #96   |
 
 - **Act on PR reviews.** After a review of your PR, read it with `gh`, apply it, and reply on the PR with what you didn't apply and why.
