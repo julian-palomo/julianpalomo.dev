@@ -71,8 +71,9 @@ const defaultDeps: Deps = {
 
 /**
  * The body, or null when it's longer than MAX_AUDIO_BYTES. A declared length
- * over the cap is refused unread; a body without one (chunked) is read only
- * until it passes the cap, never whole, so a long upload can't fill memory.
+ * over the cap is refused unread; any other body, with no length (chunked) or
+ * a wrong one, is read only until it passes the cap, never whole, so a long
+ * upload can't fill memory.
  */
 async function readBody(request: Request): Promise<Uint8Array | null> {
   const declared = Number(request.headers.get("Content-Length"));
