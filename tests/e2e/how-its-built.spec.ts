@@ -32,6 +32,8 @@ for (const [path, messages] of [
     // The drawing is decoration; its text alternative is there for screen readers.
     await expect(page.getByText(copy.flowAlt)).toHaveCount(1);
     await expect(box(page, messages)).not.toHaveAttribute("open");
+    // Closed, it still shows it can open: the summary's own chevron.
+    await expect(box(page, messages).getByTestId("details-marker")).toBeVisible();
   });
 }
 
@@ -53,6 +55,16 @@ test("the box opens, with a named diagram, its steps and links to files in the r
     const file = doc.path.split("#")[0] ?? "";
     expect(existsSync(file), file).toBe(true);
   }
+});
+
+test("the box's summary shows the focus ring when reached with the keyboard", async ({ page }) => {
+  await page.goto("/how-its-built");
+  const summary = box(page, en).locator("summary");
+  await summary.focus();
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  await expect(summary).toBeFocused();
+  expect(await summary.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe("solid");
 });
 
 test("the head and the sitemap carry the page", async ({ request }) => {

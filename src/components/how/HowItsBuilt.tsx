@@ -85,10 +85,25 @@ export function HowItsBuilt() {
       </section>
 
       {/* The only technical part, closed so a phone's reader never scrolls
-          past it; find-in-page still opens it. */}
+          past it. */}
       <details className="group rounded-[20px] border-2 border-border">
-        <summary className="flex min-h-11 cursor-pointer items-center px-5 font-display text-lg font-bold">
+        {/* `flex` hides the browser's own triangle, so the chevron shows it
+            opens, and turns when it does. */}
+        <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-[18px] px-5 font-display text-lg font-bold">
           {copy.forDevelopers}
+          <svg
+            aria-hidden="true"
+            data-testid="details-marker"
+            viewBox="0 0 24 24"
+            className="size-5 shrink-0 text-accent group-open:rotate-180 motion-safe:transition-transform motion-safe:duration-200"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
         </summary>
         <div className="flex flex-col gap-5 px-5 pb-5">
           <p className="text-muted">{copy.developersIntro}</p>
