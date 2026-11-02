@@ -34,10 +34,10 @@
   {
     "id": "profile-languages",
     "label": "Languages",
-    "text": "Spanish (native), English (full professional proficiency).",
+    "text": "Spanish (native), English (full professional proficiency), Italian (intermediate).",
     "area": "profile",
-    "source": "cv",
-    "confirmedByJulian": "2026-10-27"
+    "source": "julian",
+    "confirmedByJulian": null
   },
   {
     "id": "cazoo-role",
@@ -389,6 +389,24 @@
     "org": "Universidad de Extremadura",
     "source": "cv",
     "confirmedByJulian": "2026-10-27"
+  },
+  {
+    "id": "education-erasmus",
+    "label": "Erasmus in Milan",
+    "text": "Erasmus exchange student at Politecnico di Milano, Milan, Italy, for a year, 2009 – 2010. It is where I learnt Italian.",
+    "area": "education",
+    "org": "Politecnico di Milano",
+    "source": "julian",
+    "confirmedByJulian": null
+  },
+  {
+    "id": "education-yucatan",
+    "label": "Exchange in Mérida",
+    "text": "Exchange student at Universidad Autónoma de Yucatán, Mérida, Mexico, in 2011.",
+    "area": "education",
+    "org": "Universidad Autónoma de Yucatán",
+    "source": "julian",
+    "confirmedByJulian": null
   },
   {
     "id": "cert-claude-code-101",
