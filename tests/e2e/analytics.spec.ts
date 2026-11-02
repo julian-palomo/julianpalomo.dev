@@ -145,6 +145,43 @@ test("?notrack leaves the beacon out of the HTML and sends nothing, until ?notra
   await hideUntilSent(page, sent, ["visit", "visit"]);
 });
 
+/** Opens the home page and waits until the entrance is over, which takes the page's JavaScript, so it has hydrated. */
+async function hydratedHome(page: Page) {
+  await page.route("**/api/weather", (route) => route.fulfill({ json: { weather: null } }));
+  await page.goto("/");
+  await expect(page.locator("[data-entrance]")).toHaveCount(0);
+}
+
+test("downloading the CV sends cv_download", async ({ page }) => {
+  const sent = await collectEvents(page);
+  await hydratedHome(page);
+  const download = page.waitForEvent("download");
+  await page.getByRole("link", { name: "Download CV" }).click();
+  await download;
+  await hideUntilSent(page, sent, ["visit", "cv_download"]);
+});
+
+test("a message that goes sends contact_sent, and one that doesn't sends nothing", async ({
+  page,
+}) => {
+  const sent = await collectEvents(page);
+  await hydratedHome(page);
+  await page.getByRole("button", { name: "Contact", exact: true }).click();
+  const form = page.getByRole("dialog", { name: "Write to Julian" });
+  await form.getByLabel("Name").fill("Ada");
+  await form.getByLabel("Email").fill("not an email");
+  await form.getByLabel("Message").fill("Hello Julian, I'd like to talk about a role.");
+  // The e2e build's Turnstile test key passes at once with a dummy token.
+  await expect(form.locator('[name="cf-turnstile-response"]')).toHaveValue(/DUMMY/);
+  await form.getByRole("button", { name: "Send message" }).click();
+  await expect(form.getByLabel("Email")).toBeFocused();
+
+  await form.getByLabel("Email").fill("ada@example.org");
+  await form.getByRole("button", { name: "Send message" }).click();
+  await expect(form.getByRole("status")).toHaveText("Thanks! Julian will get back to you.");
+  await hideUntilSent(page, sent, ["visit", "contact_sent"]);
+});
+
 test("the notice under the question box, in both languages", async ({ page }) => {
   await page.goto("/");
   await expect(
