@@ -46,6 +46,13 @@ describe("the Projects page's screenshots", () => {
     }
   });
 
+  it("each grows by its width over its height, so a row's shots share one height", () => {
+    for (const [name, { width, height, grow }] of Object.entries(SHOTS)) {
+      const ratio = Number(/^grow-\[([\d.]+)\]$/.exec(grow)?.[1]);
+      expect(ratio, name).toBeCloseTo(width / height, 3);
+    }
+  });
+
   it("each shown one has alt text in both languages, and every project has some", () => {
     for (const project of t("en", "projects")) {
       const rows = PROJECT_SHOTS[project.id] ?? [];

@@ -62,10 +62,10 @@ export function ProjectCard({ project }: { project: Project }) {
  */
 function Shot({ name }: { name: ShotName }) {
   const locale = useLocale();
-  const { width, height } = SHOTS[name];
+  const { width, height, grow } = SHOTS[name];
   const base = `/images/projects/${name}`;
   return (
-    <picture className="min-w-0 basis-0" style={{ flexGrow: width / height }}>
+    <picture className={`min-w-0 basis-0 ${grow}`}>
       <source type="image/avif" srcSet={`${base}.avif`} />
       <source type="image/webp" srcSet={`${base}.webp`} />
       <img
