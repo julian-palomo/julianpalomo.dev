@@ -41,3 +41,4 @@ files are the answer, written down at the time instead of remembered later.
 | 2026-10-29 | [The page's language goes after the cached prompt](2026-10-29-page-language-outside-the-cached-prompt.md) |
 | 2026-10-29 | [A theme choice lasts until Glasgow's next dusk or dawn](2026-10-29-theme-choice-until-next-twilight.md)  |
 | 2026-10-31 | [An answer's sources fold behind a "Check sources" link](2026-10-31-sources-behind-a-link.md)             |
+| 2026-11-02 | [Contact email through `send_email`](2026-11-02-email-routing-for-the-contact-form.md)                    |
