@@ -114,17 +114,27 @@ export function Entrance({ kind, greeting, hero, className, children }: Props) {
       setStage({ status: "over" });
       return;
     }
-    const end = () => setStage({ status: "over" });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let join: Join | undefined;
+    // Once it ends it stays ended: the next beat's timer is cleared, and a
+    // beat that still fires does nothing. Without both, a tap during the full
+    // entrance would end it only until its next beat, which would start it
+    // again, cow and all, and the next tap would moo again.
+    let ended = false;
+    const end = () => {
+      ended = true;
+      clearTimeout(timer);
+      setStage({ status: "over" });
+    };
     // The listeners stay after the entrance ends, so only a skip while the
     // root still has `data-entrance` moos.
     const skip = (event: Event) => {
       if (mooes(event) && element.hasAttribute("data-entrance")) moo();
       end();
     };
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    let join: Join | undefined;
 
     const tick = () => {
+      if (ended) return;
       const elapsed = typeof clock.currentTime === "number" ? clock.currentTime : 0;
       if (kind === "short") {
         setStage({ status: "short" });

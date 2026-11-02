@@ -174,6 +174,33 @@ test("a tap shows everything at once", async ({ page }) => {
   expect(await cowInHero(page)).toBe(false);
 });
 
+test("a tap ends the full entrance for good, past its next beats", async ({ page }) => {
+  await page.goto("/");
+  await expect(async () => {
+    await page.getByRole("heading", { level: 1 }).click();
+    await expect(playing(page)).toHaveCount(0, { timeout: 300 });
+  }).toPass({ timeout: 2000 });
+  // The full entrance's beats run to about 9s; none of them may start it again.
+  const restarted = await page.evaluate(
+    () =>
+      new Promise<boolean>((resolve) => {
+        const observer = new MutationObserver(() => {
+          if (document.querySelector("[data-entrance]")) {
+            observer.disconnect();
+            resolve(true);
+          }
+        });
+        observer.observe(document.body, { attributes: true, subtree: true });
+        setTimeout(() => {
+          observer.disconnect();
+          resolve(false);
+        }, 9000);
+      }),
+  );
+  expect(restarted).toBe(false);
+  expect(await cowInHero(page)).toBe(false);
+});
+
 test("a later visit plays the short entrance, with the cow already on the edge", async ({
   page,
 }) => {
