@@ -52,8 +52,8 @@ describe("advanceReveal", () => {
   const stops = revealStops(words, false);
 
   it("types at a steady pace", () => {
-    // 90 characters arrived: within MAX_LAG_S of typing, so no catching up.
-    const near = stops.filter((stop) => stop <= 90);
+    // 200 characters arrived: within MAX_LAG_S of typing, so no catching up.
+    const near = stops.filter((stop) => stop <= 200);
     const { reveal } = run(start, near, 1000);
     expect(reveal.shown).toBeGreaterThanOrEqual(REVEAL_CPS - 5);
     expect(reveal.shown).toBeLessThanOrEqual(REVEAL_CPS);
@@ -88,9 +88,9 @@ describe("advanceReveal", () => {
 
   it("carries time over to a long word, and banks none once caught up", () => {
     const long = revealStops("a supercalifragilisticexpialidocious b", false);
-    // At 60 characters a second the 35-character word takes about 0.6s.
-    expect(run(start, long, 400).reveal.shown).toBe(long[0]);
-    expect(run(start, long, 750).reveal.shown).toBeGreaterThanOrEqual(long[1] ?? 0);
+    // At 150 characters a second the 35-character word takes about 0.23s.
+    expect(run(start, long, 150).reveal.shown).toBe(long[0]);
+    expect(run(start, long, 300).reveal.shown).toBeGreaterThanOrEqual(long[1] ?? 0);
     expect(advanceReveal({ shown: 38, carry: 5 }, long, TICK_MS)).toEqual({ shown: 38, carry: 0 });
   });
 });
