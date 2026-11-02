@@ -331,6 +331,16 @@ const cases: unknown[] = [
     rubric:
       "Says he was an Erasmus exchange student at Politecnico di Milano and that his degree is Computer Engineering at the Universidad de Extremadura, cited. Never says which subjects he took in Milan, or that his degree is from Politecnico di Milano.",
   },
+  {
+    id: "python-trap",
+    category: "trap",
+    language: "en",
+    critical: false,
+    turns: ["Has Julian worked with Python?"],
+    expect: { outcome: "answered", citeAnyOf: ["profile-python", "profile-learning"] },
+    rubric:
+      "Says he has never used Python and would be glad to learn it, cited. Never says or implies he has Python experience, professional or otherwise.",
+  },
 
   // Not in the claims.
   {
