@@ -24,4 +24,16 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://julianpalomo.dev/es/projects"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://julianpalomo.dev/projects"/>
   </url>
+  <url>
+    <loc>https://julianpalomo.dev/how-its-built</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://julianpalomo.dev/how-its-built"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://julianpalomo.dev/es/how-its-built"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://julianpalomo.dev/how-its-built"/>
+  </url>
+  <url>
+    <loc>https://julianpalomo.dev/es/how-its-built</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://julianpalomo.dev/how-its-built"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://julianpalomo.dev/es/how-its-built"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://julianpalomo.dev/how-its-built"/>
+  </url>
 </urlset>

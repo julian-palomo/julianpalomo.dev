@@ -139,3 +139,22 @@ describe("shareHead for an inner page", () => {
     expect(pageUrl("es", "projects")).toBe("https://julianpalomo.dev/es/projects");
   });
 });
+
+describe("shareHead for How it's built", () => {
+  it.each([
+    ["en", "https://julianpalomo.dev/how-its-built"],
+    ["es", "https://julianpalomo.dev/es/how-its-built"],
+  ] as const)("in %s, has its own URL and language links", (locale, url) => {
+    const { meta, links } = shareHead(locale, {
+      path: "how-its-built",
+      title: t(locale, "howItsBuiltTitle"),
+    });
+    expect(content(meta, "og:url")).toBe(url);
+    expect(links).toContainEqual({ rel: "canonical", href: url });
+    expect(links).toContainEqual({
+      rel: "alternate",
+      hrefLang: "es",
+      href: "https://julianpalomo.dev/es/how-its-built",
+    });
+  });
+});

@@ -13,6 +13,7 @@ import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiEventsRouteImport } from './routes/api/events'
 import { Route as ApiWeatherRouteImport } from './routes/api/weather'
 import { Route as Char123LocaleChar125IndexRouteImport } from './routes/{-$locale}/index'
+import { Route as Char123LocaleChar125HowItsBuiltRouteImport } from './routes/{-$locale}/how-its-built'
 import { Route as Char123LocaleChar125ProjectsRouteImport } from './routes/{-$locale}/projects'
 
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -36,6 +37,12 @@ const Char123LocaleChar125IndexRoute =
     path: '/{-$locale}/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const Char123LocaleChar125HowItsBuiltRoute =
+  Char123LocaleChar125HowItsBuiltRouteImport.update({
+    id: '/{-$locale}/how-its-built',
+    path: '/{-$locale}/how-its-built',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const Char123LocaleChar125ProjectsRoute =
   Char123LocaleChar125ProjectsRouteImport.update({
     id: '/{-$locale}/projects',
@@ -47,6 +54,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/api/events': typeof ApiEventsRoute
   '/api/weather': typeof ApiWeatherRoute
+  '/{-$locale}/how-its-built': typeof Char123LocaleChar125HowItsBuiltRoute
   '/{-$locale}/projects': typeof Char123LocaleChar125ProjectsRoute
   '/{-$locale}/': typeof Char123LocaleChar125IndexRoute
 }
@@ -54,6 +62,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/api/events': typeof ApiEventsRoute
   '/api/weather': typeof ApiWeatherRoute
+  '/{-$locale}/how-its-built': typeof Char123LocaleChar125HowItsBuiltRoute
   '/{-$locale}/projects': typeof Char123LocaleChar125ProjectsRoute
   '/{-$locale}': typeof Char123LocaleChar125IndexRoute
 }
@@ -62,6 +71,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/api/events': typeof ApiEventsRoute
   '/api/weather': typeof ApiWeatherRoute
+  '/{-$locale}/how-its-built': typeof Char123LocaleChar125HowItsBuiltRoute
   '/{-$locale}/projects': typeof Char123LocaleChar125ProjectsRoute
   '/{-$locale}/': typeof Char123LocaleChar125IndexRoute
 }
@@ -71,6 +81,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/api/events'
     | '/api/weather'
+    | '/{-$locale}/how-its-built'
     | '/{-$locale}/projects'
     | '/{-$locale}/'
   fileRoutesByTo: FileRoutesByTo
@@ -78,6 +89,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/api/events'
     | '/api/weather'
+    | '/{-$locale}/how-its-built'
     | '/{-$locale}/projects'
     | '/{-$locale}'
   id:
@@ -85,6 +97,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/api/events'
     | '/api/weather'
+    | '/{-$locale}/how-its-built'
     | '/{-$locale}/projects'
     | '/{-$locale}/'
   fileRoutesById: FileRoutesById
@@ -93,6 +106,7 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   ApiEventsRoute: typeof ApiEventsRoute
   ApiWeatherRoute: typeof ApiWeatherRoute
+  Char123LocaleChar125HowItsBuiltRoute: typeof Char123LocaleChar125HowItsBuiltRoute
   Char123LocaleChar125ProjectsRoute: typeof Char123LocaleChar125ProjectsRoute
   Char123LocaleChar125IndexRoute: typeof Char123LocaleChar125IndexRoute
 }
@@ -127,6 +141,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char123LocaleChar125IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/{-$locale}/how-its-built': {
+      id: '/{-$locale}/how-its-built'
+      path: '/{-$locale}/how-its-built'
+      fullPath: '/{-$locale}/how-its-built'
+      preLoaderRoute: typeof Char123LocaleChar125HowItsBuiltRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/{-$locale}/projects': {
       id: '/{-$locale}/projects'
       path: '/{-$locale}/projects'
@@ -141,6 +162,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   ApiEventsRoute: ApiEventsRoute,
   ApiWeatherRoute: ApiWeatherRoute,
+  Char123LocaleChar125HowItsBuiltRoute: Char123LocaleChar125HowItsBuiltRoute,
   Char123LocaleChar125ProjectsRoute: Char123LocaleChar125ProjectsRoute,
   Char123LocaleChar125IndexRoute: Char123LocaleChar125IndexRoute,
 }

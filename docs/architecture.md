@@ -31,6 +31,12 @@ flowchart TD
   sources --> render
 ```
 
+The How it's built page draws a simplified version of this diagram for
+visitors (the question, the limits, the model and its tools, the citation
+check, the answer with its sources), in
+[`src/components/how/HowItsBuilt.tsx`](../src/components/how/HowItsBuilt.tsx)
+and the translations. A change to the steps here updates that one too.
+
 The checks run in this order, so a request that fails validation never counts
 against a visitor's limit.
 

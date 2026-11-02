@@ -1,7 +1,11 @@
 import type { Messages } from "../../lib/i18n/en";
 import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
+import { type InnerPageName, PageLink } from "../page/PageLinks";
 import { PROJECT_SHOTS, SHOTS, type ShotName } from "./shots";
+
+/** A project's page on this site, linked before its other links. */
+const PROJECT_PAGE_LINKS: Record<string, InnerPageName | undefined> = { site: "howItsBuilt" };
 
 type Project = Messages["projects"][number];
 
@@ -13,6 +17,7 @@ type Project = Messages["projects"][number];
  */
 export function ProjectCard({ project }: { project: Project }) {
   const rows = PROJECT_SHOTS[project.id] ?? [];
+  const pageLink = PROJECT_PAGE_LINKS[project.id];
   return (
     <article
       aria-labelledby={`project-${project.id}`}
@@ -42,6 +47,11 @@ export function ProjectCard({ project }: { project: Project }) {
         ))}
       </ul>
       <ul className="flex flex-wrap gap-x-5 gap-y-2">
+        {pageLink && (
+          <li>
+            <PageLink page={pageLink} className="font-medium text-accent underline" />
+          </li>
+        )}
         {project.links.map((link) => (
           <li key={link.href}>
             <a href={link.href} className="font-medium text-accent underline">

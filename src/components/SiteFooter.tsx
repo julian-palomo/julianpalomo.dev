@@ -13,7 +13,7 @@ export function SiteFooter({ className }: { className?: string }) {
     <footer
       className={`flex flex-col gap-3 px-4 pt-10 text-[12.5px] text-muted sm:px-6 ${className ?? ""}`}
     >
-      <nav aria-label={t(locale, "pagesLabel")}>
+      <nav aria-label={t(locale, "pagesLabel")} className="flex flex-wrap gap-x-5 gap-y-2">
         <PageLinks className="font-medium text-accent underline" />
       </nav>
       <p>
