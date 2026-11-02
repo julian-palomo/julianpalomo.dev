@@ -22,7 +22,7 @@ an `if` that skips them on `labeled`.
 - `check`: `pnpm check` (Biome, then `tsc`).
 - `unit`: `pnpm test`.
 - `knip`: `pnpm knip`.
-- `hooks`: `pnpm test:hooks`, the Claude Code hook tests. GitHub sets `CI=true`, which makes a missing jq or Biome a failure instead of a skipped pass.
+- `hooks`: `pnpm test:hooks`, the Claude Code hook tests and those of two skill scripts (`wait-for-reply.sh`, `create-check.sh`). GitHub sets `CI=true`, which makes a missing jq or Biome a failure instead of a skipped pass.
 - `e2e`: installs Chromium, runs `pnpm test:e2e`, uploads the Playwright report on failure.
 - `changes`: `git diff` between the merge commit and its first parent, over the paths the evals measure. Outputs `bot`. When `bot` is true and the run isn't a `run-evals` labelling, it writes a notice and a summary line: "This pull request changes what the bot sees. To measure this commit, add the `run-evals` label (or remove it and add it again)."
 - `evals`: runs only when `changes` says `bot` **and** the event is the `run-evals` label being added (`docs/adr/2026-10-29-evals-on-a-label.md`). A push never starts it. Otherwise it shows as skipped, which counts as Success for a required check. `pnpm eval` once, on the `EVALS_ANTHROPIC_API_KEY` secret, with the pass rate reported, not enforced. Uploads `evals/results/` and writes the summary to the job's page. `.claude/rules/evals.md` has the rest, including who adds the label.

@@ -8,9 +8,11 @@
 # titled "Mailbox: <name> (never merge)". These checks are what make it safe
 # to allow without a permission prompt: never loosen them.
 #
-# On success it prints the comment's URL and its created_at, which is the
-# <since> that wait-for-reply.sh takes. --dry-run runs every check, prints the
-# body and the target, and posts nothing.
+# On success it prints the comment's URL and its created_at. That time is never
+# the <since> for wait-for-reply.sh: a wait starts from the newest owner
+# comment already read, or an owner reply posted before this message would be
+# missed. --dry-run runs every check, prints the body and the target, and posts
+# nothing.
 #
 # Usage: bash .claude/skills/mailbox/post.sh <name> "<pointer>" [--dry-run]
 
