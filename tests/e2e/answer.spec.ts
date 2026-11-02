@@ -169,6 +169,11 @@ test("a phone gets the compact bar after the first question", async ({ page }) =
   await ask(page, "What has Julian worked on?");
   await expect(bar).toBeVisible();
   await expect(bar.getByRole("button", { name: /^Switch to (dark|light) theme$/ })).toBeVisible();
+  await expect(bar.getByRole("button", { name: "Mute sounds" })).toBeVisible();
+  // The portrait, the name, the two toggles and the hills: no empty slot.
+  expect(
+    await bar.evaluate((element) => [...element.children].map((child) => child.localName)),
+  ).toEqual(["img", "p", "button", "button", "svg"]);
   expect((await bar.boundingBox())?.height).toBe(58);
   // The chat fills the screen under it: the hero, the name and the role have
   // scrolled away, and the cow on the chat's edge sits just under the bar.
