@@ -229,7 +229,8 @@ night in Glasgow**, wherever the visitor is.
   two presses in a row return to following Glasgow. At
   23:00, pressing light lasts until dawn, when Glasgow is light anyway; at
   14:00, pressing dark lasts until dusk. Either way, the next evening or
-  morning follows Glasgow.
+  morning follows Glasgow. "Back to live Glasgow" in the gear's panel also
+  ends a choice at once (section 8).
 - **No flash, without a head script.** The choice is stored in a cookie
   that carries its end, `theme=dark.<epoch ms>`, with a `Max-Age` up to that
   moment. The server renders `<html data-theme>` from a choice that hasn't
@@ -486,7 +487,9 @@ Comeau's blog. It's a toy, and it's honest about being one.
     - wind: Calm, Breeze, Breeze, Fresh, Fresh, Windy, Windy, Strong, Strong,
       Gale, Gale.
   - **Switches:** "Snow instead of rain" and "Haar".
-  - **"Back to live Glasgow"**: a wide flat button with the live dot.
+  - **"Back to live Glasgow"**: a wide flat button with the live dot. It
+    returns to the live sky and to Glasgow's own theme: it also ends a theme
+    choice made with the toggle (section 6).
 - **Playing starts on the first change.** Opening the panel shows the
   controls set to the live sky on screen, and changes nothing: the chip stays
   live, the sky follows the clock and the theme rule is untouched. The first
@@ -503,8 +506,9 @@ Comeau's blog. It's a toy, and it's honest about being one.
   does, so summer's evenings stay light. Pressing the theme toggle while
   playing moves the time to 13:00 (light) or 22:00 (dark); on a summer day
   when 22:00 isn't night, to the hour nearest that night's solar midnight.
-- **Nothing is stored.** A reload, or "Back to live Glasgow", returns to the
-  real sky and the theme rule from section 6.
+- **Nothing is stored.** A reload returns to the real sky and the theme rule
+  from section 6. "Back to live Glasgow", from the panel or the chip, does too,
+  and ends a theme choice as well, so the page shows Glasgow's own theme.
 - The sliders are native range inputs with `aria-valuetext` set to the words,
   and the whole panel works with the keyboard. Escape closes it and returns
   focus to the gear.
@@ -568,7 +572,7 @@ mobile; desktop is the same inside the right-hand card.
    words ("Looking up claims…") with three bouncing dots. Send becomes Stop.
 3. **Answering.** The answer types itself out. What has arrived waits in a
    buffer and appears word by word at a steady pace, whatever pace the
-   stream has: about 60 characters a second, faster when it falls more than
+   stream has: about 150 characters a second, faster when it falls more than
    about 1.5s behind, so a long answer never lags far. Each word fades in
    over 0.2s; earlier text never re-animates and the page never jumps. A
    citation appears whole, with the word before it, as a small green
@@ -587,7 +591,9 @@ mobile; desktop is the same inside the right-hand card.
    and keeps its own state while the page is open. Tapping a chip opens the
    claim exactly as Julian confirmed it, with "Confirmed by Julian on 27 Oct
    2026 · from his CV". Under the answer: "Copy", and "Keep asking" with the
-   suggested questions not asked yet.
+   suggested questions not asked yet. Suggestion chips, the first three and
+   these, are centred at every width, wrapped rows too, and so is the "Keep
+   asking" heading.
 5. **Out of questions, or something went wrong.** Errors are warm too: the cow
    lowers its head, the message says what happened and offers another way
    (the contact form, LinkedIn). Never a bare red error. For the daily limit:
@@ -634,7 +640,7 @@ text, in both languages, in the pull request that adds it.
 | The visitor's bubble appears            | 0.5s                                                                                                           | `cubic-bezier(.3, 1.5, .5, 1)` (a small overshoot) |
 | Source chips rise                       | 0.45s, 80ms apart                                                                                              | `cubic-bezier(.3, 1.4, .5, 1)`                     |
 | A claim opens                           | 0.35s                                                                                                          | `ease`                                             |
-| Each word as an answer types itself out | 0.2s fade; about 60 characters a second, faster when more than about 1.5s behind                               | `ease`                                             |
+| Each word as an answer types itself out | 0.2s fade; about 150 characters a second, faster when more than about 1.5s behind                              | `ease`                                             |
 | Button press                            | 80ms                                                                                                           | `ease`                                             |
 | The gear spins in                       | 0.6s, 2s after the entrance                                                                                    | Spring-like overshoot, then 3 pulses               |
 | Clouds cross the sky                    | 1700 units in 120–190s, over a 2900-unit loop (205–324s)                                                       | `linear`                                           |
@@ -782,9 +788,9 @@ centred and the background left exactly as it is: no blur, no fade.
   this site as contact. Julian provides the PDF; it never contains private
   data, because the repo is public.
 - **Where they sit:** from 1024px, the two secondary buttons sit under the
-  intro. Below 1024px they sit at the end of the page, above the footer: under
-  the intro they'd push the chat's first suggestions below the fixed composer
-  on a 390 × 844 phone.
+  intro, aligned with its left edge. Below 1024px they sit at the end of the
+  page, above the footer, centred: under the intro they'd push the chat's
+  first suggestions below the fixed composer on a 390 × 844 phone.
 - **"Contact"** opens a form: a bottom sheet on mobile, a dialog on desktop.
   Fields: name, email (so Julian can reply), message (up to 2,000
   characters). Protected by Cloudflare Turnstile and a hidden honeypot field,
