@@ -905,7 +905,8 @@ shows at once, so there's no typing loop, only the chime. The entrance is
 otherwise silent, since browsers allow no sound before the first
 interaction: the moo that ends it answers that interaction. Pressing the
 mute button never makes a sound, so a press on it ends the entrance
-silently.
+silently, and so does a press on the microphone, or the moo would be
+recorded with the question.
 
 The sounds are CC0 for now: Kenney's Interface Sounds and four sounds from
 Freesound; Julian will replace them one by one with his own, made with his

@@ -47,6 +47,7 @@ export function VoiceButton({ voice, disabled, onStart, onStop }: Props) {
         aria-label={t(locale, "stopRecording")}
         onClick={onStop}
         className={recordingPill}
+        data-silent-press=""
       >
         <svg aria-hidden="true" viewBox="0 0 24 24" className="size-3.5" fill="currentColor">
           <rect x="4" y="4" width="16" height="16" rx="3" />
@@ -57,6 +58,8 @@ export function VoiceButton({ voice, disabled, onStart, onStop }: Props) {
   }
   const transcribing = voice.status === "transcribing";
   return (
+    // `data-silent-press`: a press that ends the page's entrance doesn't moo
+    // (Entrance.tsx), or the moo would be recorded with the question.
     <IconButton
       look="tint"
       label={t(locale, "askByVoice")}
@@ -64,6 +67,7 @@ export function VoiceButton({ voice, disabled, onStart, onStop }: Props) {
       aria-busy={transcribing || undefined}
       onPointerEnter={onHover}
       onClick={onStart}
+      data-silent-press=""
     >
       <MicIcon />
     </IconButton>
