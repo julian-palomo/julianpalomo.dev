@@ -1,8 +1,10 @@
 import { type CSSProperties, useEffect, useId, useRef } from "react";
+import type { SliderName } from "../../lib/analytics/events";
 import { t } from "../../lib/i18n/t";
 import { momentAt, type PanelControl, panelSky } from "../../lib/scene/play";
 import type { Season } from "../../lib/scene/season";
 import type { SkyState } from "../../lib/scene/sky-state";
+import { useTrack } from "../analytics/Analytics";
 import { useNow } from "../clock/Clock";
 import { useLocale } from "../i18n/useLocale";
 import { useSoundEffects } from "../sound/Sound";
@@ -42,6 +44,7 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
   // with the DOM. Its opening sound goes with it, since the gear and the chip
   // open it from outside this component.
   const { play } = useSoundEffects();
+  const track = useTrack();
   // biome-ignore lint/correctness/useExhaustiveDependencies: the sound plays once, when the dialog opens.
   useEffect(() => {
     const dialog = ref.current;
@@ -49,6 +52,7 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
     if (open && !dialog.open) {
       dialog.showModal();
       play("panelOpen");
+      track({ name: "toy", which: "panel_open" });
     }
     if (!open && dialog.open) dialog.close();
   }, [open]);
@@ -104,6 +108,7 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
           />
 
           <Slider
+            name="hour"
             label={t(locale, "timeOfDay")}
             track="track-time"
             min={0}
@@ -113,6 +118,7 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
             onChange={(hour) => change({ type: "hour", hour })}
           />
           <LevelSlider
+            name="clouds"
             label={t(locale, "cloudsLabel")}
             track="track-clouds"
             words={t(locale, "weatherClouds")}
@@ -120,6 +126,7 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
             onChange={(value) => change({ type: "level", level: "clouds", value })}
           />
           <LevelSlider
+            name="rain"
             label={t(locale, controls.snow ? "snowLabel" : "rainLabel")}
             track="track-rain"
             words={t(locale, controls.snow ? "weatherSnowLevels" : "weatherRain")}
@@ -127,6 +134,7 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
             onChange={(value) => change({ type: "level", level: "rain", value })}
           />
           <LevelSlider
+            name="wind"
             label={t(locale, "windLabel")}
             track="track-wind"
             words={t(locale, "weatherWind")}
@@ -153,6 +161,7 @@ export function SkyPanel({ open, position, live, onClose }: Props) {
             <Button
               look="primary"
               onClick={() => {
+                track({ name: "toy", which: "back_to_live" });
                 dispatch({ type: "backToLive" });
                 close();
               }}
@@ -211,6 +220,8 @@ function SeasonPicker({ value, onChange }: { value: Season; onChange: (season: S
 }
 
 type SliderProps = {
+  /** Which slider it is, for the analytics. */
+  name: SliderName;
   label: string;
   track: string;
   min: number;
@@ -235,9 +246,15 @@ const RANGE_KEYS = new Set([
   "PageDown",
 ]);
 
-function Slider({ label, track, min, max, value, word, ends, onChange }: SliderProps) {
+function Slider({ name, label, track, min, max, value, word, ends, onChange }: SliderProps) {
   const id = useId();
   const { play } = useSoundEffects();
+  const record = useTrack();
+  // A soft click, and one analytics event, when the slider is let go, not on every step.
+  const release = () => {
+    play("slider");
+    record({ name: "toy", which: "slider", slider: name });
+  };
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline justify-between gap-3">
@@ -255,10 +272,9 @@ function Slider({ label, track, min, max, value, word, ends, onChange }: SliderP
         value={value}
         aria-valuetext={word}
         onChange={(event) => onChange(Number(event.target.value))}
-        // A soft click when the slider is let go, not on every step.
-        onPointerUp={() => play("slider")}
+        onPointerUp={release}
         onKeyUp={(event) => {
-          if (RANGE_KEYS.has(event.key)) play("slider");
+          if (RANGE_KEYS.has(event.key)) release();
         }}
         className={`sky-range ${track}`}
       />
@@ -273,6 +289,7 @@ function Slider({ label, track, min, max, value, word, ends, onChange }: SliderP
 }
 
 type LevelSliderProps = {
+  name: SliderName;
   label: string;
   track: string;
   /** One word per level, 0 to 10. */
@@ -281,10 +298,11 @@ type LevelSliderProps = {
   onChange: (value: number) => void;
 };
 
-function LevelSlider({ label, track, words, value, onChange }: LevelSliderProps) {
+function LevelSlider({ name, label, track, words, value, onChange }: LevelSliderProps) {
   const ends: [string, string] = [words[0] ?? "", words.at(-1) ?? ""];
   return (
     <Slider
+      name={name}
       label={label}
       track={track}
       min={0}

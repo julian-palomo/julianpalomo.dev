@@ -32,7 +32,21 @@ export default defineConfig({
       origins: [],
     },
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    {
+      name: "chromium",
+      use: {
+        ...devices["Desktop Chrome"],
+        // The e2e build renders Web Analytics' beacon on any host
+        // (ANALYTICS_BEACON_ANY_HOST in wrangler.jsonc), so a test can check
+        // `?notrack` removes it. Its host never resolves here, so a test run
+        // never loads it or reports a visit to Cloudflare with the real token.
+        launchOptions: {
+          args: ["--host-resolver-rules=MAP static.cloudflareinsights.com ~NOTFOUND"],
+        },
+      },
+    },
+  ],
   // Runs against a production build served by the Workers runtime, not the dev
   // server. CLOUDFLARE_ENV=e2e builds with wrangler.jsonc's `e2e` environment:
   // the chat answers in demo mode and no local .dev.vars key reaches the build,

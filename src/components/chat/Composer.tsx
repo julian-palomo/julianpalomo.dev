@@ -101,63 +101,72 @@ export function Composer({
   const describedBy = showCounter ? `${hintId} ${counterId}` : hintId;
 
   return (
-    <form
-      onSubmit={submit}
-      // Below 1024px the form is fixed to the bottom; on a keyboard that
-      // overlays the page (iOS Safari) it moves up by what the keyboard covers.
-      style={{ bottom: keyboard }}
-      className="enter-chat-later flex flex-col gap-2 max-lg:fixed max-lg:inset-x-0 max-lg:z-30 max-lg:border-t-2 max-lg:border-border max-lg:bg-background max-lg:px-4 max-lg:pt-3 max-lg:pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:max-lg:px-6"
-    >
-      {/* Fixed to the bottom of a phone, the box speaks for itself: the label
+    <>
+      <form
+        onSubmit={submit}
+        // Below 1024px the form is fixed to the bottom; on a keyboard that
+        // overlays the page (iOS Safari) it moves up by what the keyboard covers.
+        style={{ bottom: keyboard }}
+        className="enter-chat-later flex flex-col gap-2 max-lg:fixed max-lg:inset-x-0 max-lg:z-30 max-lg:border-t-2 max-lg:border-border max-lg:bg-background max-lg:px-4 max-lg:pt-3 max-lg:pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:max-lg:px-6"
+      >
+        {/* Fixed to the bottom of a phone, the box speaks for itself: the label
           stays as its accessible name, hidden to save height. */}
-      <label htmlFor={inputId} className="text-[12.5px] font-semibold text-muted max-lg:sr-only">
-        {t(locale, "questionLabel")}
-      </label>
-      {/* The box, not the textarea, shows focus: its border turns accent with a
+        <label htmlFor={inputId} className="text-[12.5px] font-semibold text-muted max-lg:sr-only">
+          {t(locale, "questionLabel")}
+        </label>
+        {/* The box, not the textarea, shows focus: its border turns accent with a
           glow, in place of the outline ring. */}
-      <div className="flex items-end gap-2 rounded-[24px] border-2 border-field-border bg-field p-1.5 pl-4 focus-within:border-accent focus-within:ring-4 focus-within:ring-accent/22">
-        {/* readOnly, not disabled, while an answer streams: a disabled field drops
+        <div className="flex items-end gap-2 rounded-[24px] border-2 border-field-border bg-field p-1.5 pl-4 focus-within:border-accent focus-within:ring-4 focus-within:ring-accent/22">
+          {/* readOnly, not disabled, while an answer streams: a disabled field drops
             keyboard focus to the page, and Send is blocked by canSend anyway.
             The transparent outline is what Windows high-contrast mode paints
             when it drops the glow. */}
-        <textarea
-          ref={setRefs}
-          id={inputId}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          onKeyDown={onKeyDown}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          readOnly={busy}
-          disabled={closed}
-          placeholder={closed ? t(locale, "questionsBackTomorrow") : undefined}
-          rows={1}
-          aria-invalid={over > 0}
-          aria-describedby={describedBy}
-          className="min-w-0 flex-1 resize-none self-center bg-transparent py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-transparent"
-        />
-        {busy ? (
-          <IconButton look="accent" label={t(locale, "stop")} onClick={onStop}>
-            <StopIcon />
-          </IconButton>
-        ) : (
-          <IconButton look="accent" label={t(locale, "send")} type="submit" disabled={!canSend}>
-            <SendIcon />
-          </IconButton>
-        )}
-      </div>
-      <div className="flex items-baseline justify-between gap-3 text-[12.5px]">
-        {/* Touch screens have no Enter or Shift, so the hint is hidden there. */}
-        <p id={hintId} className="text-muted [@media(hover:none)]:hidden">
-          {t(locale, "composerHint")}
-        </p>
-        {showCounter && (
-          <p id={counterId} className={`ml-auto ${counterClass}`}>
-            {counterText}
+          <textarea
+            ref={setRefs}
+            id={inputId}
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            onKeyDown={onKeyDown}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            readOnly={busy}
+            disabled={closed}
+            placeholder={closed ? t(locale, "questionsBackTomorrow") : undefined}
+            rows={1}
+            aria-invalid={over > 0}
+            aria-describedby={describedBy}
+            className="min-w-0 flex-1 resize-none self-center bg-transparent py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-transparent"
+          />
+          {busy ? (
+            <IconButton look="accent" label={t(locale, "stop")} onClick={onStop}>
+              <StopIcon />
+            </IconButton>
+          ) : (
+            <IconButton look="accent" label={t(locale, "send")} type="submit" disabled={!canSend}>
+              <SendIcon />
+            </IconButton>
+          )}
+        </div>
+        <div className="flex items-baseline justify-between gap-3 text-[12.5px]">
+          {/* Touch screens have no Enter or Shift, so the hint is hidden there. */}
+          <p id={hintId} className="text-muted [@media(hover:none)]:hidden">
+            {t(locale, "composerHint")}
           </p>
-        )}
-      </div>
-    </form>
+          {showCounter && (
+            <p id={counterId} className={`ml-auto ${counterClass}`}>
+              {counterText}
+            </p>
+          )}
+        </div>
+      </form>
+      {/* Outside the form on purpose: below 1024px the form is fixed to the
+        bottom, and two more lines there would cover the first suggestions on
+        a 390 × 844 phone (tests/e2e/entrance.spec.ts). There the line ends the
+        chat instead, just above the fixed composer; from lg it sits under it. */}
+      <p className="enter-chat-later text-[12.5px] text-muted lg:-mt-4">
+        {t(locale, "questionsKept")}
+      </p>
+    </>
   );
 }
 

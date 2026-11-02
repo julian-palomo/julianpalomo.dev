@@ -26,13 +26,18 @@
       // Empty so this environment never inherits, and never takes over, the
       // production custom domain.
       "routes": [],
-      "vars": { "BOT_DEMO": "1", "SCENE_OVERRIDE": "1" },
+      // ANALYTICS_BEACON_ANY_HOST renders Web Analytics' beacon off the
+      // production host, so tests/e2e/analytics.spec.ts can check that
+      // `?notrack` removes it. e2e's alone: never under `previews` or at the
+      // top level. /api/events still stores nothing off the production host.
+      "vars": { "BOT_DEMO": "1", "SCENE_OVERRIDE": "1", "ANALYTICS_BEACON_ANY_HOST": "1" },
       "secrets": { "required": [] }
     }
   },
-  // The chat's daily limits (src/lib/bot/usage.ts). Not repeated under
-  // `previews` or `env.e2e`: there the endpoint has no key, answers in demo
-  // mode or "not available", and never touches D1.
+  // The chat's daily limits (src/lib/bot/usage.ts) and the analytics events
+  // (src/lib/analytics/store.ts). Not repeated under `previews` or `env.e2e`:
+  // there the chat has no key, answers in demo mode or "not available", and
+  // never touches D1, and /api/events drops every batch off the production host.
   "d1_databases": [
     {
       "binding": "DB",

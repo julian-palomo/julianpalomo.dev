@@ -1,5 +1,6 @@
 import { t } from "../../lib/i18n/t";
 import { site } from "../../lib/site";
+import { useTrack } from "../analytics/Analytics";
 import { useLocale } from "../i18n/useLocale";
 import { chatErrorMessage, revealOnMount } from "./chat-view";
 
@@ -7,8 +8,8 @@ type Props = { error: Error };
 
 // The other ways to reach Julian, in the order the notice lists them.
 const WAYS = [
-  { name: "LinkedIn", href: site.links.linkedin },
-  { name: "GitHub", href: site.links.github },
+  { name: "LinkedIn", href: site.links.linkedin, to: "linkedin" },
+  { name: "GitHub", href: site.links.github, to: "github" },
 ] as const;
 
 /**
@@ -19,6 +20,7 @@ const WAYS = [
 export function ChatErrorNotice({ error }: Props) {
   const locale = useLocale();
   const contact = t(locale, "contact");
+  const track = useTrack();
   return (
     <div ref={revealOnMount} className="max-lg:scroll-mb-44">
       <div role="alert" className="flex min-w-0 flex-col gap-1 rounded-[20px] bg-tint px-4 py-3">
@@ -28,7 +30,11 @@ export function ChatErrorNotice({ error }: Props) {
           {WAYS.map((way, index) => (
             <span key={way.name}>
               {index > 0 && ` ${contact.between} `}
-              <a href={way.href} className="font-medium text-accent underline">
+              <a
+                href={way.href}
+                onClick={() => track({ name: "outbound", to: way.to })}
+                className="font-medium text-accent underline"
+              >
                 {way.name}
               </a>
             </span>

@@ -50,6 +50,8 @@ export const es: Messages = {
   fromJulian: "de Julián",
   newAnswer: "Nueva respuesta ↓",
   composerHint: "Intro para enviar · Mayús+Intro para una línea nueva",
+  questionsKept:
+    "Las preguntas se guardan de forma anónima durante 90 días para mejorar el asistente.",
   answering: "Respondiendo…",
   answerLabel: "Respuesta",
   sourcesLabel: "Fuentes",

@@ -2,6 +2,7 @@ import bricolageUrl from "@fontsource-variable/bricolage-grotesque/files/bricola
 import interUrl from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { z } from "zod";
 import { ClockProvider } from "../components/clock/Clock";
 import { useLocale } from "../components/i18n/useLocale";
 import { PlayProvider } from "../components/play/Play";
@@ -10,12 +11,35 @@ import { getFirstRender } from "../lib/first-render";
 import { pageTitle } from "../lib/site";
 import appCss from "../styles/app.css?url";
 
+// Cloudflare Web Analytics' beacon, as its "JS Snippet installation" shows
+// it. The token is public by design: it ships in every page.
+const WEB_ANALYTICS_BEACON = "https://static.cloudflareinsights.com/beacon.min.js";
+const WEB_ANALYTICS_TOKEN = "5733f13ad078497ba8a6938283f8ef59";
+
 export const Route = createRootRoute({
-  loader: () => getFirstRender(),
+  // `?notrack` stops this browser being counted, and `?notrack=0` counts it
+  // again (src/lib/analytics/exclusions.ts). It's validated here, on the root,
+  // because only the root's loader renders the beacon; the page removes it
+  // from the address bar once read.
+  validateSearch: z.object({ notrack: z.unknown().optional() }),
+  loaderDeps: ({ search }) => ({ notrack: search.notrack }),
+  loader: ({ deps }) => getFirstRender({ data: { notrack: deps.notrack } }),
   // The HTML depends on the visitor's cookies (theme, language) and the time,
   // so no cache may keep it and serve it to someone else.
   headers: () => ({ "Cache-Control": "private, no-store", Vary: "Cookie" }),
-  head: () => ({
+  head: ({ loaderData }) => ({
+    // A module, as Cloudflare's snippet has it, so it's deferred and never
+    // holds up the page. Only on the production host and never for a browser
+    // with the `notrack` cookie (getFirstRender).
+    scripts: loaderData?.beacon
+      ? [
+          {
+            src: WEB_ANALYTICS_BEACON,
+            type: "module",
+            "data-cf-beacon": JSON.stringify({ token: WEB_ANALYTICS_TOKEN }),
+          },
+        ]
+      : [],
     meta: [
       { charSet: "utf-8" },
       // resizes-content: Chrome on Android shrinks the page above its keyboard,

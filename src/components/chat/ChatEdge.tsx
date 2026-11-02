@@ -2,6 +2,7 @@ import { type RefObject, useEffect, useRef } from "react";
 import type { CowState } from "../../lib/cow-state";
 import { FLIGHT_MS, heroCowWidth } from "../../lib/entrance";
 import { t } from "../../lib/i18n/t";
+import { useTrack } from "../analytics/Analytics";
 import { AssistantCow } from "../cow/AssistantCow";
 import { CowHooves } from "../cow/CowHooves";
 import { useEntrance } from "../entrance/Entrance";
@@ -20,6 +21,7 @@ export function ChatEdge({ cowState }: { cowState: CowState }) {
   const locale = useLocale();
   const cow = useRef<HTMLDivElement>(null);
   const { play } = useSoundEffects();
+  const track = useTrack();
   useCowFlight(cow);
   return (
     <div className="flex items-end gap-3 lg:pl-7">
@@ -30,7 +32,10 @@ export function ChatEdge({ cowState }: { cowState: CowState }) {
             size={132}
             animated
             drawingClassName={phoneSize}
-            onMoo={() => play("moo")}
+            onMoo={() => {
+              play("moo");
+              track({ name: "toy", which: "moo" });
+            }}
           />
           <CowHooves className={phoneSize} />
         </div>
