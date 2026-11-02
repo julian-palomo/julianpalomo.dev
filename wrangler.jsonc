@@ -14,8 +14,11 @@
   "preview_urls": true,
   // Previews have no API key, so the chat answers in demo mode there. Never set
   // BOT_DEMO at the top level: production has a key and ignores it anyway.
+  // CONTACT_DEMO makes the contact form use Turnstile's test keys and send
+  // nothing (src/lib/contact/send.ts), so only production emails Julian. Never
+  // set it at the top level: production would drop every message.
   "previews": {
-    "vars": { "BOT_DEMO": "1", "SCENE_OVERRIDE": "1" }
+    "vars": { "BOT_DEMO": "1", "SCENE_OVERRIDE": "1", "CONTACT_DEMO": "1" }
   },
   // Only for the e2e build (CLOUDFLARE_ENV=e2e in playwright.config.ts), never
   // deployed. An empty `secrets.required` keeps the Vite plugin from copying a
@@ -26,7 +29,7 @@
       // Empty so this environment never inherits, and never takes over, the
       // production custom domain.
       "routes": [],
-      "vars": { "BOT_DEMO": "1", "SCENE_OVERRIDE": "1" },
+      "vars": { "BOT_DEMO": "1", "SCENE_OVERRIDE": "1", "CONTACT_DEMO": "1" },
       "secrets": { "required": [] }
     }
   },
@@ -40,6 +43,11 @@
       "database_id": "da5589f3-a532-476f-a821-b8a86e4153bf"
     }
   ],
+  // The contact form's email to Julian (src/lib/contact/send.ts). No
+  // destination here: the binding may send to any verified Email Routing
+  // address, and the address comes from the CONTACT_TO secret, so it never
+  // appears in the repo. Not repeated under `env.e2e`, which sends nothing.
+  "send_email": [{ "name": "EMAIL" }],
   "observability": {
     "enabled": true
   }
