@@ -18,7 +18,8 @@ import { Loch } from "./Loch";
 import { Meadow } from "./Meadow";
 import { Mountains } from "./Mountains";
 import { Pines } from "./Pines";
-import { Sky } from "./Sky";
+import { ShootingStar, Sky } from "./Sky";
+import { NO_REACTIONS, type Reactions } from "./use-valley";
 
 type Props = {
   sky: SkyState;
@@ -28,6 +29,8 @@ type Props = {
   choreography: "sunset" | "sunrise" | null;
   /** Every animation holds while the tab is hidden. */
   paused: boolean;
+  /** What the pointer has set off (use-valley.ts); none in a still drawing. */
+  reactions?: Reactions;
 };
 
 const SKY_KEYS = [
@@ -61,7 +64,7 @@ const svgId = (prefix: string, id: string) => `${prefix}-${id.replace(/[^a-zA-Z0
  * the root, so a new moment or weather is one style change that
  * src/styles/landscape.css transitions over 1.1s.
  */
-export function Landscape({ sky, at, choreography, paused }: Props) {
+export function Landscape({ sky, at, choreography, paused, reactions = NO_REACTIONS }: Props) {
   const id = useId();
   const skyGradient = svgId("landscape-sky", id);
   const auroraGradient = svgId("landscape-aurora", id);
@@ -125,13 +128,16 @@ export function Landscape({ sky, at, choreography, paused }: Props) {
       {/* The enter- groups are for the page's entrance (src/styles/entrance.css). */}
       <g className="enter-sky">
         <Sky skyGradient={skyGradient} auroraGradient={auroraGradient} sun={sun} moon={moon} />
+        {reactions.star && (
+          <ShootingStar key={reactions.star.id} x={reactions.star.x} y={reactions.star.y} />
+        )}
       </g>
       <g className="enter-clouds">
         <Clouds visible={fx.visibleClouds} dark={fx.darkClouds} speed={fx.cloudSpeed} />
       </g>
       <Mountains />
       <g className="enter-cottage">
-        <Cottage />
+        <Cottage puff={reactions.puff} />
       </g>
       <g className="enter-herd enter-herd-1">
         <FarCow />
@@ -140,13 +146,13 @@ export function Landscape({ sky, at, choreography, paused }: Props) {
         <HaarBand band={1} />
       </g>
       <g className="enter-loch">
-        <Loch />
+        <Loch ripples={reactions.ripples} nessie={reactions.nessie} />
       </g>
       <g className="enter-near">
         <Meadow />
       </g>
       <g className="enter-herd enter-herd-2">
-        <NearHerd />
+        <NearHerd noticed={reactions.noticed} />
       </g>
       <g className="enter-pines">
         <Pines />

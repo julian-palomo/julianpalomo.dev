@@ -172,3 +172,15 @@ function Orb({
     </g>
   );
 }
+
+/**
+ * A shooting star from a click on a clear night's sky (DESIGN.md section 7):
+ * a short streak from the click, down and to the right, gone in 0.9s.
+ */
+export function ShootingStar({ x, y }: { x: number; y: number }) {
+  return (
+    <g className="shooting-star" transform={`translate(${x} ${y})`}>
+      <path d="M-26 -9 L0 0" />
+    </g>
+  );
+}

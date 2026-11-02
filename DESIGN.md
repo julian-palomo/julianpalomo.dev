@@ -443,6 +443,50 @@ feet on `y = 0`).
 - The assistant's cow doesn't appear in the landscape: its head is far bigger
   than the herd and would break the scale. It lives only in the chat.
 
+### The valley notices the pointer
+
+The glen answers a pointer on it, as decoration only: nothing is conveyed by
+it, none of it is announced, and the landscape stays `aria-hidden` and
+`pointer-events: none`. A layer under the hero's controls listens instead,
+turns each point into the scene's own units (`src/lib/scene/valley.ts`), and
+the controls, above it, keep every click meant for them. With a mouse:
+
+- **The midges chase you.** Where midges are shown (summer, still and dry), a
+  pointer near their cloud draws it after the pointer, at most 150 units from
+  home, for up to 3s; then it drifts back on its spring and won't chase again
+  for 2s. Out of season, `?sky=summer,15:00` on a preview shows them.
+- **Ripples on the loch:** passing over the water rings it with the rain's
+  own rings, at most every 0.6s.
+- **The herd looks at you.** A pointer resting near a cow's head for 0.4s
+  makes it hold its grazing and turn its head towards the pointer, up to 20°
+  up. The calf takes a small step towards it. It lets go 1.5s after the
+  pointer leaves.
+- **The cottage:** hovering it sends an extra puff of smoke from the chimney,
+  in any season, and while its windows are lit (the sun below the horizon)
+  one flickers like a candle being lit.
+- **The pines** sway once more, on a spring, as the pointer passes through
+  their crowns.
+
+With a mouse or a finger, a tap being a `click`, which fires only when the
+finger didn't move, so scrolling past the hero never sets anything off:
+
+- **Ripples on the loch** where it's tapped.
+- **A shooting star:** at night (the sun at or below −6°, the theme's night)
+  with a clear sky (clouds at most 1, no rain), a click on the sky sends one
+  streak across it, one at a time. An easter egg, never announced.
+- **Nessie.** Five taps on the loch within ten seconds bring her up, at most
+  once a visit: a head on a long neck and two humps, in the moment's `tree`
+  colour with a `lochhi` eye
+  ([`docs/design/nessie.svg`](docs/design/nessie.svg)), about 34 units long,
+  smaller than the herd's cows. She rises near the loch's left end (x 470,
+  moved in if the hero is too narrow to show it), glides 40 units to the
+  right and sinks again, in about 4s, with a ring where she rose. Only taps
+  count: a mouse sweeping over the loch ripples it too, and would bring her
+  up by accident. No hint and no sound.
+
+With reduced motion none of it happens. The springs' animations hold while
+the tab is hidden, like the CSS ones, and the chase stops with the frames.
+
 ### Performance
 
 - The scene is server-rendered inline SVG. The first paint has the right
@@ -866,12 +910,14 @@ from. Nothing in it is imported by the app.
 | `landscape-palettes.json` | The five sky moments, the land per season, the cloud table, the cows' and particles' colours             |
 | `assistant-cow.svg`       | The assistant, with its part groups and its keyframes; the idle loop runs when you open it               |
 | `herd-cow.svg`            | One cow from the herd, grazing                                                                           |
+| `nessie.svg`              | Nessie as she shows above the loch, the waterline on y 0                                                 |
 
 Open the SVGs in a browser to see them animate.
 
 ## 17. Not in this design
 
-- Clicking a falling leaf to hear it crunch. Particles never take clicks.
+- Clicking a falling leaf to hear it crunch. Particles never take clicks:
+  the midges follow the pointer's position (section 7), not a click.
 - A babbling voice while the cow talks.
 - Special dates (Halloween, Bonfire Night, Christmas). The season mechanism
   allows them later.

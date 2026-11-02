@@ -54,7 +54,7 @@ const SIZE: Record<ParticleKind, [min: number, max: number]> = {
 
 // Midges hover in a small cloud over the loch; glints lie on the near meadow,
 // inside the band every screen shows (x 329–871 on a phone).
-const MIDGE_CLOUD = { x: [560, 640], y: [222, 238] } as const;
+export const MIDGE_CLOUD = { x: [560, 640], y: [222, 238] } as const;
 const GLINT_MEADOW = { x: [340, 860], y: [268, 300] } as const;
 
 /** mulberry32: a small, fast seeded generator, plenty for scattering particles. */

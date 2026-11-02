@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -24 70 30" width="700" height="300" role="img" aria-label="Nessie rising from the loch: a head on a long neck and two humps">
+  <!--
+    Nessie, the easter egg in the loch (DESIGN.md section 7). Flat, in the
+    landscape's style: a neck rising from the water into a small head with a
+    blunt snout, facing right, and two humps behind it, the second smaller.
+    Drawn in her own units, the waterline on y = 0; the landscape draws her
+    about 34 units long, smaller than the grazer (about 46).
+    Colours: the body is the moment's `tree` colour (here the day's) and the
+    eye and the ring the loch's highlight `lochhi`, both from
+    landscape-palettes.json. The loch here is only the background.
+  -->
+  <style>
+    .loch { fill: #B9D6DE; }
+    .body { fill: #2F4F3A; }
+    .eye, .ring { fill: none; stroke: #FFFFFF; stroke-width: 0.6; }
+    .eye { fill: #FFFFFF; stroke: none; }
+  </style>
+  <rect class="loch" x="-20" y="-24" width="70" height="30" />
+  <g class="body">
+    <path d="M12 0 C 12 -6 14 -11 18 -12 C 21 -12.6 25 -11.6 26 -9.6 C 26.6 -8.4 25.4 -7.6 23.6 -8 C 21.8 -8.4 20 -8.6 19 -7.4 C 17.6 -5.6 17.6 -2.6 18 0 Z" />
+    <path d="M1 0 C 1 -5.4 9 -5.4 9 0 Z" />
+    <path d="M-8 0 C -8 -3.4 -2.4 -3.4 -2.4 0 Z" />
+  </g>
+  <circle class="eye" cx="21.4" cy="-10.4" r="0.7" />
+  <ellipse class="ring" cx="9" cy="0.4" rx="20" ry="1.6" />
+</svg>
