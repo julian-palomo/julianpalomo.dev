@@ -11,12 +11,15 @@ import { parseSoundCookie, SOUND_COOKIE } from "./sound/cookie";
 import { parseThemeCookie, THEME_COOKIE } from "./theme";
 
 // Set for previews and e2e only (wrangler.jsonc), never in production.
-const sceneEnvSchema = z.object({ SCENE_OVERRIDE: z.string().optional().catch(undefined) });
+const demoEnvSchema = z.object({
+  SCENE_OVERRIDE: z.string().optional().catch(undefined),
+  CONTACT_DEMO: z.string().optional().catch(undefined),
+});
 
 /**
  * What the first render depends on, read on the server: the visitor's stored
- * theme and sound choice, the request's time, whether `?sky=` may set the landscape, and which
- * entrance the page plays. The client's clock starts from this `now`, so its
+ * theme and sound choice, the request's time, whether `?sky=` may set the landscape, which
+ * entrance the page plays, and whether the contact form uses Turnstile's test keys. The client's clock starts from this `now`, so its
  * first render matches the server's HTML. The entrance's cookie is refreshed
  * here on every visit, so the first HTML already knows the entrance. A theme
  * cookie that no longer holds a choice (over, or the old one-year format) is
@@ -37,11 +40,13 @@ export const getFirstRender = createServerFn({ method: "GET" }).handler(async ()
   if (stored !== undefined && choice === null) {
     deleteCookie(THEME_COOKIE, { path: "/", sameSite: "lax", secure });
   }
+  const demo = demoEnvSchema.parse(env);
   return {
     choice,
     sound: parseSoundCookie(getCookie(SOUND_COOKIE)),
     now,
-    sceneOverride: sceneEnvSchema.parse(env).SCENE_OVERRIDE === "1",
+    sceneOverride: demo.SCENE_OVERRIDE === "1",
     entrance,
+    contactDemo: demo.CONTACT_DEMO === "1",
   };
 });

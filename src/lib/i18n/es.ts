@@ -74,7 +74,13 @@ export const es: Messages = {
     "El asistente ha agotado el presupuesto de hoy. Vuelve mañana o escribe a Julián directamente: lee todos los mensajes.",
   errorGeneric: "Algo ha salido mal por mi parte. Vuelve a intentarlo en un momento.",
   questionsBackTomorrow: "Las preguntas vuelven mañana",
-  contact: { before: "También puedes escribirme por", between: "o", after: "." },
+  contact: {
+    before: "Aún puedes",
+    writeToMe: "escribirme",
+    reach: " o encontrarme en",
+    between: "o",
+    after: ".",
+  },
 
   patTheCow: "Acaricia a la vaca",
   moo: "¡Muu!",
@@ -160,4 +166,30 @@ export const es: Messages = {
   ],
   snowInsteadOfRain: "Nieve en vez de lluvia",
   backToLive: "Volver a Glasgow en directo",
+
+  downloadCv: "Descargar CV",
+  contactOpen: "Contacto",
+  contactTitle: "Escribe a Julián",
+  contactSubtitle: "Lee todos los mensajes y responde por email.",
+  contactName: "Nombre",
+  contactEmail: "Email",
+  contactEmailHint: "Para que Julián pueda responderte.",
+  contactMessage: "Mensaje",
+  contactWebsite: "Sitio web",
+  contactSend: "Enviar mensaje",
+  contactSending: "Enviando…",
+  contactSent: "¡Gracias! Julián te responderá pronto.",
+  contactFieldErrors: {
+    name: "Escribe tu nombre.",
+    email: "Eso no parece una dirección de email.",
+    message: (min) => `Escribe al menos ${min} caracteres.`,
+  },
+  contactErrors: {
+    verification:
+      "No hemos podido comprobar que eres una persona. Espera a la comprobación de abajo y vuelve a intentarlo.",
+    limit: "Ya has enviado los mensajes de hoy. Vuelve a intentarlo mañana, o búscalo en LinkedIn.",
+    unavailable:
+      "El formulario no funciona ahora mismo. Aún puedes encontrar a Julián en LinkedIn o GitHub.",
+    send: "Tu mensaje no se ha enviado. Sigue aquí: vuelve a intentarlo en un momento.",
+  },
 };
