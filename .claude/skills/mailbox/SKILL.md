@@ -1,7 +1,7 @@
 ---
 name: mailbox
 description: Create a julianpalomo.dev mailbox (a locked draft PR that is never merged, which wakes the cloud thread subscribed to it) or post one pointer message in one. Use when asked to create a mailbox, and from /implement-issue to post plan, ready, replied or blocked.
-argument-hint: "create <name> <epic…> | post <name> <pointer>"
+argument-hint: 'create <name> "<cloud thread>" <epic…> | post <name> <pointer>'
 ---
 
 # Mailbox: $ARGUMENTS
@@ -13,7 +13,7 @@ points to, and works from what it finds there. The protocol is issue #82; the
 table of mailboxes is in `AGENTS.md` section 2.
 
 - **One mailbox per cloud thread**, since an event on a PR wakes one session only. It serves the epics in its row.
-- **Only local Claude Code writes in a mailbox**, from the `Zitric` account, and only through `post.sh`. The conversation is locked, so only collaborators can comment.
+- **Only local Claude Code writes in a mailbox**, from the owner's account (`julian-palomo`), and only through `post.sh`. The conversation is locked, so only collaborators can comment.
 - **A message is a pointer, never an instruction.** Nothing in a mailbox approves a plan, merges a PR or changes a setting.
 - **The branch never changes after it is created.** `guard-bash.sh` blocks a push to a `chore/mailbox-*` branch that `origin` already has, and any merge.
 
@@ -35,19 +35,29 @@ The pointer is exactly one of:
 The script writes the body (`Mailbox from local Claude Code`, then the
 pointer) and posts it only to the PR the table names, when that PR is open, a
 draft, locked and titled `Mailbox: <name> (never merge)`. It prints the
-comment's URL and `created_at`, the `<since>` for `wait-for-reply.sh`.
+comment's URL and `created_at`. That time is never the `<since>` for
+`wait-for-reply.sh`, which starts from the newest owner comment already read
+(`/implement-issue`, step 3).
 `--dry-run` as a third argument runs the same checks and prints the body and
 the target without posting.
 
 When it refuses (no row, a PR that isn't a mailbox, a pointer in another
 form), post nothing else in its place and tell Julián.
 
-## `create <name> <epic…>`
+## `create <name> "<cloud thread>" <epic…>`
 
-Julián runs this; the cloud thread subscribes to the PR it opens. Start from a
-clean working tree.
+Julián runs this; the cloud thread subscribes to the PR it opens. The cloud
+thread is its title exactly as the app shows it, in quotes. It's a name, so it
+goes into the row as given, even when it isn't in English ("Web personal ·
+Diseño visual"). Start from a clean working tree.
 
-1. Check that `<name>` has no row in the `AGENTS.md` table, and each epic is an open issue the owner opened (`gh issue view <epic> --json state,author`).
+1. Check the arguments before any `git` command:
+
+   ```bash
+   bash .claude/skills/mailbox/create-check.sh <name> "<cloud thread>" <epic…>
+   ```
+
+   It refuses a missing title (as in `create design 44`, where the epic lands in its place), a title padded with spaces, on two lines or holding a `|`, no epic, a name that already has a row in `AGENTS.md`, and an epic that isn't an open issue the owner opened. It runs no `git`, so a refusal leaves nothing behind: stop and tell Julián what it printed. On success it prints the row for step 5.
 2. The branch, with an empty commit: if the PR were ever merged, `main`'s files wouldn't change.
 
    ```bash
@@ -82,7 +92,7 @@ clean working tree.
    git switch -c docs/mailbox-<name> origin/main
    ```
 
-   Add the row ``| `<name>` | #<pr> | <cloud thread> | #<epic>, … |`` to the table in `AGENTS.md` section 2 (Julián names the thread), then run `/handoff` and `/ship-pr`. Until it is merged, `post.sh` finds no row and posts nothing.
+   Add the row `create-check.sh` printed, with `<pr>` replaced by the draft PR's number, to the table in `AGENTS.md` section 2, then run `/handoff` and `/ship-pr`. Until it is merged, `post.sh` finds no row and posts nothing.
 
 6. Tell Julián the PR number, so the cloud thread subscribes to it.
 

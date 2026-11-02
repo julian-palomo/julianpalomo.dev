@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 # Waits, bounded, for the owner's reply on an issue or PR: every 2 minutes, for
 # up to 60, it looks for a comment (on a PR also a review or a line comment)
-# that was created after <since>, whose author's login is Zitric and whose
+# that was created after <since>, whose author association is OWNER and whose
 # first line isn't one of Claude Code's three fixed ones. Anyone else's comment
-# is skipped, even when it is the only new one: the repo is public.
+# is skipped, even when it is the only new one: the repo is public. Match the
+# owner by association, never by login: a renamed account keeps OWNER.
+#
+# <since> is the time of the newest owner comment or review already read, never
+# the caller's own later message: a reply posted between the two would be older
+# than <since> and missed. The first check runs before the first sleep, so
+# such a reply ends the wait at once. Keep the time filter a strict ">": with
+# ">=" the comment at <since>, already read, would end every wait at once.
 #
 # Exit 0 prints "<time> <url>" for each reply found. A reply isn't an OK: the
 # skill reads it and acts on it. Exit 1 means the time ran out; exit 2, bad
@@ -36,7 +43,7 @@ limit=${WAIT_LIMIT:-3600}
 
 # ISO 8601 UTC timestamps compare correctly as strings.
 select_replies() { # time-field
-  printf '.[] | select(.user.login == "Zitric" and (.%s // "") > "%s" and ((.body // "") | test("^(Plan|Reply|Mailbox) from local Claude Code") | not)) | "\\(.%s) \\(.html_url)"' \
+  printf '.[] | select(.author_association == "OWNER" and (.%s // "") > "%s" and ((.body // "") | test("^(Plan|Reply|Mailbox) from local Claude Code") | not)) | "\\(.%s) \\(.html_url)"' \
     "$1" "$since" "$1"
 }
 

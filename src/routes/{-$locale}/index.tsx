@@ -1,9 +1,12 @@
-import { createFileRoute, getRouteApi, redirect } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { createFileRoute, getRouteApi, redirect, useNavigate } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
+import { Analytics, useTrack } from "../../components/analytics/Analytics";
 import { CompactBar } from "../../components/bar/CompactBar";
 import { Chat } from "../../components/chat/Chat";
 import { useNow } from "../../components/clock/Clock";
+import { ContactProvider } from "../../components/contact/Contact";
+import { CvAndContact } from "../../components/contact/CvAndContact";
 import { Entrance } from "../../components/entrance/Entrance";
 import { HeroBubble } from "../../components/entrance/HeroBubble";
 import { LanguageToggle } from "../../components/i18n/LanguageToggle";
@@ -16,7 +19,10 @@ import { Gear } from "../../components/play/Gear";
 import { usePlay } from "../../components/play/Play";
 import { SkyPanel } from "../../components/play/SkyPanel";
 import { SiteFooter } from "../../components/SiteFooter";
+import { SoundProvider } from "../../components/sound/Sound";
+import { SoundToggle } from "../../components/sound/SoundToggle";
 import { ThemeToggle } from "../../components/theme/ThemeToggle";
+import { parseRef } from "../../lib/analytics/events";
 import { localeFromParam } from "../../lib/i18n/locale";
 import { rootLanguage } from "../../lib/i18n/root-language";
 import { t } from "../../lib/i18n/t";
@@ -31,7 +37,12 @@ export const Route = createFileRoute("/{-$locale}/")({
     parse: ({ locale }) => (locale === undefined || locale === "es" ? { locale } : false),
   },
   // `?sky=` sets the landscape on previews and in e2e (SCENE_OVERRIDE).
-  validateSearch: z.object({ sky: z.string().optional().catch(undefined) }),
+  // `?ref=` says where a visit came from (linkedin, cv, github); the page
+  // reads it once, then removes it from the address bar.
+  validateSearch: z.object({
+    sky: z.string().optional().catch(undefined),
+    ref: z.unknown().optional(),
+  }),
   beforeLoad: ({ params }) => {
     if (params.locale !== undefined || rootLanguage() !== "es") return;
     // 302, never cached: it depends on the visitor's cookie and country. The
@@ -68,10 +79,53 @@ const rootRoute = getRouteApi("__root__");
 
 type PanelState = { open: boolean; position: { top: number; left: number } | null };
 
+/**
+ * The page, inside its analytics. The visit is read once, on mount: where it
+ * came from (`?ref=`) and whether the `visited` cookie was there before the
+ * server refreshed it, which means a visit within the last 7 days.
+ */
 function Home() {
+  const { entrance, track } = rootRoute.useLoaderData();
+  const { ref } = Route.useSearch();
+  const [visit] = useState(() => ({
+    name: "visit" as const,
+    ref: parseRef(ref),
+    returning: entrance === "short",
+  }));
+  useCleanUrl();
+  return (
+    <Analytics on={track} visit={visit}>
+      <Page />
+    </Analytics>
+  );
+}
+
+/**
+ * Removes `?ref=` and `?notrack` from the address bar once the page has read
+ * them, so a copied link doesn't carry them on. Through the router, never
+ * history.replaceState: the language toggle navigates with `search: true`,
+ * which copies the router's own location, and would put them back.
+ */
+function useCleanUrl() {
+  const navigate = useNavigate();
+  const { ref } = Route.useSearch();
+  const { notrack } = rootRoute.useSearch();
+  const dirty = ref !== undefined || notrack !== undefined;
+  useEffect(() => {
+    if (!dirty) return;
+    void navigate({
+      to: ".",
+      search: (search) => ({ ...search, ref: undefined, notrack: undefined }),
+      replace: true,
+    });
+  }, [dirty, navigate]);
+}
+
+function Page() {
   const locale = useLocale();
   // Read once by Entrance, when the page mounts, so a language switch never replays it.
-  const { entrance } = rootRoute.useLoaderData();
+  const { entrance, sound, contactDemo } = rootRoute.useLoaderData();
+  const track = useTrack();
   const heroRef = useRef<HTMLDivElement>(null);
   const { sky } = Route.useSearch();
   const override = useSceneOverride(sky);
@@ -94,75 +148,90 @@ function Home() {
     }
   }
 
-  // The gear and the chip open the panel; playing starts from the sky on
-  // screen, and the popover sits under whichever was pressed.
+  // The gear and the chip open the panel, and the popover sits under
+  // whichever was pressed. Opening changes nothing: the first change in the
+  // panel starts playing, from the live sky on screen.
   function openPanel(trigger: HTMLElement) {
-    dispatch({ type: "play", from: override ?? withWeather(defaultSky(now), weather) });
     const { bottom, left } = trigger.getBoundingClientRect();
     setPanel({ open: true, position: { top: bottom + 8, left } });
   }
 
   return (
-    <Entrance kind={entrance} greeting={t(locale, "greeting")} hero={heroRef} className={page}>
-      <header className={header}>
-        <div
-          ref={heroRef}
-          className="relative h-[230px] overflow-hidden bg-tint lg:col-span-full lg:h-80"
-        >
-          <HeroLandscape override={override} weather={weather} />
-          <HeroBubble />
-          <div className="absolute inset-x-3 top-3 flex items-start justify-between gap-2">
-            <div className="flex items-start gap-2">
-              <Gear onOpen={openPanel} />
-              <div className="enter-control enter-control-1">
-                <WeatherChip
-                  weather={weather}
-                  playingHour={play.status === "playing" ? play.hour : null}
-                  onOpen={openPanel}
-                  onBackToLive={() => dispatch({ type: "backToLive" })}
-                />
+    <SoundProvider initialOn={sound}>
+      <ContactProvider demo={contactDemo}>
+        <Entrance kind={entrance} greeting={t(locale, "greeting")} hero={heroRef} className={page}>
+          <header className={header}>
+            <div
+              ref={heroRef}
+              className="relative h-[230px] overflow-hidden bg-tint lg:col-span-full lg:h-80"
+            >
+              <HeroLandscape override={override} weather={weather} />
+              <HeroBubble />
+              <div className="absolute inset-x-3 top-3 flex items-start justify-between gap-2">
+                <div className="flex items-start gap-2">
+                  <Gear onOpen={openPanel} />
+                  <div className="enter-control enter-control-1">
+                    <WeatherChip
+                      weather={weather}
+                      playingHour={play.status === "playing" ? play.hour : null}
+                      onOpen={openPanel}
+                      onBackToLive={() => {
+                        track({ name: "toy", which: "back_to_live" });
+                        dispatch({ type: "backToLive" });
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <div className="enter-control enter-control-2">
+                    <LanguageToggle />
+                  </div>
+                  <div className="enter-control enter-control-3">
+                    <SoundToggle />
+                  </div>
+                  <div className="enter-control enter-control-4">
+                    <ThemeToggle />
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex gap-2">
-              <div className="enter-control enter-control-2">
-                <LanguageToggle />
-              </div>
-              <div className="enter-control enter-control-3">
-                <ThemeToggle />
-              </div>
+            <div className="flex flex-col px-4 sm:px-6 lg:col-start-2 lg:px-0">
+              <img
+                src="/images/julian.png"
+                alt={t(locale, "portraitAlt")}
+                width={96}
+                height={120}
+                className={`enter-portrait ${portrait}`}
+              />
+              <h1 className="enter-intro enter-intro-1 mt-4 font-display text-[34px] leading-tight font-extrabold tracking-[-0.02em] sm:text-[44px]">
+                {t(locale, "name")}
+              </h1>
+              <p className="enter-intro enter-intro-2 mt-1 font-display text-lg font-bold text-accent lg:text-xl">
+                {t(locale, "role")}
+              </p>
+              <p className="enter-intro enter-intro-3 mt-3 text-muted">{t(locale, "intro")}</p>
+              {/* From 1024px under the intro; on a phone above the footer, so the
+                chat's first suggestions still show above the fixed composer. */}
+              <CvAndContact className="enter-intro enter-intro-3 mt-5 max-lg:hidden" />
             </div>
-          </div>
-        </div>
-        <div className="flex flex-col px-4 sm:px-6 lg:col-start-2 lg:px-0">
-          <img
-            src="/images/julian.png"
-            alt={t(locale, "portraitAlt")}
-            width={96}
-            height={120}
-            className={`enter-portrait ${portrait}`}
+          </header>
+          {started && <CompactBar />}
+          <main
+            ref={chatRef}
+            className={started ? `${chatCard} max-lg:min-h-[calc(100dvh-58px)]` : chatCard}
+          >
+            <Chat onStarted={start} />
+          </main>
+          <CvAndContact className="mt-10 px-4 sm:px-6 lg:hidden" />
+          <SiteFooter className="lg:col-start-2 lg:col-end-4 lg:px-0" />
+          <SkyPanel
+            open={panel.open}
+            position={panel.position}
+            live={override ?? withWeather(defaultSky(now), weather)}
+            onClose={() => setPanel((current) => ({ ...current, open: false }))}
           />
-          <h1 className="enter-intro enter-intro-1 mt-4 font-display text-[34px] leading-tight font-extrabold tracking-[-0.02em] sm:text-[44px]">
-            {t(locale, "name")}
-          </h1>
-          <p className="enter-intro enter-intro-2 mt-1 font-display text-lg font-bold text-accent lg:text-xl">
-            {t(locale, "role")}
-          </p>
-          <p className="enter-intro enter-intro-3 mt-3 text-muted">{t(locale, "intro")}</p>
-        </div>
-      </header>
-      {started && <CompactBar />}
-      <main
-        ref={chatRef}
-        className={started ? `${chatCard} max-lg:min-h-[calc(100dvh-58px)]` : chatCard}
-      >
-        <Chat onStarted={start} />
-      </main>
-      <SiteFooter className="lg:col-start-2 lg:col-end-4 lg:px-0" />
-      <SkyPanel
-        open={panel.open}
-        position={panel.position}
-        onClose={() => setPanel((current) => ({ ...current, open: false }))}
-      />
-    </Entrance>
+        </Entrance>
+      </ContactProvider>
+    </SoundProvider>
   );
 }

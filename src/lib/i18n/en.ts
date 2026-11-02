@@ -27,6 +27,9 @@ export const en = {
   switchLanguage: { short: "ES", label: "Ver en español" },
   themeToDark: "Switch to dark theme",
   themeToLight: "Switch to light theme",
+  // The sound toggle, in the hero and the compact bar.
+  muteSounds: "Mute sounds",
+  turnSoundsOn: "Turn sounds on",
 
   chatLabel: "Chat",
   // The heading beside the cow on the chat's edge, and its line.
@@ -60,10 +63,15 @@ export const en = {
   fromJulian: "from Julian",
   newAnswer: "New answer ↓",
   composerHint: "Enter to send · Shift+Enter for a new line",
+  // Under the composer: what happens to a question (docs/analytics.md).
+  questionsKept: "Questions are kept anonymously for 90 days to improve the assistant.",
   // Announced to screen readers when an answer starts.
   answering: "Answering…",
   answerLabel: "Answer",
   sourcesLabel: "Sources",
+  // The link under a finished answer that shows or hides its source chips.
+  checkSources: (count: number) => `Check sources (${count})`,
+  hideSources: "Hide sources",
   sourceNames: { cv: "CV", julian: "Julian" },
   demo: "Demo",
   lookingUpClaims: "Looking up claims…",
@@ -85,8 +93,15 @@ export const en = {
   errorGeneric: "Something went wrong on my side. Try again in a moment.",
   // The composer's placeholder once no more questions can be asked today.
   questionsBackTomorrow: "Questions are back tomorrow",
-  // "You can still reach me on LinkedIn or GitHub.", around the two links.
-  contact: { before: "You can still reach me on", between: "or", after: "." },
+  // "You can still write to me, or reach me on LinkedIn or GitHub.": "write
+  // to me" opens the contact form, around it and the two links.
+  contact: {
+    before: "You can still",
+    writeToMe: "write to me",
+    reach: ", or reach me on",
+    between: "or",
+    after: ".",
+  },
 
   patTheCow: "Pat the cow",
   moo: "Moo!",
@@ -176,6 +191,34 @@ export const en = {
   ],
   snowInsteadOfRain: "Snow instead of rain",
   backToLive: "Back to live Glasgow",
+
+  // The CV and the contact form (DESIGN.md section 14).
+  downloadCv: "Download CV",
+  contactOpen: "Contact",
+  contactTitle: "Write to Julian",
+  contactSubtitle: "He reads every message and answers by email.",
+  contactName: "Name",
+  contactEmail: "Email",
+  contactEmailHint: "So Julian can reply.",
+  contactMessage: "Message",
+  // The hidden field only bots fill in; people never see it.
+  contactWebsite: "Website",
+  contactSend: "Send message",
+  contactSending: "Sending…",
+  contactSent: "Thanks! Julian will get back to you.",
+  contactFieldErrors: {
+    name: "Write your name.",
+    email: "That doesn't look like an email address.",
+    message: (min: number) => `Write at least ${min} characters.`,
+  },
+  // A failed send keeps what the visitor wrote; each says what to do next.
+  contactErrors: {
+    verification: "We couldn't check you're a person. Wait for the check below, then try again.",
+    limit: "You've sent today's messages. Try again tomorrow, or find Julian on LinkedIn.",
+    unavailable:
+      "The form isn't working right now. You can still reach Julian on LinkedIn or GitHub.",
+    send: "Your message didn't go through. It's still here, so try again in a moment.",
+  },
 };
 
 export type Messages = typeof en;

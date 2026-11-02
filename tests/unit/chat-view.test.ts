@@ -1,15 +1,21 @@
 import { describe, expect, it } from "vitest";
 import {
   answerAsText,
+  answerOutcome,
   chatErrorMessage,
   confirmationLine,
   hideTrailingPartialMarker,
   latestMessages,
   messageText,
+  nextSources,
   outOfQuestions,
   remainingSuggestions,
   renderAnswer,
+  SOURCES_CLOSED,
+  type SourcesView,
   shouldFollow,
+  sourceCount,
+  sourcesLinkLabel,
   splitIntoChunks,
   toolStatus,
 } from "../../src/components/chat/chat-view";
@@ -275,6 +281,56 @@ describe("answerAsText", () => {
   });
 });
 
+describe("nextSources", () => {
+  it("starts closed: no list and no claim", () => {
+    expect(SOURCES_CLOSED).toEqual({ list: false, claim: null });
+  });
+
+  it("opens the list from the link, and a second tap hides it", () => {
+    const opened = nextSources(SOURCES_CLOSED, { type: "link" });
+    expect(opened).toEqual({ list: true, claim: null });
+    expect(nextSources(opened, { type: "link" })).toEqual(SOURCES_CLOSED);
+  });
+
+  it("hides an open claim with the list, so the answer folds back to its text", () => {
+    const open: SourcesView = { list: true, claim: 2 };
+    expect(nextSources(open, { type: "link" })).toEqual(SOURCES_CLOSED);
+  });
+
+  it("opens a citation's claim and the list with it, and closes the claim on a second tap", () => {
+    const opened = nextSources(SOURCES_CLOSED, { type: "citation", number: 1 });
+    expect(opened).toEqual({ list: true, claim: 1 });
+    expect(nextSources(opened, { type: "citation", number: 1 })).toEqual({
+      list: true,
+      claim: null,
+    });
+  });
+
+  it("switches to another claim from a chip, and closes it from the same chip", () => {
+    const first: SourcesView = { list: true, claim: 1 };
+    const second = nextSources(first, { type: "chip", number: 2 });
+    expect(second).toEqual({ list: true, claim: 2 });
+    expect(nextSources(second, { type: "chip", number: 2 })).toEqual({ list: true, claim: null });
+  });
+});
+
+describe("sourcesLinkLabel", () => {
+  it("shows no link when the answer has no chips", () => {
+    expect(sourcesLinkLabel(0, false, "en")).toBeUndefined();
+    expect(sourcesLinkLabel(0, true, "es")).toBeUndefined();
+  });
+
+  it("counts the chips while closed, and offers to hide them while open", () => {
+    expect(sourcesLinkLabel(2, false, "en")).toBe("Check sources (2)");
+    expect(sourcesLinkLabel(2, true, "en")).toBe("Hide sources");
+  });
+
+  it("speaks the page's language", () => {
+    expect(sourcesLinkLabel(1, false, "es")).toBe("Ver fuentes (1)");
+    expect(sourcesLinkLabel(1, true, "es")).toBe("Ocultar fuentes");
+  });
+});
+
 describe("remainingSuggestions", () => {
   it("leaves out what was asked and keeps at most the limit", () => {
     expect(remainingSuggestions(["a", "b", "c", "d", "e"], ["b", " d "], 3)).toEqual([
@@ -311,5 +367,35 @@ describe("confirmationLine", () => {
     });
     expect(naive.format(midnightUtc)).toBe("26");
     expect(confirmationLine(zustand, "en")).toContain("27 Oct 2026");
+  });
+});
+
+describe("answerOutcome", () => {
+  const body = (code: Parameters<typeof chatErrorBody>[0]) =>
+    new Error(JSON.stringify(chatErrorBody(code)));
+
+  it("is done for an answer that finished, and stopped after Stop", () => {
+    expect(answerOutcome({ error: undefined, stopped: false })).toBe("done");
+    expect(answerOutcome({ error: undefined, stopped: true })).toBe("stopped");
+  });
+
+  it("names the daily limit that was hit", () => {
+    expect(answerOutcome({ error: body("visitor_limit"), stopped: false })).toBe("visitor_limit");
+    expect(answerOutcome({ error: body("daily_budget"), stopped: false })).toBe("daily_budget");
+  });
+
+  it("calls every other failure an error, even after Stop", () => {
+    expect(answerOutcome({ error: body("unavailable"), stopped: false })).toBe("error");
+    expect(answerOutcome({ error: new Error("network"), stopped: true })).toBe("error");
+  });
+});
+
+describe("sourceCount", () => {
+  it("counts the chips a finished answer shows: each cited source once, if the server sent it", () => {
+    const text =
+      "Zustand [[redux-zustand]], again [[redux-zustand]], remote [[remote-work]] [[made-up]].";
+    expect(sourceCount(text, [zustand, remote])).toBe(2);
+    expect(sourceCount(text, [zustand])).toBe(1);
+    expect(sourceCount("No claim covers that.", [zustand])).toBe(0);
   });
 });

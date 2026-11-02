@@ -2,6 +2,7 @@
  * Pure helpers that turn the chat's state into what the components render.
  * Kept free of React so they can be unit-tested.
  */
+import type { AnswerOutcome } from "../../lib/analytics/events";
 import { type ChatErrorCode, chatErrorSchema } from "../../lib/bot/chat-error";
 import { chipLabel, parseCitations, type Source } from "../../lib/bot/citations";
 import type { Locale } from "../../lib/i18n/locale";
@@ -143,6 +144,48 @@ export function answerAsText(
   return `${prose}\n\n${sourcesHeading}\n${lines.join("\n")}`;
 }
 
+/**
+ * What an answer's sources show: whether the list of chips is open, and which
+ * claim is, by its number. Each answer starts closed and keeps its own state
+ * only while the page is open.
+ */
+export type SourcesView = { list: boolean; claim: number | null };
+
+export const SOURCES_CLOSED: SourcesView = { list: false, claim: null };
+
+/** A tap on the link under the answer, an inline citation number or a chip. */
+export type SourcesEvent =
+  | { type: "link" }
+  | { type: "citation"; number: number }
+  | { type: "chip"; number: number };
+
+/**
+ * The sources after a tap. The link opens the list, or hides it with any open
+ * claim, so the answer folds back to its text. A number or a chip opens its
+ * claim, or closes it when it's the one open; a number also opens the list,
+ * so its chip is in view.
+ */
+export function nextSources(view: SourcesView, event: SourcesEvent): SourcesView {
+  switch (event.type) {
+    case "link":
+      return view.list ? SOURCES_CLOSED : { ...view, list: true };
+    case "citation":
+      return { list: true, claim: view.claim === event.number ? null : event.number };
+    case "chip":
+      return { ...view, claim: view.claim === event.number ? null : event.number };
+    default: {
+      const unhandled: never = event;
+      throw new Error(String(unhandled));
+    }
+  }
+}
+
+/** The link's text, or undefined when the answer has no chips and so no link. */
+export function sourcesLinkLabel(count: number, open: boolean, locale: Locale): string | undefined {
+  if (count === 0) return undefined;
+  return open ? t(locale, "hideSources") : t(locale, "checkSources")(count);
+}
+
 /** The suggested questions this conversation hasn't asked yet, at most `limit`. */
 export function remainingSuggestions(
   suggestions: readonly string[],
@@ -201,6 +244,30 @@ function chatErrorCode(error: Error): ChatErrorCode | undefined {
 export function outOfQuestions(error: Error | undefined): boolean {
   const code = error ? chatErrorCode(error) : undefined;
   return code === "visitor_limit" || code === "daily_budget";
+}
+
+/**
+ * How an answer's request ended, for the `answer` event: a daily limit's 429
+ * by its code, any other failure as `error`, then Stop, else `done`. Stop
+ * aborts the request without an error, so an error always wins.
+ */
+export function answerOutcome({
+  error,
+  stopped,
+}: {
+  error: Error | undefined;
+  stopped: boolean;
+}): AnswerOutcome {
+  if (error) {
+    const code = chatErrorCode(error);
+    return code === "visitor_limit" || code === "daily_budget" ? code : "error";
+  }
+  return stopped ? "stopped" : "done";
+}
+
+/** How many source chips an answer shows once it has finished typing itself out. */
+export function sourceCount(text: string, sources: readonly Source[]): number {
+  return renderAnswer(text, sources, false).chips.length;
 }
 
 /**

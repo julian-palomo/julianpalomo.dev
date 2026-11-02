@@ -20,6 +20,8 @@ export const es: Messages = {
   switchLanguage: { short: "EN", label: "View in English" },
   themeToDark: "Cambiar al tema oscuro",
   themeToLight: "Cambiar al tema claro",
+  muteSounds: "Silenciar sonidos",
+  turnSoundsOn: "Activar sonidos",
 
   chatLabel: "Chat",
   chatHeading: "Pregúntame por Julián",
@@ -48,9 +50,13 @@ export const es: Messages = {
   fromJulian: "de Julián",
   newAnswer: "Nueva respuesta ↓",
   composerHint: "Intro para enviar · Mayús+Intro para una línea nueva",
+  questionsKept:
+    "Las preguntas se guardan de forma anónima durante 90 días para mejorar el asistente.",
   answering: "Respondiendo…",
   answerLabel: "Respuesta",
   sourcesLabel: "Fuentes",
+  checkSources: (count) => `Ver fuentes (${count})`,
+  hideSources: "Ocultar fuentes",
   sourceNames: { cv: "CV", julian: "Julián" },
   demo: "Demo",
   lookingUpClaims: "Buscando en los datos confirmados…",
@@ -70,7 +76,13 @@ export const es: Messages = {
     "El asistente ha agotado el presupuesto de hoy. Vuelve mañana o escribe a Julián directamente: lee todos los mensajes.",
   errorGeneric: "Algo ha salido mal por mi parte. Vuelve a intentarlo en un momento.",
   questionsBackTomorrow: "Las preguntas vuelven mañana",
-  contact: { before: "También puedes escribirme por", between: "o", after: "." },
+  contact: {
+    before: "Aún puedes",
+    writeToMe: "escribirme",
+    reach: " o encontrarme en",
+    between: "o",
+    after: ".",
+  },
 
   patTheCow: "Acaricia a la vaca",
   moo: "¡Muu!",
@@ -156,4 +168,30 @@ export const es: Messages = {
   ],
   snowInsteadOfRain: "Nieve en vez de lluvia",
   backToLive: "Volver a Glasgow en directo",
+
+  downloadCv: "Descargar CV",
+  contactOpen: "Contacto",
+  contactTitle: "Escribe a Julián",
+  contactSubtitle: "Lee todos los mensajes y responde por email.",
+  contactName: "Nombre",
+  contactEmail: "Email",
+  contactEmailHint: "Para que Julián pueda responderte.",
+  contactMessage: "Mensaje",
+  contactWebsite: "Sitio web",
+  contactSend: "Enviar mensaje",
+  contactSending: "Enviando…",
+  contactSent: "¡Gracias! Julián te responderá pronto.",
+  contactFieldErrors: {
+    name: "Escribe tu nombre.",
+    email: "Eso no parece una dirección de email.",
+    message: (min) => `Escribe al menos ${min} caracteres.`,
+  },
+  contactErrors: {
+    verification:
+      "No hemos podido comprobar que eres una persona. Espera a la comprobación de abajo y vuelve a intentarlo.",
+    limit: "Ya has enviado los mensajes de hoy. Vuelve a intentarlo mañana, o búscalo en LinkedIn.",
+    unavailable:
+      "El formulario no funciona ahora mismo. Aún puedes encontrar a Julián en LinkedIn o GitHub.",
+    send: "Tu mensaje no se ha enviado. Sigue aquí: vuelve a intentarlo en un momento.",
+  },
 };

@@ -1,0 +1,57 @@
+/*
+ * The contact form's <dialog> (src/components/contact/ContactDialog.tsx),
+ * DESIGN.md section 14: a bottom sheet on a phone and a centred dialog from
+ * 1024px, over a backdrop that softens the page. Colours are tokens only;
+ * what moves sits inside the no-preference block at the bottom.
+ */
+.contact-sheet {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--color-foreground);
+  background: var(--color-background);
+  inset: auto 0 0 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: calc(100dvh - 24px);
+  border-radius: 20px 20px 0 0;
+  overflow: auto;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.contact-sheet::backdrop {
+  background: color-mix(in srgb, var(--color-background) 70%, transparent);
+}
+@media (min-width: 1024px) {
+  .contact-sheet {
+    inset: 0;
+    margin: auto;
+    width: 480px;
+    max-height: calc(100dvh - 48px);
+    border: 2px solid var(--color-border);
+    border-radius: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The sheet rises; from 1024px the dialog fades in. */
+  .contact-sheet[open] {
+    animation: contact-rise 0.2s ease-out;
+  }
+  @media (min-width: 1024px) {
+    .contact-sheet[open] {
+      animation-name: contact-fade;
+    }
+  }
+}
+
+@keyframes contact-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+@keyframes contact-fade {
+  from {
+    opacity: 0;
+  }
+}

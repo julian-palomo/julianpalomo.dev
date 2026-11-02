@@ -3,20 +3,26 @@ import { DefaultChatTransport } from "ai";
 import { type RefObject, useEffect, useRef, useState } from "react";
 import type { ChatUIMessage } from "../../lib/bot/chat-message";
 import { MAX_MESSAGES } from "../../lib/bot/limits";
+import { LICK_MS } from "../../lib/cow-state";
 import { t } from "../../lib/i18n/t";
+import { useTrack } from "../analytics/Analytics";
+import { useContact } from "../contact/Contact";
 import { useCowState } from "../cow/use-cow-state";
 import { useEntrance } from "../entrance/Entrance";
 import { useLocale } from "../i18n/useLocale";
+import { type AnswerTyping, useSoundEffects } from "../sound/Sound";
 import { ChatEdge } from "./ChatEdge";
 import { ChatErrorNotice } from "./ChatErrorNotice";
 import { Composer } from "./Composer";
 import {
   answerAsText,
+  answerOutcome,
   latestMessages,
   messageText,
   outOfQuestions,
   remainingSuggestions,
   shouldFollow,
+  sourceCount,
 } from "./chat-view";
 import { Greeting } from "./Greeting";
 import { MessageList } from "./MessageList";
@@ -51,14 +57,47 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
 
   // The latest answer types itself out from what has arrived; with reduced
   // motion, after Stop or after an error, all of it shows at once.
+  const instant = stopped || status === "error" || (latestAnswer !== undefined && reducedMotion());
   const reveal = useReveal({
     id: latestAnswer?.id,
     text: latestText,
     streaming: status === "streaming" && last?.role === "assistant",
-    instant: stopped || status === "error" || (latestAnswer !== undefined && reducedMotion()),
+    instant,
   });
   // Stop stays until the answer has finished typing, so it can show the rest at once.
   const busy = requesting || reveal.revealing;
+
+  // An answer's sounds follow its typing: a soft typing loop from its first
+  // word on screen to its last, then a chime, unless it was stopped or
+  // failed. Nothing types itself out with reduced motion, so the loop stays
+  // silent there. Only the visitor's answers: the entrance's greeting types
+  // itself out elsewhere.
+  const { play, setAnswerTyping } = useSoundEffects();
+  let answerTyping: AnswerTyping = requesting && !reducedMotion() ? "soon" : "idle";
+  if (!instant && reveal.revealing && reveal.shown > 0) answerTyping = "now";
+  useEffect(() => setAnswerTyping(answerTyping), [answerTyping, setAnswerTyping]);
+  const finishedAnswer =
+    !reveal.revealing && reveal.shown > 0 && status === "ready" && !stopped
+      ? latestAnswer?.id
+      : undefined;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: each answer plays once, when it ends.
+  useEffect(() => {
+    if (finishedAnswer) play("answerEnd");
+  }, [finishedAnswer]);
+
+  // A message sent through the contact form makes the cow lick its lips once.
+  const { sent } = useContact();
+  const [cheeredFor, setCheeredFor] = useState(sent);
+  const [cheering, setCheering] = useState(false);
+  if (sent !== cheeredFor) {
+    setCheeredFor(sent);
+    setCheering(true);
+  }
+  useEffect(() => {
+    if (!cheering) return;
+    const timer = setTimeout(() => setCheering(false), LICK_MS);
+    return () => clearTimeout(timer);
+  }, [cheering]);
 
   const cowState = useCowState({
     status,
@@ -67,6 +106,7 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
     stopped,
     composer: { hasText: input.length > 0, focused: composerFocused },
     entrance: entrance.cow,
+    cheering,
   });
 
   // Sending swaps Send for Stop, a suggestion removes its own button, and
@@ -76,7 +116,26 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
   // flies in from there.
   const [flight, setFlight] = useState<{ text: string; from: DOMRect } | null>(null);
 
+  // The analytics: each question when it's sent, and its answer once the
+  // request ends (src/lib/analytics/events.ts). `awaiting` is the question
+  // whose answer isn't recorded yet.
+  const track = useTrack();
+  const awaiting = useRef<number | null>(null);
+
+  // A suggestion chip clicks instead of the send pop: both at once would be
+  // within 150ms, which plays only the first.
   function send(text: string, from?: DOMRect) {
+    play(from ? "suggestion" : "send");
+    const nth = messages.filter((message) => message.role === "user").length + 1;
+    const suggestion = from ? t(locale, "suggestions").indexOf(text) : -1;
+    track({
+      name: "question",
+      via: from ? "suggestion" : "typed",
+      suggestion: suggestion === -1 ? null : suggestion,
+      nth,
+      text,
+    });
+    awaiting.current = nth;
     if (messages.length === 0) onStarted?.();
     setFlight(from ? { text, from } : null);
     setStopped(false);
@@ -84,6 +143,26 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
     setInput("");
     inputRef.current?.focus();
   }
+
+  // Recorded when the request ends, not when the answer has typed itself
+  // out: Stop during the typing only shows the rest at once. Keyed on
+  // `requesting` alone, so the render between send() and the request starting
+  // can't record an answer that hasn't come.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: records once, when a request ends.
+  useEffect(() => {
+    const nth = awaiting.current;
+    if (requesting || nth === null) return;
+    awaiting.current = null;
+    const answer = last?.role === "assistant" ? last : undefined;
+    const sources = answer
+      ? sourceCount(
+          messageText(answer.parts),
+          answer.parts.find((part) => part.type === "data-sources")?.data.sources ?? [],
+        )
+      : 0;
+    const outcome = answerOutcome({ error: status === "error" ? error : undefined, stopped });
+    track({ name: "answer", nth, sources, outcome });
+  }, [requesting]);
 
   // For screen readers: "Answering…" when an answer starts, then the whole
   // answer once, as plain text, when it has finished typing; never piece by

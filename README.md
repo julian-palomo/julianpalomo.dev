@@ -14,7 +14,8 @@ Tailwind CSS) that runs on Cloudflare Workers at
 [julianpalomo.dev](https://julianpalomo.dev). [`DESIGN.md`](DESIGN.md)
 describes the visual design, which is being built in steps: the colours, the
 fonts, the layout and the assistant are in, and the theme follows day and
-night in Glasgow unless the visitor picks one with the toggle. The hero is a
+night in Glasgow; a visitor who picks one with the toggle keeps it until
+Glasgow's next dusk or dawn. The hero is a
 live Highland glen: its season follows the date and its sky the sun's real
 height over Glasgow, a small herd grazes, and the sun sets when the visitor
 switches to the dark theme. Glasgow's live weather rolls into it: clouds,
@@ -28,9 +29,16 @@ its lips when it's done and lowers its head when something goes wrong. It rests
 on the chat's edge. On a first visit the page introduces itself in order: who I
 am, the glen waking up, then the cow, which says hello big in the hero and flies
 down to the chat; later visits that week get a 2s version, and any tap ends
-it. The site is in
+it. Quiet CC0 sounds answer what the visitor does, such as a pop when they ask,
+a soft typing loop while the answer types itself out, a chime when it ends and
+a moo when they pat the cow; they're on by default, and a mute button in the
+hero turns them off. The site is in
 English at `/` and Spanish at `/es`: visitors in Spain get Spanish by default,
-everyone else English, and the language toggle always wins.
+everyone else English, and the language toggle always wins. Under the intro,
+"Download CV" gets my CV as a PDF, with no phone number or email address in
+it, and "Contact" opens a form that emails me. The form is protected by
+Cloudflare Turnstile and a limit of 5 messages a day per visitor, and the
+message is never stored ([`docs/contact.md`](docs/contact.md)).
 
 The weather comes from [Open-Meteo](https://open-meteo.com/) through our
 Worker, at `GET /api/weather`, so the visitor's IP never reaches Open-Meteo.
@@ -41,10 +49,11 @@ sky when it fails. The footer credits Open-Meteo, as its CC BY 4.0 terms ask.
 
 You ask a question and the answer streams in from Claude (Sonnet 5.5, through
 the Vercel AI SDK), which can only look up the facts I've confirmed. Each fact
-an answer cites shows as a numbered citation and a source chip, such as "1 ·
-CV · Cazoo · Redux → Zustand", and a citation only counts if the model looked
-that fact up while answering. Tapping a number or a chip opens the claim as I
-confirmed it, with the date I confirmed it; the model never sees that date.
+an answer cites shows as a numbered citation, and a "Check sources" link under
+the answer unfolds a chip for each one, such as "1 · CV · Cazoo · Redux →
+Zustand"; a citation only counts if the model looked that fact up while
+answering. Tapping a number or a chip opens the claim as I confirmed it, with
+the date I confirmed it; the model never sees that date.
 Answers type themselves out word by word, can be copied with their sources,
 and are followed by more questions to ask. On a phone the chat gets a compact
 bar and a composer fixed above the keyboard; screen readers hear each answer
@@ -55,6 +64,15 @@ Visitors are counted by a hash that changes every day, never by their IP.
 The live site has its API key and its limits in place, so the chat answers on
 [julianpalomo.dev](https://julianpalomo.dev); without a key it says it isn't
 available.
+
+The site counts how it's used with its own small event log in D1, read with
+`pnpm stats`: where visits come from, what visitors ask, which questions had
+no claim to answer them, how far they get and which toys they play with. No
+IP, user agent or cookie id is stored. Question text is kept anonymously for
+90 days, and the composer says so; events are kept for 13 months. Only the
+real site counts, bots and headless browsers are dropped, and `?notrack`
+leaves a browser out. Cloudflare Web Analytics stays as a rough second opinion
+on visit counts ([`docs/analytics.md`](docs/analytics.md)).
 
 What exists around it:
 
@@ -107,11 +125,13 @@ pnpm dev
 | `pnpm check`            | Runs Biome (lint and format), then `tsc`.                                                                                                                                 |
 | `pnpm test`             | Runs the unit tests once with Vitest.                                                                                                                                     |
 | `pnpm test:e2e`         | Builds, serves and runs the Playwright tests in Chromium.                                                                                                                 |
-| `pnpm test:hooks`       | Runs the tests for the Claude Code hooks in `.claude/hooks/`.                                                                                                             |
+| `pnpm test:hooks`       | Runs the tests for the Claude Code hooks in `.claude/hooks/` and two skill scripts, `wait-for-reply.sh` and `create-check.sh`.                                            |
 | `pnpm eval`             | Asks the real assistant the eval cases and has a second model judge the answers. Costs money: about $0.09, then $0.01–0.02 a case. `-t <case-id>` runs one.               |
 | `pnpm knip`             | Reports unused files, exports and dependencies.                                                                                                                           |
 | `pnpm db:migrate:local` | Applies the D1 migrations to the local database in `.wrangler/state`.                                                                                                     |
 | `pnpm og`               | Rewrites the link preview images and the icons in `public/` from a card drawn with the site's own components (`scripts/og/`). Run it after changing the name or the role. |
+| `pnpm sounds`           | Builds the sound sprite in `public/sounds/` from one file per sound in `sounds/` (`docs/sounds.md`). Needs ffmpeg.                                                        |
+| `pnpm stats`            | Prints the analytics report for the last 7 and 30 days from the production D1 (needs a Cloudflare login); `--local` reads the local one (`docs/analytics.md`).            |
 
 To try the assistant locally, copy `.dev.vars.example` to `.dev.vars` (it's
 gitignored), put an Anthropic API key in it, and set `VISITOR_SALT` to any long
@@ -123,9 +143,15 @@ key, it answers in demo mode, as on previews. `pnpm test:e2e` never uses your ke
 `wrangler.jsonc`'s `e2e` environment, which loads no secrets and runs in demo
 mode.
 
+The contact form needs two more secrets in production: `TURNSTILE_SECRET_KEY`,
+the Turnstile widget's secret, and `CONTACT_TO`, the verified Email Routing
+address that messages go to. Locally and on previews, `CONTACT_DEMO=1` checks
+Turnstile with Cloudflare's test keys and sends nothing
+([`docs/contact.md`](docs/contact.md)).
+
 `pnpm eval` reads the API key from `.dev.vars` too, asks the assistant every
 case in [`evals/`](evals/) through the same code as `/api/chat`, checks each
-answer in code (citations, links, no contact details, no Markdown), and then
+answer in code (citations, length, no contact details, no Markdown), and then
 has a second model, Claude Sonnet 5.5, judge every answer sentence by
 sentence against the claims it used: a sentence that says more than its claim
 ("managed" where the claim says "technical lead") fails the case. Before any
@@ -187,7 +213,7 @@ version from `packageManager` in `package.json`.
 ## The plan
 
 The next steps are tracked as
-[GitHub issues](https://github.com/Zitric/julianpalomo.dev/issues), one per
+[GitHub issues](https://github.com/julian-palomo/julianpalomo.dev/issues), one per
 piece of work.
 
 Each decision is recorded as it's made, one file each, in `docs/adr/`.
@@ -200,10 +226,16 @@ Each decision is recorded as it's made, one file each, in `docs/adr/`.
   through the limits, the model, its tools and the citation check.
 - [`DESIGN.md`](DESIGN.md): how the site looks, moves and sounds: colours,
   type, the live Highland landscape, the cow and the chat.
+- [Sounds](docs/sounds.md): where each sound came from, its licence, and how
+  to replace one and rebuild the sprite.
+- [Analytics](docs/analytics.md): what the site counts and never counts, how
+  long it keeps it, who is left out, and how to read `pnpm stats`.
 - [Evals](docs/evals.md): how the assistant is tested against its claims,
   and the score of every baseline.
 - [Architecture decision records](docs/adr/README.md): what was decided,
   what else was considered, and why.
+- [The contact form](docs/contact.md): how a message reaches me, what is
+  checked on the way, and what is never kept.
 - [Tech debt](docs/tech-debt.md): shortcuts taken on purpose, and their status.
 
 ## Licence
@@ -213,5 +245,5 @@ photos) is not licensed for reuse. [`LICENSE`](LICENSE) has the exact split.
 
 ## Contact
 
-[LinkedIn](https://www.linkedin.com/in/julianpalomodeonis) ·
-[GitHub](https://github.com/Zitric)
+[LinkedIn](https://www.linkedin.com/in/julianpalomo) ·
+[GitHub](https://github.com/julian-palomo)

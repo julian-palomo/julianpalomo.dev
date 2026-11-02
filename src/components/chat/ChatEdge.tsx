@@ -2,10 +2,12 @@ import { type RefObject, useEffect, useRef } from "react";
 import type { CowState } from "../../lib/cow-state";
 import { FLIGHT_MS, heroCowWidth } from "../../lib/entrance";
 import { t } from "../../lib/i18n/t";
+import { useTrack } from "../analytics/Analytics";
 import { AssistantCow } from "../cow/AssistantCow";
 import { CowHooves } from "../cow/CowHooves";
 import { useEntrance } from "../entrance/Entrance";
 import { useLocale } from "../i18n/useLocale";
+import { useSoundEffects } from "../sound/Sound";
 
 /**
  * The top of the chat (DESIGN.md sections 5 and 9): the assistant's one cow,
@@ -18,12 +20,23 @@ import { useLocale } from "../i18n/useLocale";
 export function ChatEdge({ cowState }: { cowState: CowState }) {
   const locale = useLocale();
   const cow = useRef<HTMLDivElement>(null);
+  const { play } = useSoundEffects();
+  const track = useTrack();
   useCowFlight(cow);
   return (
     <div className="flex items-end gap-3 lg:pl-7">
       <div ref={cow} className="edge-cow relative z-10 -mb-[17px] shrink-0 lg:-mb-[22px]">
         <div className="edge-lift relative" data-state={cowState}>
-          <AssistantCow state={cowState} size={132} animated drawingClassName={phoneSize} />
+          <AssistantCow
+            state={cowState}
+            size={132}
+            animated
+            drawingClassName={phoneSize}
+            onMoo={() => {
+              play("moo");
+              track({ name: "toy", which: "moo" });
+            }}
+          />
           <CowHooves className={phoneSize} />
         </div>
       </div>

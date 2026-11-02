@@ -116,7 +116,7 @@ in `.claude/rules/styling.md`. UI components still never use a colour literal.
 | Panel and dialog titles | Bricolage Grotesque | 700     | 20px                     |                          |
 | Buttons with text       | Bricolage Grotesque | 700     | 15px                     |                          |
 | Body and chat messages  | Inter               | 400     | 15.5px, line height 1.55 |                          |
-| Chips, suggestions      | Inter               | 500     | 13–14px                  |                          |
+| Chips, suggestions      | Inter               | 500     | 13–14px                  | Also the sources link    |
 | Hints, labels, captions | Inter               | 500–600 | 12–12.5px                | Labels in `muted`        |
 - Both fonts are OFL-1.1 and self-hosted from Fontsource's variable packages
   (`@fontsource-variable/bricolage-grotesque`, `@fontsource-variable/inter`),
@@ -156,14 +156,17 @@ From top to bottom:
 1. **The hero** (230px tall): the landscape fills it edge to edge. On top of
    it, a row of controls 12px from the edges:
    - left: the gear (section 8), 44px round in `accent`, and the weather chip
-     ("9°C · Drizzle", in `glass`);
+     ("9°C · Drizzle", in `glass`; only "9°C" below 400px, so the row fits a
+     320px phone in both languages);
    - right: the language toggle ("ES" / "EN"), the sound toggle and the theme
      toggle, 44px round buttons in `glass`, the size of every icon button on the site.
 2. **The portrait** (96 × 120px), overlapping the hero's bottom edge by half
    its height, 20px from the left, with a 4px ring in `background`.
 3. **Name, role and one line** ("Ask about my experience. Answers come only
-   from facts I've confirmed, with their sources."), then **"Download CV"**
-   and **"Contact"**.
+   from facts I've confirmed, with their sources."). On a phone, **"Download
+   CV"** and **"Contact"** sit at the end of the page, above the footer, so
+   the chat's first suggestions still show above the fixed composer (section
+   14).
 4. **The chat** (section 10). At its top, the cow (100 × 79px on a phone) rests
    its chin on the chat's edge, like a fence, with its two front hooves over it:
    on a phone the edge is a 3px line in `border` with rounded ends, across
@@ -218,18 +221,28 @@ night in Glasgow**, wherever the visitor is.
   it's 6° below in the morning. Sunrise, sunset and the sun's elevation are
   computed in code with the NOAA solar equations. There is no API call and no
   dependency.
-- **The toggle always wins and is remembered.** Pressing it sets the other
-  theme and stores the choice. From then on the site keeps that theme until
-  the visitor presses it again.
+- **The toggle wins until Glasgow's next dusk or dawn.** Pressing it sets
+  the other theme until Glasgow's next civil dusk or civil dawn, when the sun
+  next crosses 6° below the horizon. Two minutes later, so Glasgow has
+  surely turned, the choice ends and the site follows Glasgow again.
+  Pressing it back to Glasgow's current theme ends the choice at once, so
+  two presses in a row return to following Glasgow. At
+  23:00, pressing light lasts until dawn, when Glasgow is light anyway; at
+  14:00, pressing dark lasts until dusk. Either way, the next evening or
+  morning follows Glasgow.
 - **No flash, without a head script.** The choice is stored in a cookie
-  (`theme=light|dark`, one year). The server renders `<html data-theme>` from
-  the cookie, or from Glasgow's sun at the time of the request, so the first
-  paint is already right and there's no inline script to keep in step with the
-  TypeScript.
-- **While the page is open**, the client re-checks every minute. If the
-  visitor hasn't chosen and Glasgow's dusk or dawn arrives, the theme changes
-  by itself with the same choreography as the toggle, but slower (about 6s),
-  so it doesn't startle.
+  that carries its end, `theme=dark.<epoch ms>`, with a `Max-Age` up to that
+  moment. The server renders `<html data-theme>` from a choice that hasn't
+  ended, or from Glasgow's sun at the time of the request, so the first paint
+  is already right and there's no inline script to keep in step with the
+  TypeScript. A cookie whose end has passed, or an old one-year `theme=dark`
+  without an end, is no choice, and the server deletes it.
+- **While the page is open**, the client re-checks every minute and ends a
+  choice whose end has passed. When the theme follows Glasgow and its dusk
+  or dawn arrives, the theme changes by itself with the same choreography as
+  the toggle, but slower (about 6s), so it doesn't startle. A choice ends
+  just as Glasgow comes round to the same theme, so its end changes nothing
+  on screen.
 - **The landscape matches the theme.** Normally it shows Glasgow's real time.
   If the chosen theme disagrees with it (dark during Glasgow's day, or light
   at night), the landscape shows a representative moment instead: today's
@@ -379,9 +392,10 @@ come from Glasgow (below); the gear lets visitors set them (section 8).
   - the chip's temperature: rounded to a whole degree.
 - **Attribution:** Open-Meteo's terms ask for a credit under CC BY 4.0. The
   footer says "Weather data by Open-Meteo.com" with a link.
-- **The weather chip** reads "Glasgow · 15:04 · 9°C · Drizzle" on desktop and
-  "9°C · Drizzle" on mobile, in Glasgow's time. It's a button that opens the
-  gear's panel.
+- **The weather chip** reads "Glasgow · 15:04 · 9°C · Drizzle" on desktop,
+  "9°C · Drizzle" on mobile and "9°C" below 400px, in Glasgow's time. Its
+  accessible name always holds the whole weather. It's a button that opens
+  the gear's panel.
 
 ### Particles
 
@@ -473,9 +487,18 @@ Comeau's blog. It's a toy, and it's honest about being one.
       Gale, Gale.
   - **Switches:** "Snow instead of rain" and "Haar".
   - **"Back to live Glasgow"**: a wide flat button with the live dot.
+- **Playing starts on the first change.** Opening the panel shows the
+  controls set to the live sky on screen, and changes nothing: the chip stays
+  live, the sky follows the clock and the theme rule is untouched. The first
+  change to any control (a season, the time, a level, a switch) starts
+  playing from the live sky at that moment, with that change. Closing the
+  panel without a change leaves everything live, and pressing the theme
+  toggle then is an ordinary toggle.
 - **While playing**, the slider's time also drives the theme (night is dark),
   the chip turns `accent` and reads "Your sky · 15:00 · tap to reset" ("Your
-  sky · 15:00" on a phone), and tapping it goes back to live. A season other
+  sky · 15:00" on a phone, "15:00" below 400px, where its accent colour and
+  its accessible name still say it's the visitor's sky), and tapping it goes
+  back to live. A season other
   than today's moves the date to the 15th of its middle month, as `?sky=`
   does, so summer's evenings stay light. Pressing the theme toggle while
   playing moves the time to 13:00 (light) or 22:00 (dark); on a summer day
@@ -535,7 +558,11 @@ mobile; desktop is the same inside the right-hand card.
 1. **Typing.** The composer grows as the visitor types, up to 6 lines, and its
    border lights up in `accent`. The cow listens. The character counter only
    appears near the limit (from 900 of 1,000). Hint under the box: "Enter to
-   send · Shift+Enter for a new line" (hidden on touch screens).
+   send · Shift+Enter for a new line" (hidden on touch screens). Under it from
+   1024px, a muted line: "Questions are kept anonymously for 90 days to
+   improve the assistant." (`docs/analytics.md`). On a phone the same line
+   ends the chat, just above the fixed composer, so the composer stays as
+   short as before.
 2. **Thinking.** The question jumps into place as a bubble, with a small
    bounce and a "pop". The cow chews. A status pill says what's happening in
    words ("Looking up claims…") with three bouncing dots. Send becomes Stop.
@@ -552,11 +579,15 @@ mobile; desktop is the same inside the right-hand card.
    visitor was already at the bottom; if they scrolled up to read, a "New
    answer ↓" pill appears instead.
 4. **Done**, when the last word is on screen, not when the stream ends. The
-   cow licks once, satisfied. The sources rise in one by one
-   (80ms apart) as numbered chips, such as "1 · Julian · Work mode". Tapping
-   a chip opens the claim exactly as Julian confirmed it, with "Confirmed by
-   Julian on 27 Oct 2026 · from his CV". Under the answer: "Copy", and "Keep
-   asking" with the suggested questions not asked yet.
+   cow licks once, satisfied. Under the answer, a small `accent` text link,
+   "Check sources (2)", folds its sources away; an answer with none has no
+   link. Tapping it makes the sources rise in one by one (80ms apart) as
+   numbered chips, such as "1 · Julian · Work mode", and the link becomes
+   "Hide sources", which also closes an open claim. Each answer starts folded
+   and keeps its own state while the page is open. Tapping a chip opens the
+   claim exactly as Julian confirmed it, with "Confirmed by Julian on 27 Oct
+   2026 · from his CV". Under the answer: "Copy", and "Keep asking" with the
+   suggested questions not asked yet.
 5. **Out of questions, or something went wrong.** Errors are warm too: the cow
    lowers its head, the message says what happened and offers another way
    (the contact form, LinkedIn). Never a bare red error. For the daily limit:
@@ -568,10 +599,13 @@ mobile; desktop is the same inside the right-hand card.
 
 - **Suggested questions:** tapping one flies it into place as the visitor's
   bubble (a FLIP animation) and plays the "pop".
-- **Citations are buttons:** each number opens its claim. This is what sets
-  the bot apart: you can see where every sentence comes from. To show the
-  claim's text and confirmation date, the `data-sources` part carries them;
-  the model, the prompt and the tools don't change.
+- **Citations are buttons:** each number opens its claim, and unfolds the
+  chips so its own is in view. This is what sets the bot apart: you can see
+  where every sentence comes from. The numbers always show; only the row of
+  chips folds, so the sources stay one tap away
+  ([`docs/adr/2026-10-31-sources-behind-a-link.md`](docs/adr/2026-10-31-sources-behind-a-link.md)). To show the claim's
+  text and confirmation date, the `data-sources` part carries them; the
+  model, the prompt and the tools don't change.
 - **Copy** copies the answer as plain text with its sources listed at the
   end, ready to paste into an email.
 - **Screen readers:** "Answering…" is announced when an answer starts, and the
@@ -618,7 +652,7 @@ On a first visit, or the first in a week:
 
 | When                   | What                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0.08s to 0.32s         | The name, the role, the line, and "Download CV" and "Contact" rise, 80ms apart, 0.45s each. The portrait drops in at 0.1s (0.6s). The hero's buttons pop in from 0.3s, 70ms apart. They work from the start.                                                                                                                                                                                                                                            |
+| 0.08s to 0.32s         | The name, the role and the line rise, 80ms apart, 0.45s each; from 1024px, "Download CV" and "Contact" rise with the line. The portrait drops in at 0.1s (0.6s). The hero's buttons pop in from 0.3s, 70ms apart. They work from the start.                                                                                                                                                                                                             |
 | 0.6s to about 3.9s     | The glen wakes, slowly. The sky fades in (1.05s from 0.6s). The land rises back to front: far hills from 0.68s, middle from 0.87s, near land from 1.05s, 1.5s each. The loch fades in at 1.2s, the trees grow one after another from 1.43s to 1.85s, the cottage pops at 1.73s, the haar fades in at 1.5s, the two herd groups walk in at 1.88s and 2.03s (1.8s each), and the particles fade in at 2.4s.                                               |
 | 2.5s                   | The cow appears big in the middle of the hero, about 200px wide (at most 62% of the hero's height), scaling up from nothing with a small overshoot (0.6s). It talks.                                                                                                                                                                                                                                                                                    |
 | 3.15s                  | A speech bubble says "Hi! I'm the Highland cow" ("¡Hola! Soy la vaca de las Highlands"), with no full stop and its text centred, for 1.7s. From `lg` it's a pill above the cow. On a phone it sits beside the cow's head, under the hero's controls and clear of them, wrapping naturally in about 92px with a 14px radius and a comic-style tail on its left edge, pointing down towards the cow's mouth. It's decoration, hidden from screen readers. |
@@ -678,31 +712,50 @@ With `prefers-reduced-motion: reduce`:
 Sounds are **on by default**, quiet, and one tap away from off.
 
 - They play through [use-sound](https://github.com/joshwcomeau/use-sound)
-  from a single audio sprite. The sounds issue checks that it works with
-  React 19 before relying on it.
+  from a single audio sprite (WebM, with MP3 for browsers without it), which
+  loads once the page is idle, or at the first tap, click or key if that
+  comes first, never on the critical path. Each loop (the rain, the typing)
+  is a file of its own, since a looping slice of a sprite clicks at its
+  seams, and loads only the first time it's needed. `docs/sounds.md` lists
+  each file's source and licence, and how to replace one.
 - Browsers block audio until the first interaction with the page. That's
   fine: every sound here answers something the visitor did.
 - **The sound toggle** is always visible (in the hero, and in the compact bar
-  on mobile). The choice is stored in a cookie (`sound=on|off`), so the
-  server renders the right icon.
+  on mobile), labelled "Mute sounds" or "Turn sounds on". The choice is
+  stored in a cookie (`sound=on|off`, a year), so the server renders the
+  right icon.
 - All sounds are short and quiet (the loudest at about half volume), and no
-  sound plays more than once every 150ms.
+  sound plays more than once every 150ms. Nothing makes a sound on hover.
 
-| Moment                               | Sound                                 |
-| ------------------------------------ | ------------------------------------- |
-| Send a question                      | A "pop"                               |
-| An answer starts                     | A soft brush                          |
-| An answer ends                       | A short chime                         |
-| Tap the cow                          | A soft "moo" (at most once every 3s)  |
-| Theme toggle                         | A switch click                        |
-| Language toggle                      | A soft tick                           |
-| Release a slider in the gear's panel | A soft click                          |
-| Heavy rain (7 or more)               | A rain loop, very low, while it lasts |
-| Download the CV                      | A paper rustle                        |
+| Moment                                     | Sound                                                 |
+| ------------------------------------------ | ----------------------------------------------------- |
+| Send a question                            | A "pop"                                               |
+| Press a suggested question                 | A soft click, in place of the pop                     |
+| An answer types itself out                 | A soft, low keyboard-typing loop, until its last word |
+| An answer ends (its last word)             | A short chime                                         |
+| Open the sources under an answer           | A soft click                                          |
+| Tap the cow                                | A soft "moo" (at most once every 3s)                  |
+| A tap, click or key that ends the entrance | The same moo, under the same 3s rule                  |
+| Theme toggle                               | A switch click                                        |
+| Language toggle                            | A soft tick                                           |
+| Open or close the gear's panel             | A soft tick                                           |
+| Release a slider in the gear's panel       | A soft click                                          |
+| Heavy rain (7 or more)                     | A rain loop, very low, while it lasts                 |
+| Download the CV                            | A paper rustle                                        |
+| A contact message is sent                  | The moo, then the lick                                |
 
-Which sounds: Julian's own (made with his synths) or a CC0 pack such as
-Kenney's Interface Sounds, plus a CC0 moo. The sounds issue asks Julian before
-it starts, and records each file's source and licence in `docs/sounds.md`.
+Only the visitor's own answers make the answer sounds: the greeting that
+types itself out in the first visit's entrance is silent, and so is a theme
+change that Glasgow's dusk or dawn brings. With reduced motion an answer
+shows at once, so there's no typing loop, only the chime. The entrance is
+otherwise silent, since browsers allow no sound before the first
+interaction: the moo that ends it answers that interaction. Pressing the
+mute button never makes a sound, so a press on it ends the entrance
+silently.
+
+The sounds are CC0 for now: Kenney's Interface Sounds and four sounds from
+Freesound; Julian will replace them one by one with his own, made with his
+synths, each one a file swap.
 
 ## 13. The portrait
 
@@ -728,13 +781,17 @@ centred and the background left exactly as it is: no blur, no fade.
   **without his phone number or email address**, with LinkedIn, GitHub and
   this site as contact. Julian provides the PDF; it never contains private
   data, because the repo is public.
+- **Where they sit:** from 1024px, the two secondary buttons sit under the
+  intro. Below 1024px they sit at the end of the page, above the footer: under
+  the intro they'd push the chat's first suggestions below the fixed composer
+  on a 390 × 844 phone.
 - **"Contact"** opens a form: a bottom sheet on mobile, a dialog on desktop.
   Fields: name, email (so Julian can reply), message (up to 2,000
   characters). Protected by Cloudflare Turnstile and a hidden honeypot field,
   and limited per visitor per day like the chat. The message goes to Julian's
   email from the server; his address is a secret and never appears in the
   repo or the page. Success: "Thanks! Julian will get back to you." and the
-  cow licks, satisfied.
+  cow moos (when sound is on, section 12) and licks, satisfied.
 
 ### Sharing
 

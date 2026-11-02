@@ -62,6 +62,9 @@
   [data-entrance="full"] .enter-control-3 {
     animation-delay: 0.44s;
   }
+  [data-entrance="full"] .enter-control-4 {
+    animation-delay: 0.51s;
+  }
 
   /* The glen wakes, slowly: the sky, then the land back to front, the loch,
      the trees one after another, the cottage, the haar, the herd and the
@@ -180,6 +183,9 @@
   }
   [data-entrance="short"] .enter-control-3 {
     animation-delay: 0.14s;
+  }
+  [data-entrance="short"] .enter-control-4 {
+    animation-delay: 0.21s;
   }
 
   /* The glen wakes at its quick pace. */

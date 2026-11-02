@@ -1,10 +1,15 @@
 import { type CSSProperties, useEffect, useId, useRef } from "react";
+import type { SliderName } from "../../lib/analytics/events";
 import { t } from "../../lib/i18n/t";
-import { momentAt } from "../../lib/scene/play";
+import { momentAt, type PanelControl, panelSky } from "../../lib/scene/play";
 import type { Season } from "../../lib/scene/season";
+import type { SkyState } from "../../lib/scene/sky-state";
+import { useTrack } from "../analytics/Analytics";
 import { useNow } from "../clock/Clock";
 import { useLocale } from "../i18n/useLocale";
+import { useSoundEffects } from "../sound/Sound";
 import { Button } from "../ui/Button";
+import { CloseIcon } from "../ui/CloseIcon";
 import { IconButton } from "../ui/IconButton";
 import { usePlay } from "./Play";
 
@@ -14,6 +19,8 @@ type Props = {
   open: boolean;
   /** Where the popover sits from 1024px, under the gear; the sheet below that ignores it. */
   position: { top: number; left: number } | null;
+  /** The live sky on screen: the controls show it until the first change starts playing from it. */
+  live: SkyState;
   onClose: () => void;
 };
 
@@ -23,21 +30,42 @@ type Props = {
  * gear or the chip that opened it. The backdrop is clear, so the visitor
  * watches the sky change as they play.
  */
-export function SkyPanel({ open, position, onClose }: Props) {
+export function SkyPanel({ open, position, live, onClose }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const locale = useLocale();
   const now = useNow();
   const { state, dispatch } = usePlay();
+  // Opening the panel changes nothing: it shows the live sky, read afresh on
+  // every render, and the first change starts playing from it.
+  const controls = state.status === "playing" ? state : panelSky(live);
+  const change = (control: PanelControl) => dispatch({ ...control, from: live });
 
   // The dialog is outside React's model: opening and closing it is syncing
-  // with the DOM.
+  // with the DOM. Its opening sound goes with it, since the gear and the chip
+  // open it from outside this component.
+  const { play } = useSoundEffects();
+  const track = useTrack();
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the sound plays once, when the dialog opens.
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      play("panelOpen");
+      track({ name: "toy", which: "panel_open" });
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
+
+  // Every way out comes through here: the close button, the backdrop, Escape
+  // (the dialog's own close event) and "Back to live Glasgow". The close
+  // event also fires when the effect above closes the dialog, by which time
+  // `open` is false, so the sound plays once.
+  const close = () => {
+    if (open) play("panelClose");
+    onClose();
+  };
 
   const place = position
     ? ({
@@ -53,15 +81,15 @@ export function SkyPanel({ open, position, onClose }: Props) {
       className="sky-panel"
       aria-labelledby={titleId}
       style={place}
-      onClose={onClose}
+      onClose={close}
       // A click on the backdrop lands on the dialog itself; clicks inside land
       // on its content. Keyboards close it with Escape, which the modal dialog
       // handles natively.
       onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (event.target === event.currentTarget) close();
       }}
     >
-      {state.status === "playing" && (
+      {open && (
         <div className="flex flex-col gap-5 p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -70,57 +98,61 @@ export function SkyPanel({ open, position, onClose }: Props) {
               </h2>
               <p className="text-[13px] text-muted">{t(locale, "playSubtitle")}</p>
             </div>
-            <IconButton look="tint" label={t(locale, "close")} onClick={onClose}>
+            <IconButton look="tint" label={t(locale, "close")} onClick={close}>
               <CloseIcon />
             </IconButton>
           </div>
 
           <SeasonPicker
-            value={state.season}
-            onChange={(season) => dispatch({ type: "season", season })}
+            value={controls.season}
+            onChange={(season) => change({ type: "season", season })}
           />
 
           <Slider
+            name="hour"
             label={t(locale, "timeOfDay")}
             track="track-time"
             min={0}
             max={23}
-            value={state.hour}
-            word={timeLabel(state.hour, t(locale, "moments")[momentAt(state, now)])}
-            onChange={(hour) => dispatch({ type: "hour", hour })}
+            value={controls.hour}
+            word={timeLabel(controls.hour, t(locale, "moments")[momentAt(controls, now)])}
+            onChange={(hour) => change({ type: "hour", hour })}
           />
           <LevelSlider
+            name="clouds"
             label={t(locale, "cloudsLabel")}
             track="track-clouds"
             words={t(locale, "weatherClouds")}
-            value={state.clouds}
-            onChange={(value) => dispatch({ type: "level", level: "clouds", value })}
+            value={controls.clouds}
+            onChange={(value) => change({ type: "level", level: "clouds", value })}
           />
           <LevelSlider
-            label={t(locale, state.snow ? "snowLabel" : "rainLabel")}
+            name="rain"
+            label={t(locale, controls.snow ? "snowLabel" : "rainLabel")}
             track="track-rain"
-            words={t(locale, state.snow ? "weatherSnowLevels" : "weatherRain")}
-            value={state.rain}
-            onChange={(value) => dispatch({ type: "level", level: "rain", value })}
+            words={t(locale, controls.snow ? "weatherSnowLevels" : "weatherRain")}
+            value={controls.rain}
+            onChange={(value) => change({ type: "level", level: "rain", value })}
           />
           <LevelSlider
+            name="wind"
             label={t(locale, "windLabel")}
             track="track-wind"
             words={t(locale, "weatherWind")}
-            value={state.wind}
-            onChange={(value) => dispatch({ type: "level", level: "wind", value })}
+            value={controls.wind}
+            onChange={(value) => change({ type: "level", level: "wind", value })}
           />
 
           <div className="flex flex-col gap-2">
             <Switch
               label={t(locale, "snowInsteadOfRain")}
-              on={state.snow}
-              onChange={(on) => dispatch({ type: "switch", name: "snow", on })}
+              on={controls.snow}
+              onChange={(on) => change({ type: "switch", name: "snow", on })}
             />
             <Switch
               label={t(locale, "weatherHaar")}
-              on={state.haar}
-              onChange={(on) => dispatch({ type: "switch", name: "haar", on })}
+              on={controls.haar}
+              onChange={(on) => change({ type: "switch", name: "haar", on })}
             />
           </div>
 
@@ -130,8 +162,9 @@ export function SkyPanel({ open, position, onClose }: Props) {
             <Button
               look="primary"
               onClick={() => {
+                track({ name: "toy", which: "back_to_live" });
                 dispatch({ type: "backToLive" });
-                onClose();
+                close();
               }}
             >
               <span aria-hidden="true" className="size-2 rounded-full bg-live" />
@@ -188,6 +221,8 @@ function SeasonPicker({ value, onChange }: { value: Season; onChange: (season: S
 }
 
 type SliderProps = {
+  /** Which slider it is, for the analytics. */
+  name: SliderName;
   label: string;
   track: string;
   min: number;
@@ -200,8 +235,27 @@ type SliderProps = {
   onChange: (value: number) => void;
 };
 
-function Slider({ label, track, min, max, value, word, ends, onChange }: SliderProps) {
+// The keys that move a range input, whose release plays the slider's click.
+const RANGE_KEYS = new Set([
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "Home",
+  "End",
+  "PageUp",
+  "PageDown",
+]);
+
+function Slider({ name, label, track, min, max, value, word, ends, onChange }: SliderProps) {
   const id = useId();
+  const { play } = useSoundEffects();
+  const record = useTrack();
+  // A soft click, and one analytics event, when the slider is let go, not on every step.
+  const release = () => {
+    play("slider");
+    record({ name: "toy", which: "slider", slider: name });
+  };
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline justify-between gap-3">
@@ -219,6 +273,10 @@ function Slider({ label, track, min, max, value, word, ends, onChange }: SliderP
         value={value}
         aria-valuetext={word}
         onChange={(event) => onChange(Number(event.target.value))}
+        onPointerUp={release}
+        onKeyUp={(event) => {
+          if (RANGE_KEYS.has(event.key)) release();
+        }}
         className={`sky-range ${track}`}
       />
       {ends && (
@@ -232,6 +290,7 @@ function Slider({ label, track, min, max, value, word, ends, onChange }: SliderP
 }
 
 type LevelSliderProps = {
+  name: SliderName;
   label: string;
   track: string;
   /** One word per level, 0 to 10. */
@@ -240,10 +299,11 @@ type LevelSliderProps = {
   onChange: (value: number) => void;
 };
 
-function LevelSlider({ label, track, words, value, onChange }: LevelSliderProps) {
+function LevelSlider({ name, label, track, words, value, onChange }: LevelSliderProps) {
   const ends: [string, string] = [words[0] ?? "", words.at(-1) ?? ""];
   return (
     <Slider
+      name={name}
       label={label}
       track={track}
       min={0}
@@ -282,21 +342,5 @@ function Switch({
         />
       </span>
     </button>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="size-5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    >
-      <path d="M6 6l12 12M18 6L6 18" />
-    </svg>
   );
 }

@@ -38,7 +38,7 @@ must keep doing; the ADRs say why.
 ## Limits
 
 - **Every model call goes through the daily limits.** `handleChat` checks them in D1 before creating the model and answers `429` (`visitor_limit` or `daily_budget`) when one is hit. With a key but no `DB` binding or no `VISITOR_SALT` it answers `503`: never call the model without the limits in front of it. Demo answers cost nothing and skip them.
-- **`limits.ts` stays browser-safe**: the constants, the price table and pure functions only. D1, the visitor hash and anything that reads a secret go in `usage.ts`, which only `chat.ts` imports.
+- **`limits.ts` stays browser-safe**: the constants, the price table and pure functions only. D1, the visitor hash and anything that reads a secret go in `usage.ts`, which only server code imports: `chat.ts`, and `src/lib/contact/` for the contact form's daily limit.
 - **The prices in `limits.ts` belong to the model.** When `MODEL_ID` in `model.ts` changes, change them in the same commit. Money is integer micro-dollars, never floats.
 - A visitor is a SHA-256 of the salt, the UTC day and `visitorKey(ip)`: the IPv4 address, or the /64 of an IPv6 one, so rotating through a /64 doesn't reset the limit. Never store the IP or the prefix, and keep the day in the hash so a visitor can't be followed across days.
 - **Usage is recorded once per answer, however it ends**: from `toUIMessageStream`'s `onEnd`, the one callback the SDK calls for a finished, failed, aborted or cancelled answer. It adds up each finished step in `onStepEnd`; never use `onEnd`'s `totalUsage`, which comes back empty when a later step fails, and never record from `streamText`'s `onEnd` or `onAbort` as well. `createUIMessageStreamResponse` gets `consumeSseStream`, which reads a copy of the stream to its end inside `waitUntil`, and the write goes through `waitUntil` too: without both, Workers may cancel the rest of the request when the visitor disconnects, before `onEnd` runs.
@@ -56,6 +56,11 @@ must keep doing; the ADRs say why.
 
 - `src/components/chat/` renders the answer with `parseCitations` and shows a chip only for an id that is both cited in the text and in the answer's `data-sources` part. The pure logic lives in `chat-view.ts`, with unit tests.
 - **The chat sends only the latest `MAX_MESSAGES` messages**, trimmed by `latestMessages` in `chat-view.ts` so they start with a question, through `DefaultChatTransport`'s `prepareSendMessagesRequest` in `Chat.tsx`. The screen keeps the whole conversation. `send` passes the page's `locale` as each message's `body`, read from `useLocale()` when it is sent, so a question after a language switch carries the new one; `tests/e2e/language.spec.ts` checks the request. `MAX_MESSAGES` lives in `limits.ts`, the one constant the transport and `chat.ts`'s validation share; the endpoint still rejects longer requests, which only a forged one can be.
+- **The chat records analytics events** through `useTrack` (`src/components/analytics/Analytics.tsx`):
+  - a `question` in `send`;
+  - an `answer` once the request ends, with `answerOutcome` and `sourceCount` from `chat-view.ts`.
+
+  Neither touches `/api/chat` or anything in `src/lib/bot/`, so they need no eval run (`docs/analytics.md`).
 - Code the browser imports must not pull in server code or `claims.json`: share values through client-safe modules (`limits.ts`, `chat-error.ts`, `chat-message.ts`, `../claim-id.ts`), never through `chat.ts` or `claims.ts`.
 
 ## Where things live
@@ -69,14 +74,14 @@ must keep doing; the ADRs say why.
 
 - **The API key is read only on the server**, in `chat.ts` through the route. Without it, and without demo mode, the endpoint answers `503 { "error": "unavailable" }` and never creates a model.
 - `/api/chat` is the one internal route the browser calls with `fetch`, from `useChat` in `src/components/chat/Chat.tsx`; everything else goes through `createServerFn` (`react-and-typescript.md`).
-- Errors reach the client as `{ "error": ... }` (built in `chat-error.ts`) or a fixed stream message, never a stack trace or the provider's message. The real error goes to `console.error` once, from `streamText`'s own `onError` (without it the SDK logs it too), and Workers observability keeps it. The UI stream's `onError` only maps it to the fixed message.
+- Errors reach the client as `{ "error": ... }` (built in `chat-error.ts`) or a fixed stream message, never a stack trace or the provider's message. The real error goes to `console.error` once, from `streamText`'s own `onError` (without it the SDK logs it too), and Workers observability keeps it. The UI stream's `onError` only maps it to the fixed message. That message, `STREAM_ERROR_TEXT` in `chat-error.ts`, is never shown: `useChat` turns the error chunk into its `error`, and `chatErrorMessage` shows `errorGeneric` in the page's language, so never translate it on the server. `tests/e2e/chat.spec.ts` checks this on `/es`.
 - `tests/e2e/bundle.spec.ts` fails if the browser bundle contains `ANTHROPIC_API_KEY` or `confirmedByJulian`.
 
 ## Tests
 
 - Unit tests never call the real model. They use `MockLanguageModelV4` from `ai/test`, passed in through `handleChat`'s `createModel`, an in-memory store through `createStore`, so they never touch D1, and a fake `waitUntil` that collects what it's given.
 - The evals in `evals/` are the one place real models are called outside production: the bot's through `handleChat`, and the judge's directly (`.claude/rules/evals.md`). A change to the prompt, the tools or the model's settings needs a full eval run.
-- e2e tests run the chat in demo mode. The "not available" test fakes the 503 with `page.route`, using `chatErrorBody` so its body can't drift from the endpoint's.
+- e2e tests run the chat in demo mode. The "not available" test fakes the 503 with `page.route`, using `chatErrorBody` so its body can't drift from the endpoint's, and the stream-error test builds its failed stream with the SDK and `STREAM_ERROR_TEXT` the same way.
 
 ## The AI SDK
 
