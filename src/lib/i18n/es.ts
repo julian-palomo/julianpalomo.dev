@@ -220,7 +220,7 @@ export const es: Messages = {
     },
     valley: {
       title: "Un valle de verdad",
-      body: "El paisaje de arriba está en directo. La estación sigue el calendario, el sol está a la altura a la que está ahora mismo sobre Glasgow, y el tiempo es el de Glasgow de la última media hora. Si allí llueve, aquí también.",
+      body: "El paisaje de arriba está en directo. La estación sigue el calendario, el sol está a la altura real que tiene ahora mismo sobre Glasgow, y el tiempo es el de Glasgow de la última media hora. Si allí llueve, aquí también.",
     },
     howIBuiltIt: "Cómo la hice",
     buildFlow: {
@@ -245,7 +245,7 @@ export const es: Messages = {
     steps: [
       {
         title: "Hecha con ayuda de la IA, pero con reglas",
-        body: "Hice esta web con la ayuda de Claude, una IA de la empresa Anthropic, y de Claude Code, su asistente para escribir código. Le di reglas por escrito: puede proponer cambios, pero solo yo los acepto, y solo yo puedo aprobar una línea sobre mi experiencia.",
+        body: "Hice esta web con la ayuda de Claude, una IA de la empresa Anthropic, y de Claude Code, su asistente para escribir código. Les di reglas por escrito: pueden proponer cambios, pero solo yo los acepto, y solo yo puedo aprobar una línea sobre mi experiencia.",
       },
       {
         title: "Primero, un plan",
@@ -261,7 +261,7 @@ export const es: Messages = {
       },
       {
         title: "Un supervisor que ve el conjunto",
-        body: "Conversaciones con Claude en la app de Claude supervisan el trabajo. Llevan notas de todo el proyecto, de sus decisiones y de cómo me gusta hacer las cosas, así que revisan cada plan y cada cambio con más contexto que la sesión que lo escribió.",
+        body: "Unas conversaciones con Claude, en la app de Claude, supervisan el trabajo. Llevan notas de todo el proyecto, de sus decisiones y de cómo me gusta hacer las cosas, así que revisan cada plan y cada cambio con más contexto que la sesión que lo escribió.",
       },
       {
         title: "Buzones entre ellos",
