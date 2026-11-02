@@ -116,10 +116,11 @@ export function Entrance({ kind, greeting, hero, className, children }: Props) {
     }
     let timer: ReturnType<typeof setTimeout> | undefined;
     let join: Join | undefined;
-    // Once it ends it stays ended: the next beat's timer is cleared, and a
-    // beat that still fires does nothing. Without both, a tap during the full
-    // entrance would end it only until its next beat, which would start it
-    // again, cow and all, and the next tap would moo again.
+    // Once it ends it stays ended: the next beat's timer is cleared, a beat
+    // that still fires does nothing, and so does a background tab shown
+    // later (`show`). Without these, a tap during the full entrance would end
+    // it only until its next beat, which would start it again, cow and all,
+    // and the next tap would moo again.
     let ended = false;
     const end = () => {
       ended = true;
@@ -155,7 +156,8 @@ export function Entrance({ kind, greeting, hero, className, children }: Props) {
       if (wait !== null) timer = setTimeout(tick, wait);
     };
 
-    // A background tab starts the entrance when it's first shown, from the beginning.
+    // A background tab starts the entrance when it's first shown, from the
+    // beginning, unless it has already ended.
     const show = () => {
       if (ended || document.visibilityState !== "visible") return;
       document.removeEventListener("visibilitychange", show);

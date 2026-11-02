@@ -836,7 +836,8 @@ Around both:
   JavaScript starts late, the entrance carries on from the beat it has
   reached: a cow that should already be in the hero appears there, a flight
   that has begun is skipped, and a greeting already on screen stays whole. A
-  page opened in a background tab starts the entrance when it's first shown.
+  page opened in a background tab starts the entrance when it's first shown,
+  unless it has already ended. Once ended, nothing starts it again.
 - **The gear waits** until 2s after it ends (section 8).
 - **Screen readers** have the chat from the start: it's hidden with
   `opacity`, never `display` or `visibility`, and the greeting's full text is
