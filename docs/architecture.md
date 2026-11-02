@@ -122,6 +122,14 @@ in the browser and types itself out word by word
 and the screen-reader announcement wait for the last word. The server and the model
 know nothing of it.
 
+**The analytics.** The chat records each question and how its answer ended
+(`question` and `answer` events, through `useTrack` from
+[`src/components/analytics/Analytics.tsx`](../src/components/analytics/Analytics.tsx)),
+and the page sends them to `POST /api/events`, which stores them in D1
+([`docs/analytics.md`](analytics.md)). It happens in the browser, beside the
+path above: nothing in `src/lib/bot/` knows about it, and the request to
+`/api/chat` doesn't change.
+
 **The evals.** [`evals/run-case.ts`](../evals/run-case.ts) asks the real model
 its questions through `handleChat` itself, with a request shaped like
 `useChat`'s, so every step above runs as it does in production: the
