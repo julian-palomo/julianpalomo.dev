@@ -169,7 +169,7 @@ in `.claude/rules/styling.md`. UI components still never use a colour literal.
   | Suggested questions | Rise 2px and settle; the chat's cow tilts towards the one under the pointer                                          |
   | Download CV         | The sheet's corner folds out, as if the CV were coming out                                                           |
   | Contact             | The envelope's flap opens                                                                                            |
-  | GitHub              | None: GitHub's guidelines don't allow its mark to move. Its border lights up in `accent`, like the other pills'      |
+  | GitHub              | None: GitHub's guidelines ask that its mark not be altered, so it stays still; its border lights up in `accent`      |
   | Check sources       | The answer's citation numbers hop, one after another                                                                 |
 
   A disabled button has no gesture.
@@ -944,8 +944,8 @@ centred and the background left exactly as it is: no blur, no fade.
   Invertocat, from GitHub's own logo files, unchanged: its brand guidelines
   (brand.github.com) allow it as a button to a GitHub profile, only in black
   or white, so it's black in the light theme and white in the dark
-  (`github-mark`), and it never moves. Those guidelines are GitHub's terms,
-  not an open licence.
+  (`github-mark`). They ask that it not be altered, so it stays still on
+  hover. Those guidelines are GitHub's terms, not an open licence.
 - **Where they sit:** from 1024px, the three pills sit under the intro,
   aligned with its left edge. Below 1024px they sit after the chat,
   centred, before the inner pages' cards: under the intro they'd push the
