@@ -73,7 +73,7 @@ test("the answer types itself out, and its sources link appears only after the l
 
 test("a finished answer has no Copy button, in either language", async ({ page }) => {
   await ask(page, "What has Julian worked on?");
-  // Only once the answer has finished, when a Copy button used to appear.
+  // Checked on the finished answer, so a button that came at the end would show.
   await expect(page.getByTestId("chat-announcer")).toContainText(DEMO_ANSWER_INTRO);
   const answer = page.getByRole("article", { name: "Answer" });
   await expect(answer.getByRole("button", { name: /^Check sources/ })).toBeVisible();

@@ -39,7 +39,7 @@ describe("batchSchema", () => {
   it.each([
     ["an unknown event", { name: "click", target: "button" }],
     ["an extra field", { name: "sources_opened", text: "the answer" }],
-    ["a removed event (answers have no Copy button)", { name: "copied" }],
+    ["an event no longer on the list", { name: "copied" }],
     ["an extra field on a visit", { ...EVERY_EVENT[0], user_agent: "Mozilla/5.0" }],
     ["a slider without its name", { name: "toy", which: "slider" }],
     ["a slider name on another toy", { name: "toy", which: "moo", slider: "wind" }],
