@@ -5,7 +5,8 @@ import { es } from "../../src/lib/i18n/es";
 
 // Links to other sites open in a new tab and say so; links within the site
 // don't (DESIGN.md section 15). Every link is collected by its href's
-// origin, so a new one can't be missed.
+// origin, so a new one can't be missed. How it's built's links to the repo
+// say they're on GitHub too, and end with the same note.
 
 test.beforeEach(async ({ page }) => {
   await page.route("**/api/weather", (route) => route.fulfill({ json: { weather: null } }));
@@ -47,9 +48,6 @@ for (const [prefix, messages] of [
       page,
     }) => {
       await page.goto(url);
-      // The box for developers holds the repo's links; open it so they're there.
-      const box = page.locator("details");
-      if ((await box.count()) > 0) await box.first().locator("summary").click();
       const links = await linksOn(page);
       // Every page has both: Open-Meteo's credit in the footer, and the
       // site's own pages.

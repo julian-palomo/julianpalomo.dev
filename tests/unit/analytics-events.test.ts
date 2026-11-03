@@ -22,7 +22,6 @@ const EVERY_EVENT: AnalyticsEvent[] = [
   { name: "question", via: "suggestion", suggestion: 2, nth: 1, text: "Is Julian open to remote?" },
   { name: "answer", nth: 1, sources: 0, outcome: "visitor_limit" },
   { name: "sources_opened" },
-  { name: "copied" },
   { name: "toy", which: "moo" },
   { name: "toy", which: "slider", slider: "wind" },
   { name: "cv_download" },
@@ -39,7 +38,8 @@ describe("batchSchema", () => {
 
   it.each([
     ["an unknown event", { name: "click", target: "button" }],
-    ["an extra field", { name: "copied", text: "the answer" }],
+    ["an extra field", { name: "sources_opened", text: "the answer" }],
+    ["an event no longer on the list", { name: "copied" }],
     ["an extra field on a visit", { ...EVERY_EVENT[0], user_agent: "Mozilla/5.0" }],
     ["a slider without its name", { name: "toy", which: "slider" }],
     ["a slider name on another toy", { name: "toy", which: "moo", slider: "wind" }],
@@ -70,13 +70,13 @@ describe("batchSchema", () => {
   });
 
   it("rejects an empty batch, one over the cap, a bad id and extra top-level fields", () => {
-    const copied = { name: "copied" };
+    const opened = { name: "sources_opened" };
     expect(batchSchema.safeParse(batch([])).success).toBe(false);
-    expect(batchSchema.safeParse(batch(Array(MAX_EVENTS_PER_LOAD + 1).fill(copied))).success).toBe(
+    expect(batchSchema.safeParse(batch(Array(MAX_EVENTS_PER_LOAD + 1).fill(opened))).success).toBe(
       false,
     );
-    expect(batchSchema.safeParse({ visit_id: "1", events: [copied] }).success).toBe(false);
-    expect(batchSchema.safeParse({ ...batch([copied]), ip: "203.0.113.7" }).success).toBe(false);
+    expect(batchSchema.safeParse({ visit_id: "1", events: [opened] }).success).toBe(false);
+    expect(batchSchema.safeParse({ ...batch([opened]), ip: "203.0.113.7" }).success).toBe(false);
   });
 });
 
@@ -180,7 +180,7 @@ describe("the client's queue", () => {
   it("stops recording after 100 events in a page load, however many were sent", () => {
     let queue = EMPTY_QUEUE;
     for (let index = 0; index < MAX_EVENTS_PER_LOAD + 20; index++) {
-      queue = enqueue(queue, { name: "copied" });
+      queue = enqueue(queue, { name: "sources_opened" });
       if (index === 49) queue = { ...queue, pending: [] };
     }
     expect(queue.recorded).toBe(MAX_EVENTS_PER_LOAD);

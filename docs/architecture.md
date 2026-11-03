@@ -38,10 +38,13 @@ flowchart TD
 ```
 
 The How it's built page draws a simplified version of this diagram for
-visitors (the question, the limits, the model and its tools, the citation
-check, the answer with its sources), in
-[`src/components/how/HowItsBuilt.tsx`](../src/components/how/HowItsBuilt.tsx)
-and the translations. A change to the steps here updates that one too.
+visitors as a ring (the question, the limits, the model with the confirmed
+facts it reads, the citation check, the answer with its sources, and the
+suggested questions' shortcut), each stop with a plain sentence and a
+technical line, in
+[`src/components/how/Ring.tsx`](../src/components/how/Ring.tsx),
+[`src/lib/how/ring.ts`](../src/lib/how/ring.ts) and the translations. A
+change to the steps here updates that one too.
 
 The checks run in this order, so a request that fails validation never counts
 against a visitor's limit.
@@ -159,8 +162,8 @@ Either one opens the claim under the answer, with its text and when Julian
 confirmed it.
 The text doesn't show at the stream's pace: what has arrived waits in a buffer
 in the browser and types itself out word by word
-([`reveal.ts`](../src/components/chat/reveal.ts)), and the sources link, Copy
-and the screen-reader announcement wait for the last word. The server and the model
+([`reveal.ts`](../src/components/chat/reveal.ts)), and the sources link and
+the screen-reader announcement wait for the last word. The server and the model
 know nothing of it.
 
 **The analytics.** The chat records each question and how its answer ended

@@ -142,9 +142,9 @@ const SECTIONS: Section[] = [
       WHERE name = 'answer' AND at >= ${since} GROUP BY label ORDER BY count DESC, label`,
   ),
   counts(
-    "Sources opened and answers copied",
+    "Sources opened",
     (since) => `SELECT name AS label, COUNT(*) AS count FROM events
-      WHERE name IN ('sources_opened', 'copied') AND at >= ${since} GROUP BY label ORDER BY label`,
+      WHERE name = 'sources_opened' AND at >= ${since} GROUP BY label ORDER BY label`,
   ),
   counts(
     "Toys",

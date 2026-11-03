@@ -7,7 +7,7 @@ paths:
 # Styling
 
 Tailwind CSS 4 through `@tailwindcss/vite`. `src/styles/app.css` imports
-Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `cow.css`, `entrance.css`, `contact.css` and `transitions.css`;
+Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `cow.css`, `entrance.css`, `contact.css`, `transitions.css` and `how.css`;
 `src/routes/__root.tsx` links `app.css`.
 
 ## Fonts live only in `src/styles/fonts.css`
@@ -70,6 +70,10 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - The view transition between pages (`DESIGN.md` sections 11 and 18): the timing of every `::view-transition-*` pseudo-element, the hero's snapshots anchored at the bottom, and `animation: none` under reduced motion. The router decides when a transition runs (`src/router.tsx`, `src/lib/page-transition.ts`).
 - The names live in `src/components/page/transition-names.ts`, as Tailwind classes. A name may be on one element per page only; the hero's is set only while it's on screen.
 
+## How it's built's diagrams' motion lives in `src/styles/how.css`
+
+- The ring's dot turning and Claude's fetch with the facts' glow, the cycle's dot, marching line and pulse, and a ring card rising in (`DESIGN.md` sections 11 and 18). `src/components/how/` sets the classes, and the dots' positions as inline transforms. Everything that moves sits inside `prefers-reduced-motion: no-preference`, and only `transform` and `opacity` animate: the marching line moves a dashed line along itself, never its `stroke-dashoffset`.
+
 ## Focus
 
 - `app.css` gives every `:focus-visible` element a 3px `accent` outline 2px away (`DESIGN.md` section 15). Never remove it without a replacement.
@@ -78,12 +82,12 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 
 ## Shared pieces live in `src/components/ui/`
 
-- Small, typed and feature-free. `IconButton` is a round, flat, 44px icon-only button with a required `label` (its accessible name) and a `look`: `accent`, `glass` (`bg-glass` with a 6px blur) for buttons on the landscape, or `tint` for buttons on a panel. Its press scale (0.92 over 80ms) runs only under `motion-safe`.
+- Small, typed and feature-free. `IconButton` is a round, flat, 44px icon-only button with a required `label` (its accessible name) and a `look`: `accent`, `glass` (`bg-glass` with a 6px blur) for buttons on the landscape, or `tint` for buttons on a panel. Its press scale (0.92 over 80ms) runs only under `motion-safe`; `aria-disabled` dims it to 50% and stops the press, while it keeps focus (How it's built's Previous step).
 - `BubbleTail` is a speech bubble's comic-style tail (`DESIGN.md` section 4), on the bubble's `left`, `top` or `bottom` edge, in `field` and `border`. Its callers place it so its joining edge covers the bubble's 1.5px border: the hero's hello, the cow's "Moo!" and the gear's hint.
 - `CloseIcon` is the cross on a dialog's or panel's Close button: the gear's panel and the contact form.
 - `boop.ts` plays a button's gesture on hover (`DESIGN.md` sections 4 and 11): `boopOnHover` takes the parts to move, by their `data-boop` name, and keyframes as a function of the spring in `src/lib/spring.ts`, and plays them with the Web Animations API. Only with a mouse and without reduced motion, checked at the moment of hovering. A part that already has a CSS transform of its own (the theme toggle's sun and moon) moves in a group of its own inside it, so the two never fight.
 - `Button` is the wide, flat, fully round button (`DESIGN.md` section 4), with a `look` (`primary` today) and a 0.97 press scale under `motion-safe`. "Back to live Glasgow" is its first caller.
-- `OutsideLink` is every link to another site (`DESIGN.md` section 15): a new tab with `rel="noopener"`, and an `aria-label` of its visible text plus `opensInNewTab`, rather than a hidden span, which can leave a stray space in the name. `tests/e2e/links.spec.ts` checks every link on every page by its origin, so a plain `<a>` to another site fails it.
+- `OutsideLink` is every link to another site (`DESIGN.md` section 15): a new tab with `rel="noopener"`, and an `aria-label` of its visible text plus `opensInNewTab`, rather than a hidden span, which can leave a stray space in the name. A caller may pass its own `note`, ending the same way, and an `arrow`: How it's built's `DocLink` says ", on GitHub, opens in a new tab", with a ↗. `tests/e2e/links.spec.ts` checks every link on every page by its origin, so a plain `<a>` to another site fails it.
 - A piece, or a new look of one, is added with its first caller, not ahead of it.
 
 ## Markup
@@ -93,4 +97,4 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - Semantic elements first (`main`, `h1`, `nav`, `button`); the e2e test finds the page by role (`tests/e2e/home.spec.ts`).
 - The layout works at 375px wide (small phone) before anything else.
 
-If `tokens.css`, `fonts.css`, `cow.css`, `landscape.css`, `play.css`, `chat.css`, `entrance.css`, `contact.css`, `transitions.css`, `app.css`, `src/lib/scene/palette.ts` or `src/components/ui/` change shape, update this rule.
+If `tokens.css`, `fonts.css`, `cow.css`, `landscape.css`, `play.css`, `chat.css`, `entrance.css`, `contact.css`, `transitions.css`, `how.css`, `app.css`, `src/lib/scene/palette.ts` or `src/components/ui/` change shape, update this rule.

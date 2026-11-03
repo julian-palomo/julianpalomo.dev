@@ -30,7 +30,7 @@ function setup() {
 describe("d1EventStore.record", () => {
   it("stores a question's text apart from its other fields, and never anything about the request", async () => {
     const { store, rows } = setup();
-    expect(await store.record(VISIT_ID, [QUESTION, { name: "copied" }], NOW)).toBe(2);
+    expect(await store.record(VISIT_ID, [QUESTION, { name: "sources_opened" }], NOW)).toBe(2);
     expect(rows()).toEqual([
       {
         at: NOW,
@@ -39,20 +39,20 @@ describe("d1EventStore.record", () => {
         data: JSON.stringify({ via: "typed", suggestion: null, nth: 1 }),
         question_text: QUESTION.text,
       },
-      { at: NOW, visit_id: VISIT_ID, name: "copied", data: "{}", question_text: null },
+      { at: NOW, visit_id: VISIT_ID, name: "sources_opened", data: "{}", question_text: null },
     ]);
   });
 
   it("stores at most 100 events per page load, counting those already stored", async () => {
     const { store, rows } = setup();
-    const copied = (count: number) =>
-      Array.from({ length: count }, () => ({ name: "copied" }) as const);
-    expect(await store.record(VISIT_ID, copied(60), NOW)).toBe(60);
-    expect(await store.record(VISIT_ID, copied(60), NOW)).toBe(40);
-    expect(await store.record(VISIT_ID, copied(1), NOW)).toBe(0);
+    const opened = (count: number) =>
+      Array.from({ length: count }, () => ({ name: "sources_opened" }) as const);
+    expect(await store.record(VISIT_ID, opened(60), NOW)).toBe(60);
+    expect(await store.record(VISIT_ID, opened(60), NOW)).toBe(40);
+    expect(await store.record(VISIT_ID, opened(1), NOW)).toBe(0);
     expect(rows()).toHaveLength(100);
     // Another page load has its own 100.
-    expect(await store.record("7a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d", copied(1), NOW)).toBe(1);
+    expect(await store.record("7a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d", opened(1), NOW)).toBe(1);
   });
 });
 
@@ -61,8 +61,12 @@ describe("d1EventStore.prune", () => {
     const { store, rows } = setup();
     const cutoff = eventsCutoff(NOW);
     expect(new Date(cutoff).toISOString()).toBe("2026-05-15T12:00:00.000Z");
-    await store.record(VISIT_ID, [{ name: "copied" }], cutoff - 1);
-    await store.record("7a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d", [{ name: "copied" }], cutoff);
+    await store.record(VISIT_ID, [{ name: "sources_opened" }], cutoff - 1);
+    await store.record(
+      "7a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+      [{ name: "sources_opened" }],
+      cutoff,
+    );
     await store.prune(NOW);
     expect(rows().map((row) => row.at)).toEqual([cutoff]);
   });

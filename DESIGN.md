@@ -148,10 +148,9 @@ in `.claude/rules/styling.md`. UI components still never use a colour literal.
   ("Download CV", "Contact"), each with a 16px line icon before its words: a
   sheet with a folded corner and an envelope. Never a 3D edge or a drop
   shadow.
-- **The hand cursor** shows on everything that can be pressed: buttons,
-  summaries that open, and the sky panel's options; never on a disabled
-  button, a field or plain text. A slider's thumb shows the open hand, closed
-  while it's dragged.
+- **The hand cursor** shows on everything that can be pressed: buttons and
+  the sky panel's options; never on a disabled button, a field or plain
+  text. A slider's thumb shows the open hand, closed while it's dragged.
 - **Gestures on hover.** With a mouse, a button answers the pointer with a
   small gesture on a spring (section 11), about 0.3s, back to rest:
 
@@ -693,8 +692,8 @@ mobile; desktop is the same inside the right-hand card.
    "Hide sources", which also closes an open claim. Each answer starts folded
    and keeps its own state while the page is open. Tapping a chip opens the
    claim exactly as Julian confirmed it, with "Confirmed by Julian on 27 Oct
-   2026 · from his CV". Under the answer: "Copy", and "Keep asking" with the
-   suggested questions not asked yet. Suggestion chips, the first three and
+   2026 · from his CV". Under the answer: "Keep asking" with the suggested
+   questions not asked yet. Suggestion chips, the first three and
    these, are centred at every width, wrapped rows too, and so is the "Keep
    asking" heading.
 5. **Out of questions, or something went wrong.** Errors are warm too: the cow
@@ -715,8 +714,6 @@ mobile; desktop is the same inside the right-hand card.
   ([`docs/adr/2026-10-31-sources-behind-a-link.md`](docs/adr/2026-10-31-sources-behind-a-link.md)). To show the claim's
   text and confirmation date, the `data-sources` part carries them; the
   model, the prompt and the tools don't change.
-- **Copy** copies the answer as plain text with its sources listed at the
-  end, ready to paste into an email.
 - **Screen readers:** "Answering…" is announced when an answer starts, and the
   full answer once when it has finished typing, never piece by piece. This settles the
   VoiceOver check left open in phase 4.
@@ -761,6 +758,13 @@ text, in both languages, in the pull request that adds it.
 | Nessie rises, glides and sinks                              | About 4s                                                                                                       | `ease-in-out`                                      |
 | A window flickering like a candle                           | 0.8s                                                                                                           | `ease-in-out`                                      |
 | Moving to another page                                      | 250ms: the hero morphs, the rest cross-fades; the page's name moves to or from its title tab in 350ms          | `ease-out`                                         |
+| How it's built: the ring's autoplay                         | 2.8s a stop                                                                                                    | Section 18                                         |
+| How it's built: the ring's dot to the next stop             | 1.1s, always clockwise                                                                                         | `ease`                                             |
+| How it's built: Claude's fetch and the facts' glow          | 1.2s, 0.9s after the dot leaves                                                                                | `ease-in-out`                                      |
+| How it's built: the cycle's dot to the next actor           | 0.9s                                                                                                           | `ease`                                             |
+| How it's built: the cycle's marching line                   | 0.6s a dash and gap, looping                                                                                   | `linear`                                           |
+| How it's built: an actor that keeps the step pulses         | 1.4s, looping                                                                                                  | `ease-in-out`                                      |
+| How it's built: a ring card rises in                        | 0.3s                                                                                                           | `ease`                                             |
 
 ### Springs
 
@@ -1088,17 +1092,55 @@ language toggle goes to the same page in the other language.
   sources it shows, the exam before every change, the limits and what isn't
   kept, the live valley). The numbers (questions a day, days a question is
   kept) come from the code, so the page stays true if they change.
-- **Part 2, "How I built it":** a drawing of the way of working (a plan,
-  small tasks, programming sessions, two AI reviewers, a mailbox, a
-  supervisor, and Julian deciding), then seven short steps. The drawing is
-  decoration, with a text alternative for screen readers; the steps carry the
-  meaning.
-- **Part 3, "For developers":** the only technical part, a `<details>`
-  closed by default, so a phone's reader never scrolls past it. It holds a
-  diagram of how a question is answered, with its accessible name and its
-  steps as a list under it, and links to the repository's documents.
-- **The drawings** are inline SVGs in the site's tokens (boxes in `tint` with
-  a `border` outline, arrows in `muted`, the last box in `accent`), so they
-  follow both themes. They're at most 340px wide, centred.
+- **Part 2, "How a question is answered": a ring.** Five stops on a circle,
+  clockwise from the top: Your question, Daily limits, Claude, Citation
+  check, Answer + sources. In the centre, a dashed tile, "Confirmed facts",
+  with a book icon and a dashed spoke from Claude; near the top, a small
+  "Shortcut" pill on a chord from Your question to Answer + sources (the
+  suggested questions' stored answers). A dot in `accent` turns round the
+  circle to the current stop, which fills in `accent`; it always turns
+  clockwise, so from the last stop to the first it goes on round, never
+  back. On Claude, a small dot runs out along the spoke to the facts and
+  back, and the tile glows.
+  - **It plays by itself**, every 2.8s, until the "Pause" ("Pausar") button
+    stops it; "Play the journey" ("Reproducir el recorrido") starts it again.
+    Tapping a stop, the centre or the shortcut pauses it and shows that one.
+    It holds while the pointer or focus is on it, and while the tab is
+    hidden. With reduced motion it starts paused.
+  - **Under the ring** (beside it from `lg`), a card for the current stop:
+    its name, the plain sentence, and a "The technical side" ("La parte
+    técnica") disclosure with the technical line and its GitHub link. Every
+    card sits in the same cell, so the tallest sets the height and autoplay
+    never moves the page; the disclosure stays open from stop to stop.
+- **Part 3, "How I built it": a cycle.** Four actors on a diamond: Me (top,
+  in `accent`, "I decide"), Claude Code (right, drawn as a small stack, "one
+  session per task"), GitHub (bottom, "tasks and mailboxes") and Supervisor
+  (left, "Claude, in the app"). Ten steps, which the visitor walks through
+  with "Previous step", "Next step" ("Start again" on the last) and "N of
+  10"; nothing plays by itself. Each step's line marches in `accent` from one
+  actor to the next, a dot moves to the one that receives the change, and
+  that actor gets an `accent` ring; it pulses when the step stays with it,
+  as with the two reviewers.
+  - **Under it** (beside it from `lg`), a card with a two-way switch, "In
+    plain words" | "For developers" ("En palabras sencillas" | "Para
+    desarrolladores"), then the step's actors ("Me → Claude Code") and its
+    plain sentence, or its technical line and GitHub link.
+- **The technical side lives on each diagram,** next to the step it
+  explains, not in a box at the end of the page. Every link names its document,
+  goes to the file on GitHub, opens in a new tab and ends in ↗; screen
+  readers hear ", on GitHub, opens in a new tab" instead.
+- **The drawings** are inline SVGs in the site's tokens (lines in `border`
+  and `muted`, the dots and the current line in `accent`), at most 340px
+  wide, centred, with the stops and actors as HTML over them. They follow
+  both themes, and nothing in them overlaps at 320px.
+- **Accessibility:** every stop is a real `<button>`, in reading order (the
+  five stops, then the centre, then the shortcut), with `aria-pressed` and
+  `aria-controls` pointing at the one card container. That card isn't a live
+  region, so autoplay doesn't talk over a screen reader. The cycle's card is
+  a polite live region, since only the visitor moves it.
+- **Motion:** the ring's dot travels in 1.1s, the cycle's in 0.9s, and a
+  ring card rises in over 0.3s. With reduced motion the dots jump, nothing
+  marches, pulses, fetches or glows, and the card just changes. Only
+  `transform` and `opacity` move (`src/styles/how.css`).
 - "Claude" and "Claude Code" are named once, with what they are, at their
   first mention.

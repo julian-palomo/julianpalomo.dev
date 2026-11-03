@@ -314,22 +314,14 @@ describe("splitIntoChunks", () => {
 });
 
 describe("answerAsText", () => {
-  it("drops the citations and lists the sources at the end", () => {
-    const { chips } = renderAnswer("It moved to Zustand [[redux-zustand]].", [zustand], false);
-    expect(
-      answerAsText(
-        "It moved to Zustand [[redux-zustand]].",
-        chips,
-        { cv: "CV", julian: "Julian" },
-        "Sources:",
-      ),
-    ).toBe("It moved to Zustand.\n\nSources:\n1. CV · Cazoo · Redux → Zustand");
+  it("drops every citation marker and the space it leaves before punctuation", () => {
+    expect(answerAsText("It moved to Zustand [[redux-zustand]]. Remote too [[made-up]].")).toBe(
+      "It moved to Zustand. Remote too.",
+    );
   });
 
   it("is just the text when nothing was cited", () => {
-    expect(answerAsText("No sources here.", [], { cv: "CV", julian: "Julian" }, "Sources:")).toBe(
-      "No sources here.",
-    );
+    expect(answerAsText("No sources here.")).toBe("No sources here.");
   });
 });
 
