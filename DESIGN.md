@@ -148,6 +148,10 @@ in `.claude/rules/styling.md`. UI components still never use a colour literal.
   ("Download CV", "Contact"), each with a 16px line icon before its words: a
   sheet with a folded corner and an envelope. Never a 3D edge or a drop
   shadow.
+- **The hand cursor** shows on everything that can be pressed: buttons,
+  summaries that open, and the sky panel's options; never on a disabled
+  button, a field or plain text. A slider's thumb shows the open hand, closed
+  while it's dragged.
 - **Gestures on hover.** With a mouse, a button answers the pointer with a
   small gesture on a spring (section 11), about 0.3s, back to rest:
 
