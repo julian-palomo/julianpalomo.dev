@@ -122,7 +122,7 @@ for (const theme of ["light", "dark"] as const) {
   }
 }
 
-// The entrance plays only on a page load's first page (src/lib/page-load.ts):
+// The entrance plays only on a page load's first page (src/components/page/page-load.ts):
 // the home page reached by a client navigation starts at rest, chat and all.
 async function backToTheChat(page: Page) {
   await expect(async () => {

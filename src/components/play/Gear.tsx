@@ -89,7 +89,9 @@ export function Gear({ onOpen }: { onOpen: (trigger: HTMLElement) => void }) {
       {bubble && (
         <p
           role="status"
-          className="absolute top-full left-0 mt-3 w-max max-w-[220px] rounded-[14px] border-[1.5px] border-border bg-field px-3 py-2 text-[13px] font-semibold text-foreground"
+          // One line below lg, where two would hang over the inner pages' title
+          // tab, 28px into the hero; the screen's width, less its gutters, is the limit.
+          className="absolute top-full left-0 mt-3 w-max max-w-[220px] max-lg:max-w-[calc(100vw-1.5rem)] rounded-[14px] border-[1.5px] border-border bg-field px-3 py-2 text-[13px] font-semibold text-foreground"
         >
           {t(locale, "playBubble")}
           {/* Pointing up at the gear, whose centre is 22px in. */}

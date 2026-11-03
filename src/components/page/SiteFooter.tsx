@@ -1,7 +1,8 @@
-import { t } from "../lib/i18n/t";
-import { useLocale } from "./i18n/useLocale";
-import { PageLinks } from "./page/PageLinks";
-import { OutsideLink } from "./ui/OutsideLink";
+import { t } from "../../lib/i18n/t";
+import { useLocale } from "../i18n/useLocale";
+import { textLink } from "../ui/looks";
+import { OutsideLink } from "../ui/OutsideLink";
+import { PageLinks } from "./PageLinks";
 
 /**
  * Every page's footer: the links to the inner pages (DESIGN.md section 18),
@@ -23,12 +24,12 @@ export function SiteFooter({
     >
       {pageLinks && (
         <nav aria-label={t(locale, "pagesLabel")} className="flex flex-wrap gap-x-5 gap-y-2">
-          <PageLinks className="font-medium text-accent underline" />
+          <PageLinks className={textLink} />
         </nav>
       )}
       <p>
         {credit.before}{" "}
-        <OutsideLink href="https://open-meteo.com/" className="font-medium text-accent underline">
+        <OutsideLink href="https://open-meteo.com/" className={textLink}>
           {credit.link}
         </OutsideLink>
       </p>

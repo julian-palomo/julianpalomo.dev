@@ -1,4 +1,5 @@
 import { createRouter } from "@tanstack/react-router";
+import { motionReduced } from "./components/ui/motion";
 import { pageChange } from "./lib/page-transition";
 import { routeTree } from "./routeTree.gen";
 
@@ -13,13 +14,11 @@ export function getRouter() {
     // doesn't, those few navigations get the same short cross-fade.
     defaultViewTransition: {
       types: ({ fromLocation, toLocation }) =>
-        pageChange(fromLocation?.pathname, toLocation.pathname, prefersReducedMotion()),
+        // Only called in the browser, on a navigation.
+        pageChange(fromLocation?.pathname, toLocation.pathname, motionReduced()),
     },
   });
 }
-
-// Only called in the browser, on a navigation.
-const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 declare module "@tanstack/react-router" {
   interface Register {

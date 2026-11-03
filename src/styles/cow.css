@@ -31,8 +31,9 @@
   transform-box: view-box;
 }
 
-/* Reading, after a long wait: glasses on, the notebook held open in front,
-   and the head lowered 5 units towards it. Only the chat's cow reads. */
+/* Reading: glasses on, the notebook held open in front, and the head lowered
+   5 units towards it. The chat's cow reads after a long wait, and the
+   not-found page's peeking cow reads all along. */
 .cow-live[data-state="reading"] .notebook,
 .cow-live[data-state="reading"] .glasses {
   opacity: 1;
@@ -117,7 +118,9 @@
   }
 
   /* On the chat's edge (src/components/chat/ChatEdge.tsx), it rises 8px
-     over the edge while it thinks and while a pointer is over it. */
+     over the edge while it thinks or reads and while a pointer is over it.
+     The inner pages' peeking cow (src/components/page/CowPeek.tsx) shares
+     the lift, so on the not-found page, reading, it sits 8px up. */
   .edge-lift {
     transition: transform 0.3s ease;
   }

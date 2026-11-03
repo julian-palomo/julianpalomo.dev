@@ -15,7 +15,9 @@ import {
 } from "../../lib/how/ring";
 import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
+import { motionReduced } from "../ui/motion";
 import { DocLink } from "./DocLink";
+import { diagramCard, diagramColumn, diagramSection, stepButton } from "./diagram";
 
 // The drawing's coordinates: a square, with the circle in the middle.
 const SIZE = 340;
@@ -38,8 +40,6 @@ const fetchTo = {
   x: (CENTRE - claude.x) * 0.6,
   y: (CENTRE - claude.y) * 0.6,
 };
-
-const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const chip =
   "border-[1.5px] font-semibold leading-tight transition-colors duration-200 motion-safe:active:scale-[0.97]";
@@ -72,7 +72,7 @@ export function Ring({ headingClass }: { headingClass: string }) {
   const [technical, setTechnical] = useState(false);
 
   useEffect(() => {
-    if (!reducedMotion()) setPlaying(true);
+    if (!motionReduced()) setPlaying(true);
   }, []);
 
   useEffect(() => {
@@ -117,7 +117,7 @@ export function Ring({ headingClass }: { headingClass: string }) {
   return (
     <section
       aria-labelledby={headingId}
-      className="flex flex-col gap-6 lg:grid lg:grid-cols-[340px_1fr] lg:items-center lg:gap-x-8"
+      className={diagramSection}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}
@@ -126,7 +126,7 @@ export function Ring({ headingClass }: { headingClass: string }) {
       <h2 id={headingId} className={`${headingClass} lg:col-span-2`}>
         {copy.howAnswered}
       </h2>
-      <div className="flex flex-col items-center gap-4">
+      <div className={diagramColumn}>
         <div className="@container relative aspect-square w-full max-w-[340px]">
           <svg aria-hidden="true" viewBox={`0 0 ${SIZE} ${SIZE}`} className="absolute inset-0">
             <circle
@@ -222,7 +222,7 @@ export function Ring({ headingClass }: { headingClass: string }) {
         <button
           type="button"
           onClick={() => setPlaying((current) => !current)}
-          className="-mt-7 inline-flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-border bg-field px-4 text-sm font-semibold hover:border-accent motion-safe:active:scale-[0.97] lg:mt-0"
+          className={`-mt-7 ${stepButton} lg:mt-0`}
         >
           {playing ? <PauseIcon /> : <PlayIcon />}
           {playLabel}
@@ -240,7 +240,7 @@ export function Ring({ headingClass }: { headingClass: string }) {
           return (
             <div
               key={item}
-              className={`col-start-1 row-start-1 flex flex-col gap-3 rounded-[20px] border-2 border-border p-5 ${current ? "how-card-in" : "invisible"}`}
+              className={`col-start-1 row-start-1 ${diagramCard} ${current ? "how-card-in" : "invisible"}`}
             >
               <h3 className="font-display text-lg font-bold">{texts[item].name}</h3>
               <p>{texts[item].plain}</p>

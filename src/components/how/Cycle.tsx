@@ -12,6 +12,7 @@ import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
 import { IconButton } from "../ui/IconButton";
 import { DocLink } from "./DocLink";
+import { diagramCard, diagramColumn, diagramSection, stepButton } from "./diagram";
 
 // The drawing's coordinates; the actors sit at ACTOR_PLACES, in percent of these.
 const WIDTH = 340;
@@ -67,14 +68,11 @@ export function Cycle({ headingClass }: { headingClass: string }) {
   const nextLabel = last ? cycle.again : cycle.next;
 
   return (
-    <section
-      aria-labelledby={headingId}
-      className="flex flex-col gap-6 lg:grid lg:grid-cols-[340px_1fr] lg:items-center lg:gap-x-8"
-    >
+    <section aria-labelledby={headingId} className={diagramSection}>
       <h2 id={headingId} className={`${headingClass} lg:col-span-2`}>
         {copy.howIBuiltIt}
       </h2>
-      <div className="flex flex-col items-center gap-4">
+      <div className={diagramColumn}>
         <div className="relative aspect-[340/300] w-full max-w-[340px]">
           <svg aria-hidden="true" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="absolute inset-0">
             {EDGES.map(([a, b]) => {
@@ -163,7 +161,7 @@ export function Cycle({ headingClass }: { headingClass: string }) {
             type="button"
             aria-controls={cardId}
             onClick={() => setIndex(nextStep)}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-border bg-field px-4 text-sm font-semibold hover:border-accent motion-safe:active:scale-[0.97]"
+            className={stepButton}
           >
             {nextLabel}
             <Arrow />
@@ -174,7 +172,7 @@ export function Cycle({ headingClass }: { headingClass: string }) {
         </div>
       </div>
 
-      <div id={cardId} className="flex flex-col gap-3 rounded-[20px] border-2 border-border p-5">
+      <div id={cardId} className={diagramCard}>
         <fieldset className="grid grid-cols-2 rounded-[22px] border-[1.5px] border-border bg-field p-0.5">
           <legend className="sr-only">{cycle.views}</legend>
           <button

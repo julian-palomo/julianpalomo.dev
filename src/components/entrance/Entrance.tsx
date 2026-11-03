@@ -21,9 +21,10 @@ import {
   nextBeatIn,
   SHORT_MS,
 } from "../../lib/entrance";
-import { pageRenderedBefore } from "../../lib/page-load";
 import { useReveal } from "../chat/use-reveal";
+import { pageRenderedBefore } from "../page/page-load";
 import { useSoundEffects } from "../sound/Sound";
+import { motionReduced } from "../ui/motion";
 
 type Stage =
   // The server's HTML and the first client render: the CSS plays on its own.
@@ -110,7 +111,7 @@ export function Entrance({ kind, greeting, hero, className, children }: Props) {
     if (!first) return;
     const element = root.current;
     const clock = element ? cssClock(element) : undefined;
-    if (!element || !clock || reducedMotion()) {
+    if (!element || !clock || motionReduced()) {
       setStage({ status: "over" });
       return;
     }
@@ -232,8 +233,6 @@ function viewOf(
     }
   }
 }
-
-const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /** The CSS animation entrance.css runs on the page's root, whose time is the entrance's. */
 function cssClock(root: HTMLElement): CSSAnimation | undefined {

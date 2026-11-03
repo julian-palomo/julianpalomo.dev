@@ -1,6 +1,7 @@
 import { type Doc, docUrl } from "../../lib/how/docs";
 import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
+import { textLink } from "../ui/looks";
 import { OutsideLink } from "../ui/OutsideLink";
 
 /**
@@ -11,12 +12,7 @@ import { OutsideLink } from "../ui/OutsideLink";
 export function DocLink({ doc }: { doc: Doc }) {
   const copy = t(useLocale(), "howItsBuilt");
   return (
-    <OutsideLink
-      href={docUrl(doc)}
-      note={copy.newTab}
-      arrow
-      className="self-start font-medium text-accent underline"
-    >
+    <OutsideLink href={docUrl(doc)} note={copy.newTab} arrow className={`self-start ${textLink}`}>
       {copy.docNames[doc]}
     </OutsideLink>
   );

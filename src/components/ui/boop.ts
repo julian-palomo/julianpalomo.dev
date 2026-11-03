@@ -1,5 +1,6 @@
 import type { PointerEvent } from "react";
 import { type Curve, kick, type Spring } from "../../lib/spring";
+import { isMouseHover, motionReduced } from "./motion";
 
 /*
  * The buttons' gestures on hover, the "boop" (DESIGN.md section 11,
@@ -34,19 +35,6 @@ function curveOf(spring: Spring): Curve {
   const curve = kick(spring);
   curves.set(spring, curve);
   return curve;
-}
-
-/**
- * Whether the pointer is a mouse that hovers. Hover gestures never play on
- * touch: a phone fires pointerenter on a tap, just before the click.
- */
-export function isMouseHover(event: { pointerType: string }): boolean {
-  return event.pointerType === "mouse" && matchMedia("(hover: hover) and (pointer: fine)").matches;
-}
-
-/** Read at the moment it's needed, so a change in the OS setting applies at once. */
-export function motionReduced(): boolean {
-  return matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 /** The handler that plays a gesture when a mouse moves onto the element. */

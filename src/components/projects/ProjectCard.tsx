@@ -2,6 +2,7 @@ import type { Messages } from "../../lib/i18n/en";
 import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
 import { type InnerPageName, PageLink } from "../page/PageLinks";
+import { card, textLink } from "../ui/looks";
 import { OutsideLink } from "../ui/OutsideLink";
 import { PROJECT_SHOTS, SHOTS, type ShotName } from "./shots";
 
@@ -22,7 +23,7 @@ export function ProjectCard({ project }: { project: Project }) {
   return (
     <article
       aria-labelledby={`project-${project.id}`}
-      className="flex flex-col gap-4 rounded-[20px] border-2 border-border p-5 sm:p-6"
+      className={`flex flex-col gap-4 ${card} p-5 sm:p-6`}
     >
       <div className="flex flex-col gap-1">
         <h2 id={`project-${project.id}`} className="font-display text-2xl font-extrabold">
@@ -50,12 +51,12 @@ export function ProjectCard({ project }: { project: Project }) {
       <ul className="flex flex-wrap gap-x-5 gap-y-2">
         {pageLink && (
           <li>
-            <PageLink page={pageLink} className="font-medium text-accent underline" />
+            <PageLink page={pageLink} className={textLink} />
           </li>
         )}
         {project.links.map((link) => (
           <li key={link.href}>
-            <OutsideLink href={link.href} className="font-medium text-accent underline">
+            <OutsideLink href={link.href} className={textLink}>
               {link.label}
             </OutsideLink>
           </li>

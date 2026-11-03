@@ -1,5 +1,6 @@
 import { springs } from "../../lib/spring";
 import { boopOnHover } from "../ui/boop";
+import { chip } from "../ui/looks";
 
 // On hover a question rises 2px and settles back.
 const onHover = boopOnHover({
@@ -40,7 +41,7 @@ export function Suggestions({ label, heading, questions, onPick }: Props) {
               data-boop="rise"
               onPointerEnter={onHover}
               onClick={(event) => onPick(question, event.currentTarget.getBoundingClientRect())}
-              className="min-h-11 rounded-full border-[1.5px] border-border bg-field px-4 py-2 text-left text-sm font-medium hover:border-accent"
+              className={`min-h-11 ${chip} px-4 py-2 text-left text-sm font-medium hover:border-accent`}
             >
               {question}
             </button>

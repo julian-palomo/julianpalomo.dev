@@ -7,6 +7,7 @@ import { useTrack } from "../analytics/Analytics";
 import { useLocale } from "../i18n/useLocale";
 import { useSoundEffects } from "../sound/Sound";
 import { boopOnHover } from "../ui/boop";
+import { chip } from "../ui/looks";
 import {
   confirmationLine,
   messageText,
@@ -156,7 +157,7 @@ export function AssistantMessage({ message, typed, wait }: Props) {
                       aria-expanded={open === number}
                       aria-controls={claimId}
                       onClick={() => tap({ type: "chip", number })}
-                      className="min-h-11 rounded-full border-[1.5px] border-border bg-field px-3 text-left text-[13px] font-medium break-words hover:border-accent"
+                      className={`min-h-11 ${chip} px-3 text-left text-[13px] font-medium break-words hover:border-accent`}
                     >
                       {number} · {chipLabel(source, names)}
                     </button>

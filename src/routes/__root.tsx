@@ -5,6 +5,8 @@ import type { ReactNode } from "react";
 import { z } from "zod";
 import { ClockProvider } from "../components/clock/Clock";
 import { useLocale } from "../components/i18n/useLocale";
+import { ErrorPage } from "../components/page/ErrorPage";
+import { NotFoundPage } from "../components/page/NotFoundPage";
 import { PlayProvider } from "../components/play/Play";
 import { ThemeDocument } from "../components/theme/Theme";
 import { getFirstRender } from "../lib/first-render";
@@ -69,6 +71,9 @@ export const Route = createRootRoute({
     ],
   }),
   shellComponent: RootDocument,
+  // In the language of the path, inside the inner pages' shell (DESIGN.md section 18).
+  notFoundComponent: NotFoundPage,
+  errorComponent: ErrorPage,
 });
 
 // No script in <head>: the server renders data-theme from the cookie or

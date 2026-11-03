@@ -2,6 +2,7 @@ import { useState } from "react";
 import { chipLabel, type Source } from "../../lib/bot/citations";
 import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
+import { chip } from "../ui/looks";
 import { waitChips, waitLine } from "./chat-view";
 
 /** One sweep of light across the pill's line. Keep in step with chat.css. */
@@ -74,7 +75,7 @@ export function WaitStatus({ parts, sources, longWait }: Props) {
           {shown.map((source) => (
             <li
               key={source.id}
-              className="chip-rise flex items-center gap-1 rounded-full border-[1.5px] border-border bg-field px-2.5 py-1 text-[12.5px] font-medium"
+              className={`chip-rise flex items-center gap-1 ${chip} px-2.5 py-1 text-[12.5px] font-medium`}
               style={{ animationDelay: `${known[source.id] ?? 0}ms` }}
             >
               <CheckIcon />
@@ -84,7 +85,7 @@ export function WaitStatus({ parts, sources, longWait }: Props) {
           {more > 0 && (
             <li
               key={MORE}
-              className="chip-rise rounded-full border-[1.5px] border-border bg-field px-2.5 py-1 text-[12.5px] font-medium text-muted"
+              className={`chip-rise ${chip} px-2.5 py-1 text-[12.5px] font-medium text-muted`}
               style={{ animationDelay: `${known[MORE] ?? 0}ms` }}
             >
               {t(locale, "moreFacts")(more)}
