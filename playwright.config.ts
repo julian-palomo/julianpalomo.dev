@@ -1,8 +1,16 @@
 import { defineConfig, devices } from "@playwright/test";
 import { ENTRANCE_COOKIE } from "./src/lib/entrance";
+import { e2ePort } from "./tests/e2e/port";
 
-const port = 4173;
+// The folder of this file, the worktree's root wherever the command runs from;
+// never process.cwd(), which would give one worktree several ports.
+const port = e2ePort(process.env, import.meta.dirname);
 const isCI = Boolean(process.env.CI);
+
+// Once, from the runner: the workers load this file too.
+if (process.env.TEST_WORKER_INDEX === undefined) {
+  console.log(`e2e: serving on http://localhost:${port} (set E2E_PORT to choose another)`);
+}
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -55,13 +63,17 @@ export default defineConfig({
   // Runs against a production build served by the Workers runtime, not the dev
   // server. CLOUDFLARE_ENV=e2e builds with wrangler.jsonc's `e2e` environment:
   // the chat answers in demo mode and no local .dev.vars key reaches the build,
-  // so a test run never calls the real model.
+  // so a test run never calls the real model. The preview gets CLOUDFLARE_ENV
+  // too, so vite.config.ts leaves the Workers inspector off for it.
   webServer: {
-    command: `CLOUDFLARE_ENV=e2e pnpm build && pnpm preview --port ${port} --strictPort`,
+    command: `CLOUDFLARE_ENV=e2e pnpm build && CLOUDFLARE_ENV=e2e pnpm preview --port ${port} --strictPort`,
     url: `http://localhost:${port}`,
-    // Never reuse a server: several worktrees share port 4173, and reusing one
-    // would test another worktree's build. A run that finds the port taken
-    // fails at once with "already used"; --strictPort covers two runs racing.
+    // Never reuse a server: one already on this port is another run of this
+    // worktree, a `pnpm preview`, or another worktree whose folder hashed to
+    // the same port, and reusing it would test a build this run didn't make.
+    // A run that finds the port taken fails at once with "already used":
+    // wait for the other run, or set E2E_PORT. --strictPort covers two runs
+    // racing.
     reuseExistingServer: false,
     timeout: 120_000,
   },

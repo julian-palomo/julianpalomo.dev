@@ -156,8 +156,8 @@ test("with sound on, a sent message makes the cow moo once, then lick", async ({
   await expect(page.locator(".edge-lift")).toHaveAttribute("data-state", "satisfied");
 });
 
-test("with sound off, a sent message only licks", async ({ page, context }) => {
-  await context.addCookies([{ name: "sound", value: "off", url: "http://localhost:4173" }]);
+test("with sound off, a sent message only licks", async ({ page, context, baseURL }) => {
+  await context.addCookies([{ name: "sound", value: "off", url: baseURL ?? "" }]);
   await countSounds(page);
   await sendMessage(page);
   await expect(page.locator(".edge-lift")).toHaveAttribute("data-state", "satisfied");
