@@ -94,10 +94,10 @@ never does.
 
 Lowering either needs Julian's OK (`.claude/rules/evals.md`).
 
-**In CI the 90% is reported, not enforced.** CI runs each case once, 40
-answers, where one answer moves the rate by 2.5 points, and the current
-baseline (run 12) sits at exactly 90%. Enforcing it there would fail about
-every other bot pull request from noise alone. So the job sets
+**In CI the 90% is reported, not enforced.** CI runs each case once, 51
+answers, where one answer moves the rate by about 2 points, and the full runs
+since run 11 have landed between 87.5% and 94.1%. Enforcing it there would
+fail bot pull requests from noise alone. So the job sets
 `EVAL_PASS_RATE=reported`: a rate below 90% shows as a warning in its summary
 and as an annotation on the run, and the critical cases, the calibration, provider errors and the cost cap
 still fail it. A local `pnpm eval` and every run recorded below enforce it.
