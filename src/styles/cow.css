@@ -7,7 +7,9 @@
  *
  * The SVG's own `transform="scale(0)"` and `opacity="0"` hide the tongue and
  * the open mouth; never set `transform` or `opacity` on those groups outside
- * an animation, or they show.
+ * an animation, or they show. The notebook is the one exception: it shows in
+ * the reading state, with reduced motion too, since it says what the cow is
+ * doing, not how it moves.
  */
 
 .cow .tilt,
@@ -24,6 +26,23 @@
 }
 .cow .lick-l {
   transform-origin: 96px 148px;
+}
+.cow .notebook,
+.cow .notebook-turn {
+  transform-box: view-box;
+}
+.cow .notebook {
+  transform-origin: 162px 160px;
+}
+/* The spine, which the turning page swings around. */
+.cow .notebook-turn {
+  transform-origin: 162px 145px;
+  opacity: 0;
+}
+
+/* Reading, after a long wait: the notebook, open. Only the chat's cow reads. */
+.cow-live[data-state="reading"] .notebook {
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -92,6 +111,14 @@
 
   /* On the chat's edge (src/components/chat/ChatEdge.tsx), it rises 8px
      over the edge while it thinks and while a pointer is over it. */
+  /* The notebook rises into its hoof in 0.3s, and a page turns every 1.2s. */
+  .cow-live[data-state="reading"] .notebook {
+    animation: cow-notebook-in 0.3s ease-out both;
+  }
+  .cow-live[data-state="reading"] .notebook-turn {
+    animation: cow-page-turn 1.2s ease-in-out 0.3s infinite;
+  }
+
   .edge-lift {
     transition: transform 0.3s ease;
   }
@@ -276,5 +303,32 @@
   94%,
   100% {
     transform: rotate(0deg);
+  }
+}
+@keyframes cow-notebook-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes cow-page-turn {
+  0% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+    transform: scaleX(-1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(-1);
   }
 }

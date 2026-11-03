@@ -25,6 +25,9 @@ export const assistantCow = {
   mouth: "#5A1A16",
   tongue: "#E48A8A",
   "tongue-dark": "#C96B70",
+  "notebook-cover": "#2B6F4A",
+  "notebook-page": "#F7F1E3",
+  "notebook-line": "#B8A98C",
 } as const;
 
 /** The five moments of the day, from darkest to brightest (DESIGN.md section 7). */

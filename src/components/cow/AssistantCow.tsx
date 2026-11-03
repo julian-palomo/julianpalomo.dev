@@ -262,6 +262,27 @@ function CowDrawing({ size, className }: { size: number; className: string | und
           </g>
         </g>
       </g>
+      {/* Only in the reading state, after a long wait: held at the right of
+          the muzzle, by the right hoof on the chat's edge, so the chewing jaw
+          stays in view. One page turns around the spine. */}
+      <g className="notebook" opacity="0">
+        <path
+          d="M138 128 L162 132 L186 128 L188 156 L162 160 L136 156 Z"
+          fill={cow["notebook-cover"]}
+        />
+        <path d="M140 129 L162 133 L162 157 L139 153 Z" fill={cow["notebook-page"]} />
+        <path d="M162 133 L184 129 L185 153 L162 157 Z" fill={cow["notebook-page"]} />
+        <path
+          d="M143 137 L158 139.5 M143 142 L158 144.5 M143 147 L155 149 M166 139.5 L181 137 M166 144.5 L181 142 M166 149.5 L178 147"
+          fill="none"
+          stroke={cow["notebook-line"]}
+          strokeWidth="1.2"
+          strokeLinecap="round"
+        />
+        <g className="notebook-turn">
+          <path d="M162 133 L184 129 L185 153 L162 157 Z" fill={cow["notebook-page"]} />
+        </g>
+      </g>
     </svg>
   );
 }

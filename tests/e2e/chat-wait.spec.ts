@@ -89,10 +89,38 @@ test("with reduced motion the chips simply appear and the line doesn't sweep", a
   expect(await sweep.evaluate((element) => getComputedStyle(element).display)).toBe("none");
 });
 
-test("after a long wait with no word, the pill says it's still chewing", async ({ page }) => {
+const cow = (page: Page) => page.locator(".edge-lift");
+const notebookOpacity = (page: Page) =>
+  page.locator(".edge-cow .notebook").evaluate((element) => getComputedStyle(element).opacity);
+
+test("after a long wait with no word, the pill says it's still chewing and the cow reads", async ({
+  page,
+}) => {
+  await page.clock.install();
+  await ask(page);
+  await expect(pill(page)).toBeVisible();
+  await expect(cow(page)).toHaveAttribute("data-state", "thinking");
+  expect(await notebookOpacity(page)).toBe("0");
+  await page.clock.fastForward(LONG_WAIT_MS);
+  await expect(pill(page)).toHaveText(en.chewingItOver);
+  await expect(cow(page)).toHaveAttribute("data-state", "reading");
+  await expect.poll(() => notebookOpacity(page)).toBe("1");
+  // The notebook goes, and the cow talks, once the first word is on screen.
+  await expect(answerText(page)).not.toBeEmpty();
+  await expect(cow(page)).toHaveAttribute("data-state", "talking");
+  expect(await notebookOpacity(page)).toBe("0");
+});
+
+test("with reduced motion the notebook simply shows, open and still", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.clock.install();
   await ask(page);
   await expect(pill(page)).toBeVisible();
   await page.clock.fastForward(LONG_WAIT_MS);
-  await expect(pill(page)).toHaveText(en.chewingItOver);
+  await expect(cow(page)).toHaveAttribute("data-state", "reading");
+  expect(await notebookOpacity(page)).toBe("1");
+  const moving = await page
+    .locator(".edge-cow .notebook")
+    .evaluate((element) => element.getAnimations({ subtree: true }).length);
+  expect(moving).toBe(0);
 });

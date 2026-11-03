@@ -57,6 +57,7 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - Its keyframes come from the `<style>` of `docs/design/assistant-cow.svg`, prefixed `cow-`, and are keyed by the `data-state` and `data-pat` that `src/components/cow/AssistantCow.tsx` sets. Only the chat's cow has `.cow-live`, so the link preview card's stays still. Its 8px rise over the chat's edge (`.edge-lift`, `src/components/chat/ChatEdge.tsx`) lives here too.
 - Every rule that moves it sits inside `prefers-reduced-motion: no-preference`, so with reduced motion it's the still drawing in every state. Only `transform` and `opacity` animate.
 - The lick lasts 1.6s here and in `LICK_MS` (`src/lib/cow-state.ts`); keep the two in step.
+- The notebook, in the `reading` state after a long wait, is the one part shown outside `no-preference`: it says what the cow is doing, so with reduced motion it shows open and still. Its rise and its turning page sit inside `no-preference`, like the rest.
 - Its tilt towards the pointer arrives as `--cow-follow` from `src/components/cow/use-cow-follow.ts` and is applied with the `rotate` property on the drawing, which composes with the `transform` its states animate.
 
 ## The page's entrance lives in `src/styles/entrance.css`

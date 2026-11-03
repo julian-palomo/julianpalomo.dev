@@ -608,7 +608,7 @@ through.
 | Idle                 | Nothing is happening                                             | A 12s loop: tilts one way (18–26%), licks to the right (44–58%), tilts the other way (66–70%), licks to the left (76–90%) |
 | Listening            | The visitor is typing                                            | Holds its head tilted, as if listening                                                                                    |
 | Thinking             | A question was sent and no word is on screen yet                 | Chews (the jaw moves side to side every 0.55s) with a slight thoughtful tilt                                              |
-| Reading              | 5s have passed with no word on screen yet                        | Keeps chewing and tilting as it thinks                                                                                    |
+| Reading              | 5s have passed with no word on screen yet                        | Brings out a small open notebook, held by its right hoof, and turns its pages while it keeps chewing                      |
 | Talking              | The answer is typing itself out, from its first word to its last | The mouth opens and closes, irregularly, every 1.8s                                                                       |
 | Satisfied            | The answer just finished typing                                  | Licks once (1.6s), then goes back to idle                                                                                 |
 | Sorry                | An error or the daily limit                                      | Lowers its head and stays still                                                                                           |
@@ -654,10 +654,10 @@ mobile; desktop is the same inside the right-hand card.
      "Looking up claims…" while a tool runs; "Reading 3 confirmed facts…"
      once the tool has found them ("Reading", not "Using": the answer may
      not cite them all); "Writing the answer…" when it found none; and
-     "Chewing it over properly…" once 5s have passed with no word. The
-     line is `muted` on `background`, and the light a narrow band of
-     `foreground`, so it reads between sweeps; a new line doesn't restart
-     the sweep.
+     "Chewing it over properly…" once 5s have passed with no word, when the
+     cow also brings out its notebook (section 9). The line is `muted` on
+     `background`, and the light a narrow band of `foreground`, so it reads
+     between sweeps; a new line doesn't restart the sweep.
    - **The claims it's reading,** as small chips under the pill, each with
      its label (as in "Cazoo · Role") and a small check in `accent`: at most
      five, then "+N more". They rise one after another, 300ms apart, and
@@ -742,6 +742,7 @@ text, in both languages, in the pull request that adds it.
 | The status pill's light sweeps through its words            | 1.8s a sweep, right to left, on a loop                                                                         | `linear`                                           |
 | The claims being read rise, as an answer is awaited         | 0.45s each, 300ms apart                                                                                        | Like source chips                                  |
 | The wait's pill and chips fade as the first word comes      | 0.15s                                                                                                          | `ease`                                             |
+| The cow's notebook comes out, after a long wait             | 0.3s, then a page turns every 1.2s                                                                             | `ease-out`; the pages `ease-in-out`                |
 | Each word as an answer types itself out                     | 0.2s fade; about 150 characters a second, faster when more than about 0.6s behind                              | `ease`                                             |
 | Button press                                                | 80ms                                                                                                           | `ease`                                             |
 | The gear spins in                                           | 0.6s, 2s after the entrance                                                                                    | Spring-like overshoot, then 3 pulses               |
@@ -839,6 +840,8 @@ With `prefers-reduced-motion: reduce`:
 - answer text appears as it arrives, without typing itself out or fading;
   sources, and the claims being read while an answer is awaited, appear
   without rising, and the status pill's line is still;
+- after a long wait the cow's notebook simply shows, open, with no page
+  turning;
 - the gear appears without spinning or pulsing;
 - moving to another page changes it at once, with no transition;
 - no gesture on hover, the cow doesn't follow the pointer, the valley
