@@ -18,6 +18,8 @@ type Props = {
   /** The landscape `?sky=` fixes, or null for Glasgow's. */
   override: SkyState | null;
   weather: LiveWeather | null;
+  /** The row's view-transition name, while the hero is on screen. */
+  className?: string;
 };
 
 /**
@@ -26,7 +28,7 @@ type Props = {
  * the right, and the sky panel they open. The `enter-control` classes time
  * each one's pop-in during the home page's entrance and do nothing elsewhere.
  */
-export function HeroControls({ override, weather }: Props) {
+export function HeroControls({ override, weather, className = "" }: Props) {
   const track = useTrack();
   const now = useNow();
   const { state: play } = usePlay();
@@ -43,7 +45,9 @@ export function HeroControls({ override, weather }: Props) {
 
   return (
     <>
-      <div className="absolute inset-x-3 top-3 flex items-start justify-between gap-2">
+      <div
+        className={`absolute inset-x-3 top-3 flex items-start justify-between gap-2 ${className}`}
+      >
         <div className="flex items-start gap-2">
           <Gear onOpen={openPanel} />
           <div className="enter-control enter-control-1">

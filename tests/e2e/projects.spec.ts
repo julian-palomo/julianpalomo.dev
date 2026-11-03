@@ -91,16 +91,14 @@ for (const [what, name] of [
   });
 }
 
-test("the home page's Projects links, next to the CV and in the footer, open the page", async ({
-  page,
-}) => {
+test("the home page's Projects card opens the page", async ({ page }) => {
   await page.goto("/");
-  const row = page.getByRole("banner").getByRole("link", { name: en.projectsTitle });
-  await expect(row).toHaveAttribute("href", "/projects");
-  const footer = page.getByRole("contentinfo").getByRole("link", { name: en.projectsTitle });
-  await expect(footer).toHaveAttribute("href", "/projects");
+  const card = page
+    .getByRole("navigation", { name: en.pagesLabel })
+    .getByRole("link", { name: en.projectsTitle });
+  await expect(card).toHaveAttribute("href", "/projects");
   await expect(async () => {
-    await footer.click();
+    await card.click();
     await expect(page).toHaveURL(/\/projects$/, { timeout: 1000 });
   }).toPass({ timeout: 5000 });
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(en.projectsTitle);
@@ -141,7 +139,10 @@ test("home, Projects, then back home: the entrance doesn't play again", async ({
   await page.goto("/");
   await expect(page.locator("[data-entrance]")).toHaveCount(0, { timeout: 5000 });
   await expect(async () => {
-    await page.getByRole("contentinfo").getByRole("link", { name: en.projectsTitle }).click();
+    await page
+      .getByRole("navigation", { name: en.pagesLabel })
+      .getByRole("link", { name: en.projectsTitle })
+      .click();
     await expect(page).toHaveURL(/\/projects$/, { timeout: 1000 });
   }).toPass({ timeout: 5000 });
   await backToTheChat(page);

@@ -76,16 +76,24 @@ test("the head and the sitemap carry the page", async ({ request }) => {
   expect(sitemap).toContain("<loc>https://julianpalomo.dev/es/how-its-built</loc>");
 });
 
-test("the home row, the footer and the Projects card link to the page", async ({ page }) => {
+test("the home page's card, the footers and the Projects card link to the page", async ({
+  page,
+}) => {
   await page.goto("/");
-  for (const area of ["banner", "contentinfo"] as const) {
-    await expect(
-      page.getByRole(area).getByRole("link", { name: en.howItsBuiltTitle }),
-    ).toHaveAttribute("href", "/how-its-built");
-  }
+  await expect(
+    page
+      .getByRole("navigation", { name: en.pagesLabel })
+      .getByRole("link", { name: en.howItsBuiltTitle }),
+  ).toHaveAttribute("href", "/how-its-built");
   await page.goto("/projects");
   await expect(
-    page.getByRole("article").nth(1).getByRole("link", { name: en.howItsBuiltTitle }),
+    page.getByRole("contentinfo").getByRole("link", { name: en.howItsBuiltTitle }),
+  ).toHaveAttribute("href", "/how-its-built");
+  await expect(
+    page
+      .getByRole("article")
+      .filter({ has: page.getByRole("heading", { name: "julianpalomo.dev" }) })
+      .getByRole("link", { name: en.howItsBuiltTitle }),
   ).toHaveAttribute("href", "/how-its-built");
 });
 
@@ -106,14 +114,4 @@ for (const theme of ["light", "dark"] as const) {
       expect(scroll).toBeLessThanOrEqual(width);
     });
   }
-}
-
-// The home row now holds four links; "Cómo está hecha" is the longest.
-for (const path of ["/", "/es"] as const) {
-  test(`the home page's row of links fits at 320px on ${path}`, async ({ page }) => {
-    await page.setViewportSize({ width: 320, height: 700 });
-    await page.goto(path);
-    const scroll = await page.evaluate(() => document.documentElement.scrollWidth);
-    expect(scroll).toBeLessThanOrEqual(320);
-  });
 }

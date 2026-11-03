@@ -14,6 +14,8 @@ import { HeroLandscape } from "../../components/landscape/HeroLandscape";
 import { useLiveWeather } from "../../components/landscape/useLiveWeather";
 import { useSceneOverride } from "../../components/landscape/useSceneOverride";
 import { HeroControls } from "../../components/page/HeroControls";
+import { PageCards } from "../../components/page/PageCards";
+import { PORTRAIT_TRANSITION, useHeroTransition } from "../../components/page/transition-names";
 import { SiteFooter } from "../../components/SiteFooter";
 import { SoundProvider } from "../../components/sound/Sound";
 import { parseRef } from "../../lib/analytics/events";
@@ -88,6 +90,7 @@ function Page() {
   // Read once by Entrance, when the page mounts, so a language switch never replays it.
   const { entrance, sound, contactDemo } = rootRoute.useLoaderData();
   const heroRef = useRef<HTMLDivElement>(null);
+  const heroTransition = useHeroTransition(heroRef);
   const { sky } = Route.useSearch();
   const override = useSceneOverride(sky);
   // An override is a fixed scene, so it doesn't wait for the real weather.
@@ -113,11 +116,15 @@ function Page() {
           <header className={header}>
             <div
               ref={heroRef}
-              className="relative h-[230px] overflow-hidden bg-tint lg:col-span-full lg:h-80"
+              className={`relative h-[230px] overflow-hidden bg-tint lg:col-span-full lg:h-80 ${heroTransition.hero}`}
             >
               <HeroLandscape override={override} weather={weather} />
               <HeroBubble />
-              <HeroControls override={override} weather={weather} />
+              <HeroControls
+                override={override}
+                weather={weather}
+                className={heroTransition.controls}
+              />
             </div>
             <div className="flex flex-col px-4 sm:px-6 lg:col-start-2 lg:px-0">
               <img
@@ -125,7 +132,7 @@ function Page() {
                 alt={t(locale, "portraitAlt")}
                 width={96}
                 height={120}
-                className={`enter-portrait ${portrait}`}
+                className={`enter-portrait ${portrait} ${PORTRAIT_TRANSITION}`}
               />
               <h1 className="enter-intro enter-intro-1 mt-4 font-display text-[34px] leading-tight font-extrabold tracking-[-0.02em] sm:text-[44px]">
                 {t(locale, "name")}
@@ -147,7 +154,8 @@ function Page() {
             <Chat onStarted={start} />
           </main>
           <CvAndContact className="mt-10 justify-center px-4 sm:px-6 lg:hidden" />
-          <SiteFooter className="lg:col-start-2 lg:col-end-4 lg:px-0" />
+          <PageCards className="mt-10 px-4 sm:px-6 lg:col-start-2 lg:col-end-4 lg:px-0" />
+          <SiteFooter pageLinks={false} className="lg:col-start-2 lg:col-end-4 lg:px-0" />
         </Entrance>
       </ContactProvider>
     </SoundProvider>

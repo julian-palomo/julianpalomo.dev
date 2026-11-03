@@ -1,0 +1,49 @@
+/*
+ * The change of page (DESIGN.md section 11): a view transition the router
+ * starts on every navigation to another page (src/router.tsx,
+ * src/lib/page-transition.ts). The landscape keeps its place and changes
+ * height, a home card's name becomes the page's title tab, and the rest
+ * cross-fades. The names are set where the elements are
+ * (src/components/page/transition-names.ts).
+ */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 250ms;
+  animation-timing-function: ease-out;
+}
+
+/* A page's name moving between its card and its title tab takes a little
+   longer, so the move reads. */
+::view-transition-group(page-title-projects),
+::view-transition-old(page-title-projects),
+::view-transition-new(page-title-projects),
+::view-transition-group(page-title-how-its-built),
+::view-transition-old(page-title-how-its-built),
+::view-transition-new(page-title-how-its-built) {
+  animation-duration: 350ms;
+}
+
+/* The landscape crops its sky as its box gets shorter and keeps the ground
+   (preserveAspectRatio="xMidYMax slice"), so its snapshots are anchored at
+   the bottom too, filling the box as it changes height. */
+::view-transition-group(hero) {
+  overflow: clip;
+}
+::view-transition-old(hero),
+::view-transition-new(hero) {
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+}
+
+/* With reduced motion the page simply changes. The router starts no
+   transition where the browser supports view-transition types; this covers
+   the browsers that don't. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
