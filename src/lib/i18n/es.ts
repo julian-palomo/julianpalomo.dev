@@ -174,6 +174,7 @@ export const es: Messages = {
   backToLive: "Volver a Glasgow en directo",
 
   downloadCv: "Descargar CV",
+  cvPill: "CV",
   contactOpen: "Contacto",
   contactTitle: "Escribe a Julián",
   contactSubtitle: "Lee todos los mensajes y responde a cada uno él mismo.",

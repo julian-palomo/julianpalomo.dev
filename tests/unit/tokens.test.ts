@@ -63,6 +63,7 @@ const pairs: [string, string, number][] = [
   ["danger", "field", TEXT],
   ["field-border", "background", UI],
   ["field-border", "field", UI],
+  ["github-mark", "background", UI],
 ];
 
 describe("tokens.css", () => {

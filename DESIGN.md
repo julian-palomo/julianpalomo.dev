@@ -145,10 +145,10 @@ in `.claude/rules/styling.md`. UI components still never use a colour literal.
 - **Buttons:** flat. The primary button is `accent` on `on-accent`; it
   brightens slightly on hover and, when pressed, scales to `0.92` (round icon
   buttons such as Send) or `0.97` (wide buttons such as "Back to live
-  Glasgow") for 80ms. Secondary buttons are `border`-outlined pills
-  ("Download CV", "Contact"), each with a 16px line icon before its words: a
-  sheet with a folded corner and an envelope. Never a 3D edge or a drop
-  shadow.
+  Glasgow") for 80ms. Secondary buttons are `border`-outlined pills ("CV",
+  "Contact", "GitHub"), each with a 16px icon before its words: a sheet with
+  a folded corner, an envelope, and GitHub's own mark (section 14). Never a
+  3D edge or a drop shadow.
 - **The hand cursor** shows on everything that can be pressed: buttons and
   the sky panel's options; never on a disabled button, a field or plain
   text. A slider's thumb shows the open hand, closed while it's dragged.
@@ -168,6 +168,7 @@ in `.claude/rules/styling.md`. UI components still never use a colour literal.
   | Suggested questions | Rise 2px and settle; the chat's cow tilts towards the one under the pointer                                          |
   | Download CV         | The sheet's corner folds out, as if the CV were coming out                                                           |
   | Contact             | The envelope's flap opens                                                                                            |
+  | GitHub              | None: GitHub's guidelines don't allow its mark to move. Its border lights up in `accent`, like the other pills'      |
   | Check sources       | The answer's citation numbers hop, one after another                                                                 |
 
   A disabled button has no gesture.
@@ -188,8 +189,8 @@ From top to bottom:
 2. **The portrait** (96 × 120px), overlapping the hero's bottom edge by half
    its height, 20px from the left, with a 4px ring in `background`.
 3. **Name, role and one line** ("Ask about my experience. Answers come only
-   from facts I've confirmed, with their sources."). On a phone, **"Download
-   CV"** and **"Contact"** sit after the chat, so the chat's first
+   from facts I've confirmed, with their sources."). On a phone, **"CV"**,
+   **"Contact"** and **"GitHub"** sit after the chat, so the chat's first
    suggestions still show above the fixed composer (section 14).
 4. **The chat** (section 10). At its top, the cow (100 × 79px on a phone) rests
    its chin on the chat's edge, like a fence, with its two front hooves over it:
@@ -797,7 +798,7 @@ On a first visit, or the first in a week:
 
 | When                   | What                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0.08s to 0.32s         | The name, the role and the line rise, 80ms apart, 0.45s each; from 1024px, "Download CV" and "Contact" rise with the line. The portrait drops in at 0.1s (0.6s). The hero's buttons pop in from 0.3s, 70ms apart. They work from the start.                                                                                                                                                                                                             |
+| 0.08s to 0.32s         | The name, the role and the line rise, 80ms apart, 0.45s each; from 1024px, the CV, Contact and GitHub pills rise with the line. The portrait drops in at 0.1s (0.6s). The hero's buttons pop in from 0.3s, 70ms apart. They work from the start.                                                                                                                                                                                                        |
 | 0.6s to about 3.9s     | The glen wakes, slowly. The sky fades in (1.05s from 0.6s). The land rises back to front: far hills from 0.68s, middle from 0.87s, near land from 1.05s, 1.5s each. The loch fades in at 1.2s, the trees grow one after another from 1.43s to 1.85s, the cottage pops at 1.73s, the haar fades in at 1.5s, the two herd groups walk in at 1.88s and 2.03s (1.8s each), and the particles fade in at 2.4s.                                               |
 | 2.5s                   | The cow appears big in the middle of the hero, about 200px wide (at most 62% of the hero's height), scaling up from nothing with a small overshoot (0.6s). It talks.                                                                                                                                                                                                                                                                                    |
 | 3.15s                  | A speech bubble says "Hi! I'm the Highland cow" ("¡Hola! Soy la vaca de las Highlands"), with no full stop and its text centred, for 1.7s. From `lg` it's a pill above the cow. On a phone it sits beside the cow's head, under the hero's controls and clear of them, wrapping naturally in about 92px with a 14px radius and a comic-style tail on its left edge, pointing down towards the cow's mouth. It's decoration, hidden from screen readers. |
@@ -928,22 +929,35 @@ centred and the background left exactly as it is: no blur, no fade.
 
 ## 14. CV and contact
 
-- **Both buttons have an icon** before their words, a sheet with a folded
-  corner and an envelope, which move on hover (section 4).
-- **"Download CV"** downloads the Software Engineer version of Julian's CV
+- **Three pills: "CV", "Contact" and "GitHub",** each with an icon before
+  its word. The sheet's folded corner and the envelope's flap move on hover
+  (section 4); GitHub's mark doesn't.
+- **"CV"** downloads the Software Engineer version of Julian's CV
   **without his phone number or email address**, with LinkedIn, GitHub and
   this site as contact. Julian provides the PDF; it never contains private
   data, because the repo is public.
-- **Where they sit:** from 1024px, the two secondary buttons sit under the
-  intro, aligned with its left edge. Below 1024px they sit after the chat,
+  Its visible word is "CV", which says what it is; its name for screen
+  readers is "Download CV" ("Descargar CV"), which says what it does.
+- **"GitHub"** opens Julian's GitHub profile in a new tab (section 15), with
+  the same press sound as the CV. Its icon is GitHub's mark, the
+  Invertocat, from GitHub's own logo files, unchanged: its brand guidelines
+  (brand.github.com) allow it as a button to a GitHub profile, only in black
+  or white, so it's black in the light theme and white in the dark
+  (`github-mark`), and it never moves. Those guidelines are GitHub's terms,
+  not an open licence.
+- **Where they sit:** from 1024px, the three pills sit under the intro,
+  aligned with its left edge. Below 1024px they sit after the chat,
   centred, before the inner pages' cards: under the intro they'd push the
   chat's first suggestions below the fixed composer on a 390 × 844 phone.
-  They share a line from 360px, desktop included; narrower, they stack, both
-  full width. In the intro's 300px column the pills' padding is 16px, and
-  the row never wraps: a font that renders wider runs into the 48px gap
-  beside the column instead.
-- **Only these two:** the row holds the actions. The inner pages are places,
-  and have their own cards (section 18).
+  The three share a line from 390px, desktop included; from 360px "GitHub"
+  may wrap under the other two, which stay on one line; narrower, they
+  stack, all full width. The pills' padding is 16px, so the three fit a
+  390px phone in Spanish too; in the intro's 300px column it's 12px and the
+  gaps 6px, and the row never wraps: in Spanish it runs about
+  4px into the 48px gap beside the column, and a font that renders wider
+  runs further into it rather than wrapping.
+- **Only these three:** the row holds the actions. The inner pages are
+  places, and have their own cards (section 18).
 - **"Contact"** opens a form: a bottom sheet on mobile, a dialog on desktop.
   Under its title, "Write to Julian", it says plainly that he answers: "He
   reads every message and replies to each one himself." ("Lee todos los
@@ -986,10 +1000,11 @@ centred and the background left exactly as it is: no blur, no fade.
 - `lang` on `<html>` matches the page's language, and each page links its
   other language with `hreflang`.
 - Reduced motion (section 11) and muted sound (section 12) lose nothing.
-- Links to other sites (the projects' links, Open-Meteo's credit, LinkedIn
-  and GitHub, the repo's files) open in a new tab, and say so to screen
-  readers (", opens in a new tab"), so the chat stays where it was. Links
-  between the site's own pages, and "Download CV", don't.
+- Links to other sites (the GitHub pill, the projects' links, Open-Meteo's
+  credit, LinkedIn and GitHub in the chat's error notice, the repo's files)
+  open in a new tab, and say so to screen readers (", opens in a new tab"),
+  so the chat stays where it was. Links between the site's own pages, and
+  the CV download, don't.
 - Every icon-only button has a label ("Switch to dark theme", "Mute sounds",
   "Ver en español").
 

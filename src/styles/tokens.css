@@ -21,6 +21,8 @@
   --on-user: #ffffff;
   --glass: rgb(246 248 243 / 86%);
   --danger: #b7191c;
+  /* GitHub's mark, black or white only, per its brand guidelines. */
+  --github-mark: #000000;
   --live: #e5484d;
   --track-night: #0e1a24;
   --track-dawn: #f5c49a;
@@ -49,6 +51,7 @@
   --on-user: #ffffff;
   --glass: rgb(14 21 17 / 80%);
   --danger: #fd7468;
+  --github-mark: #ffffff;
   --live: #e5484d;
   --track-night: #0e1a24;
   --track-dawn: #f5c49a;
@@ -139,6 +142,11 @@
   initial-value: transparent;
 }
 
+@property --github-mark {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
 @property --danger {
   syntax: "<color>";
   inherits: true;
@@ -217,6 +225,7 @@
   --color-on-user: var(--on-user);
   --color-glass: var(--glass);
   --color-danger: var(--danger);
+  --color-github-mark: var(--github-mark);
   --color-live: var(--live);
   --color-track-night: var(--track-night);
   --color-track-dawn: var(--track-dawn);
