@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from "react";
 import type { ChatUIMessage } from "../../lib/bot/chat-message";
 import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
+import { motionReduced } from "../ui/motion";
 import { AnswerWait, AssistantMessage, answerBubble } from "./AssistantMessage";
 import { messageText, type Wait } from "./chat-view";
 import { WaitStatus } from "./WaitStatus";
@@ -56,8 +57,6 @@ export function MessageList({ messages, typing, flight, wait }: Props) {
   );
 }
 
-const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
 /**
  * The visitor's question. It pops into place with a small overshoot; sent
  * from a suggestion chip, it flies from the chip instead (a FLIP: drawn in
@@ -71,7 +70,7 @@ function Question({ text, from }: { text: string; from: DOMRect | null }) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: a bubble flies in only when it first appears.
   useLayoutEffect(() => {
     const bubble = ref.current;
-    if (!bubble || !from || reducedMotion()) return;
+    if (!bubble || !from || motionReduced()) return;
     const to = bubble.getBoundingClientRect();
     const dx = from.left + from.width / 2 - (to.left + to.width / 2);
     const dy = from.top + from.height / 2 - (to.top + to.height / 2);

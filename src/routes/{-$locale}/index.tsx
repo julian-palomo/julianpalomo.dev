@@ -15,14 +15,14 @@ import { useLiveWeather } from "../../components/landscape/useLiveWeather";
 import { useSceneOverride } from "../../components/landscape/useSceneOverride";
 import { HeroControls } from "../../components/page/HeroControls";
 import { PageCards } from "../../components/page/PageCards";
+import { useMarkPageRendered } from "../../components/page/page-load";
+import { SiteFooter } from "../../components/page/SiteFooter";
 import { PORTRAIT_TRANSITION, useHeroTransition } from "../../components/page/transition-names";
-import { SiteFooter } from "../../components/SiteFooter";
 import { SoundProvider } from "../../components/sound/Sound";
 import { parseRef } from "../../lib/analytics/events";
 import { localeFromParam } from "../../lib/i18n/locale";
 import { redirectToSpanish } from "../../lib/i18n/locale-route";
 import { t } from "../../lib/i18n/t";
-import { useMarkPageRendered } from "../../lib/page-load";
 import { shareHead } from "../../lib/share";
 
 // `/` is English and `/es` is Spanish: one route, so switching language keeps

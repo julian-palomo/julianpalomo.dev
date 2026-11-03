@@ -30,7 +30,7 @@ import {
   springs,
   stepSpring,
 } from "../../lib/spring";
-import { isMouseHover, motionReduced } from "../ui/boop";
+import { isMouseHover, motionReduced } from "../ui/motion";
 
 /** Something drawn where the pointer was, in scene units, with an id for its key. */
 export type Spot = { id: number; x: number; y: number };

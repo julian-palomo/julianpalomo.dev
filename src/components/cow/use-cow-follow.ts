@@ -1,7 +1,7 @@
 import { type RefObject, useEffect } from "react";
 import { followTilt } from "../../lib/cow-state";
 import { atRest, type SpringState, springs, stepSpring } from "../../lib/spring";
-import { isMouseHover, motionReduced } from "../ui/boop";
+import { isMouseHover, motionReduced } from "../ui/motion";
 
 // Where its chin is in the drawing (viewBox 5 26 190 150): the point its
 // tilts turn around. Keep in step with `.cow .tilt` in src/styles/cow.css.

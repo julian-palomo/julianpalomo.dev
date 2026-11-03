@@ -3,6 +3,7 @@ import { site } from "../../lib/site";
 import { useTrack } from "../analytics/Analytics";
 import { useContact } from "../contact/Contact";
 import { useLocale } from "../i18n/useLocale";
+import { textLink } from "../ui/looks";
 import { OutsideLink } from "../ui/OutsideLink";
 import { chatErrorMessage, revealOnMount } from "./chat-view";
 
@@ -30,7 +31,7 @@ export function ChatErrorNotice({ error }: Props) {
         <p>{chatErrorMessage(error, locale)}</p>
         <p className="text-[12.5px] text-muted">
           {contact.before}{" "}
-          <button type="button" onClick={openContact} className="font-medium text-accent underline">
+          <button type="button" onClick={openContact} className={textLink}>
             {contact.writeToMe}
           </button>
           {contact.reach}{" "}
@@ -40,7 +41,7 @@ export function ChatErrorNotice({ error }: Props) {
               <OutsideLink
                 href={way.href}
                 onClick={() => track({ name: "outbound", to: way.to })}
-                className="font-medium text-accent underline"
+                className={textLink}
               >
                 {way.name}
               </OutsideLink>
