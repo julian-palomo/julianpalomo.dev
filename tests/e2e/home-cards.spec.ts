@@ -1,9 +1,10 @@
 import { expect, type Page, test } from "@playwright/test";
 import { en } from "../../src/lib/i18n/en";
 import { es } from "../../src/lib/i18n/es";
+import { site } from "../../src/lib/site";
 
 // The home page's actions and places (DESIGN.md sections 14 and 18): a row
-// with the two actions, the inner pages as cards, and a view transition
+// with the three actions, the inner pages as cards, and a view transition
 // between pages (section 11).
 
 test.beforeEach(async ({ page }) => {
@@ -13,39 +14,93 @@ test.beforeEach(async ({ page }) => {
 const cards = (page: Page, messages: typeof en = en) =>
   page.getByRole("navigation", { name: messages.pagesLabel });
 
-/** The row the visible "Download CV" sits in: the banner's from 1024px, the one under the chat below. */
+/** The row the visible CV pill sits in: the banner's from 1024px, the one under the chat below. */
 const actionRow = (page: Page, messages: typeof en) =>
   page.getByRole("link", { name: messages.downloadCv }).locator("..");
+
+const githubPill = (page: Page, messages: typeof en) =>
+  actionRow(page, messages).getByRole("link", { name: /^GitHub/ });
 
 for (const [home, messages] of [
   ["/", en],
   ["/es", es],
 ] as const) {
   for (const width of [320, 360, 390, 768, 1024, 1280]) {
-    test(`at ${width}px ${home}'s row holds the two actions and nothing else`, async ({ page }) => {
+    test(`at ${width}px ${home}'s row holds the three actions and nothing else`, async ({
+      page,
+    }) => {
       await page.setViewportSize({ width, height: 800 });
       await page.goto(home);
       // At rest: the entrance moves the row while it plays.
       await expect(page.locator("[data-entrance]")).toHaveCount(0, { timeout: 5000 });
       const row = actionRow(page, messages);
-      await expect(row.locator("> *")).toHaveCount(2);
-      await expect(row.getByRole("link")).toHaveCount(1);
-      const cv = await row.getByRole("link", { name: messages.downloadCv }).boundingBox();
-      const contact = await row.getByRole("button", { name: messages.contactOpen }).boundingBox();
-      if (!cv || !contact) throw new Error("not on screen");
-      if (width >= 360) {
+      await expect(row.locator("> *")).toHaveCount(3);
+      await expect(row.getByRole("link")).toHaveCount(2);
+      const boxes = await Promise.all([
+        row.getByRole("link", { name: messages.downloadCv }).boundingBox(),
+        row.getByRole("button", { name: messages.contactOpen }).boundingBox(),
+        githubPill(page, messages).boundingBox(),
+      ]);
+      const [cv, contact, github] = boxes;
+      if (!cv || !contact || !github) throw new Error("not on screen");
+      if (width >= 390) {
         // One line, desktop's 300px column included.
         expect(Math.abs(cv.y - contact.y)).toBeLessThan(1);
+        expect(Math.abs(cv.y - github.y)).toBeLessThan(1);
+      } else if (width >= 360) {
+        // CV and Contact share a line; GitHub may wrap under them.
+        expect(Math.abs(cv.y - contact.y)).toBeLessThan(1);
       } else {
-        // Stacked, both as wide as the row.
+        // Stacked, all as wide as the row.
         expect(contact.y).toBeGreaterThan(cv.y + cv.height - 1);
+        expect(github.y).toBeGreaterThan(contact.y + contact.height - 1);
         expect(Math.abs(cv.width - contact.width)).toBeLessThan(1);
+        expect(Math.abs(cv.width - github.width)).toBeLessThan(1);
+      }
+      if (width >= 1024) {
+        // In the intro's column, clear of the chat card beside it.
+        const chat = await page.getByRole("main").boundingBox();
+        if (!chat) throw new Error("not on screen");
+        expect(github.x + github.width).toBeLessThan(chat.x);
       }
       const scroll = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(scroll).toBeLessThanOrEqual(width);
     });
   }
+
+  test(`${home}'s GitHub pill opens Julian's GitHub in a new tab`, async ({ page }) => {
+    await page.goto(home);
+    const pill = githubPill(page, messages);
+    await expect(pill).toBeVisible();
+    await expect(pill).toHaveAttribute("href", site.links.github);
+    await expect(pill).toHaveAttribute("target", "_blank");
+    await expect(pill).toHaveAttribute("aria-label", `GitHub${messages.opensInNewTab}`);
+  });
 }
+
+test("the GitHub pill records an outbound event", async ({ page, context }) => {
+  const sent: { events: { name: string; to?: string }[] }[] = [];
+  await page.route("**/api/events", async (route) => {
+    sent.push(route.request().postDataJSON());
+    await route.fulfill({ status: 204 });
+  });
+  // The new tab goes nowhere, so the run never reaches GitHub.
+  await context.route("https://github.com/**", (route) => route.fulfill({ body: "" }));
+  await page.goto("/");
+  await expect(page.locator("[data-entrance]")).toHaveCount(0, { timeout: 5000 });
+  const tab = context.waitForEvent("page");
+  await githubPill(page, en).click();
+  await (await tab).close();
+  await expect
+    .poll(async () => {
+      await page.evaluate(() => {
+        Object.defineProperty(document, "visibilityState", { value: "hidden", configurable: true });
+        document.dispatchEvent(new Event("visibilitychange"));
+      });
+      return sent.flatMap((body) => body.events).filter((event) => event.name === "outbound");
+    })
+    .toEqual([{ name: "outbound", to: "github" }]);
+});
 
 for (const [home, messages, prefix] of [
   ["/", en, ""],

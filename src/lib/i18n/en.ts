@@ -201,6 +201,8 @@ export const en = {
 
   // The CV and the contact form (DESIGN.md section 14).
   downloadCv: "Download CV",
+  // The CV pill's visible text; its name for screen readers is downloadCv.
+  cvPill: "CV",
   contactOpen: "Contact",
   contactTitle: "Write to Julian",
   contactSubtitle: "He reads every message and replies to each one himself.",

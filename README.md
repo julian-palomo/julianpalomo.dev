@@ -22,11 +22,12 @@ language toggle always wins. [`DESIGN.md`](DESIGN.md) describes how it looks,
 moves and sounds.
 
 - **The home page:** my pixel-art portrait, my name, my role, the chat with
-  the assistant, and a card for each page below. "Download CV" gets my CV as
-  a PDF, with no phone number or email address in it. "Contact" opens a form
-  that emails me, protected by Cloudflare Turnstile and a limit of 5 messages
-  a day per visitor; the message is never stored
-  ([`docs/contact.md`](docs/contact.md)).
+  the assistant, and a card for each page below. "CV" gets my CV as a PDF,
+  with no phone number or email address in it. "Contact" opens a form that
+  emails me, protected by Cloudflare Turnstile and a limit of 5 messages a
+  day per visitor; the message is never stored
+  ([`docs/contact.md`](docs/contact.md)). "GitHub" opens my GitHub profile in
+  a new tab.
 - **Projects** (`/projects`, `/es/projects`): this site and Form:at, each
   with why I made it and what it does, taken from the facts I've confirmed.
 - **How it's built** (`/how-its-built`, `/es/how-its-built`): for people who
