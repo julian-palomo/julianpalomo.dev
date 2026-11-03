@@ -177,8 +177,8 @@ test.describe("the entrance", () => {
     expect(await soundsStarted(page)).toBe(0);
   });
 
-  test("with sound off, ending the entrance stays silent", async ({ page, context }) => {
-    await context.addCookies([{ name: "sound", value: "off", url: "http://localhost:4173" }]);
+  test("with sound off, ending the entrance stays silent", async ({ page, context, baseURL }) => {
+    await context.addCookies([{ name: "sound", value: "off", url: baseURL ?? "" }]);
     await countSounds(page);
     const sprite = page.waitForResponse((response) => response.url().includes("/sounds/sprite."));
     await page.goto(DRY);
