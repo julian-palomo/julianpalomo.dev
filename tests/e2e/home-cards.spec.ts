@@ -106,13 +106,8 @@ test('a card opens its page, and "Ask the cow" comes back with no entrance', asy
   await expect(page.locator("[data-entrance]")).toHaveCount(0, { timeout: 300 });
 });
 
-/**
- * Follows the Projects card and returns the view-transition pseudo-elements
- * that animated, read from `document.getAnimations()` every frame.
- */
-async function transitionsOnCardClick(page: Page): Promise<string[]> {
-  await page.goto("/");
-  await expect(page.locator("[data-entrance]")).toHaveCount(0, { timeout: 5000 });
+/** Records, every frame, the view-transition pseudo-elements that animate. */
+async function watchTransitions(page: Page) {
   await page.evaluate(() => {
     const seen = new Set<string>();
     Object.assign(window, { seenTransitions: seen });
@@ -130,16 +125,27 @@ async function transitionsOnCardClick(page: Page): Promise<string[]> {
     };
     requestAnimationFrame(look);
   });
+}
+
+/** The pseudo-elements seen since `watchTransitions`, once a 250ms transition has had time to end. */
+async function seenTransitions(page: Page): Promise<string[]> {
+  await page.waitForTimeout(500);
+  return page.evaluate(() => [
+    ...((window as unknown as { seenTransitions: Set<string> }).seenTransitions ?? []),
+  ]);
+}
+
+/** Follows the Projects card and returns the view-transition pseudo-elements that animated. */
+async function transitionsOnCardClick(page: Page): Promise<string[]> {
+  await page.goto("/");
+  await expect(page.locator("[data-entrance]")).toHaveCount(0, { timeout: 5000 });
+  await watchTransitions(page);
   await expect(async () => {
     await cards(page).getByRole("link", { name: en.projectsTitle }).click();
     await expect(page).toHaveURL(/\/projects$/, { timeout: 1000 });
   }).toPass({ timeout: 5000 });
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(en.projectsTitle);
-  // Long enough for a 250ms transition to have started and ended.
-  await page.waitForTimeout(500);
-  return page.evaluate(() => [
-    ...((window as unknown as { seenTransitions: Set<string> }).seenTransitions ?? []),
-  ]);
+  return seenTransitions(page);
 }
 
 test("following a card runs a view transition", async ({ page }) => {
@@ -149,4 +155,23 @@ test("following a card runs a view transition", async ({ page }) => {
 test("with reduced motion, following a card runs none", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   expect(await transitionsOnCardClick(page)).toEqual([]);
+});
+
+// The link lands on `/#ask`, and the hash is then dropped: that tidy-up must
+// not start a transition of its own, which would skip this one and throw.
+test('"← Ask the cow" runs a view transition and focuses the composer, with no error', async ({
+  page,
+}) => {
+  const errors: Error[] = [];
+  page.on("pageerror", (error) => errors.push(error));
+  await page.goto("/projects");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(en.projectsTitle);
+  await watchTransitions(page);
+  await expect(async () => {
+    await page.getByRole("link", { name: en.askTheCow }).click();
+    await expect(page).toHaveURL(/\/$/, { timeout: 1000 });
+  }).toPass({ timeout: 5000 });
+  await expect(page.getByLabel("Your question")).toBeFocused();
+  expect(await seenTransitions(page)).not.toEqual([]);
+  expect(errors).toEqual([]);
 });
