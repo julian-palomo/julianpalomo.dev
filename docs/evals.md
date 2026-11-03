@@ -145,6 +145,7 @@ its settings, adds a row. Rows are never edited.
 | 10  | 2026-10-28 | `bc33e4a`, Sonnet 5.5†     | Sonnet 5.5, effort low   | Sonnet 5.5, effort medium | 2    | 75/80 (93.8%) | none                                                         | $1.32‡ |
 | 11  | 2026-10-28 | `bfbf87d`                  | Sonnet 5.5, effort low   | Sonnet 5.5, effort medium | 2    | 70/80 (87.5%) | none                                                         | $1.33  |
 | 12  | 2026-10-28 | `4bd3587`                  | Sonnet 5.5, effort low   | Sonnet 5.5, effort medium | 2    | 72/80 (90%)   | none                                                         | $1.31  |
+| 13  | 2026-11-03 | `5e406e3`, in CI           | Sonnet 5.5, effort low   | Sonnet 5.5, effort medium | 1    | 48/51 (94.1%) | none                                                         | $0.90  |
 
 Runs 2 to 4 tried drafts of the prompt that weren't committed one by one; the
 committed prompt, `93d228f`, is draft 4 without one phrase (below). Run 5 also
@@ -189,6 +190,24 @@ below the threshold, and one of its failures was the premise rule flagging a
 supported "Sí" (remote-es). Run 12 narrows that rule to premises no claim
 states, with a held-out item that must come out supported, and moves the
 no-Markdown rule to its own section with an example. It passes at exactly 90%.
+
+Run 13 is the first row recorded from CI: the `run-evals` run on PR #145
+([run 122](https://github.com/julian-palomo/julianpalomo.dev/actions/runs/41607066341)),
+on `5e406e3`, GitHub's merge of `7071fc4` into `main` at `848c9b8`. It
+measures two changes together. #140's prompt adds two bullets to Sources: a
+question about the assistant or the site is answered from the julianpalomo.dev
+claims, and the citation markers' syntax is never shown. #140 was merged
+unmeasured, on the understanding that this run would measure it. #145's answer
+cache for the suggested questions is never touched by the evals
+(`evals/run-case.ts`). The cases have grown from 40 to 51 since run 12, so its
+pass rate isn't comparable with the rows above. Against CI run 108 (43/51, on
+`76a425b`, not recorded since it changed no prompt), no case that passed
+there fails here. how-grounded, the case #140 fixed, now passes. The three
+failures failed in run 108 too: degree-es-page (a Spanish answer to an English
+question asked from the Spanish page), casual-react-es ("Antes de eso", an
+order no claim states) and insult-es (it repeated "panoli"). The cost is the
+bot $0.32, the judge $0.49 and the calibration $0.09, with all 16 calibration
+items right.
 
 ## What the baseline showed
 
