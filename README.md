@@ -1,53 +1,59 @@
 # julianpalomo.dev
 
-Hi! This is the source code of my personal website. It's a work in progress.
+Hi! This is the source code of my personal website,
+[julianpalomo.dev](https://julianpalomo.dev).
 
-The idea is a small site with an AI assistant you can ask about my experience.
-The twist: it should only answer from facts I've verified myself, show where
-each answer comes from, and say "I don't know" when it doesn't.
+It's a small site with an AI assistant you can ask about my experience. The
+twist: it only answers from facts I've confirmed myself, shows where each
+answer comes from, and says "I don't know" when it doesn't. I built it with
+Claude Code, under a written set of rules, hooks and reviewers that live in
+this repo too.
 
 ## Status
 
-The home page has my pixel-art portrait, my name, my role and a chat with the
-assistant. It is a TanStack Start app (React, TypeScript in strict mode,
-Tailwind CSS) that runs on Cloudflare Workers at
-[julianpalomo.dev](https://julianpalomo.dev). [`DESIGN.md`](DESIGN.md)
-describes the visual design, which is being built in steps: the colours, the
-fonts, the layout and the assistant are in, and the theme follows day and
-night in Glasgow; a visitor who picks one with the toggle keeps it until
-Glasgow's next dusk or dawn. The hero is a
-live Highland glen: its season follows the date and its sky the sun's real
-height over Glasgow, a small herd grazes, and the sun sets when the visitor
-switches to the dark theme. Glasgow's live weather rolls into it: clouds,
-rain, snow, wind and haar, with leaves, petals, midges or frost by season, and
-a chip with the time and the temperature. A gear lets visitors play with
-the sky on their own screen (season, time of day, clouds, rain or snow, wind
-and haar) until they go back to live Glasgow. With a mouse, the buttons
-answer the pointer with small springy gestures, and the glen notices it: the
-midges chase it, the herd looks up and the pines sway. The assistant is a
-Highland cow that greets you and follows the chat: it listens while you type,
-chews while it looks things up, talks while the answer types itself out, licks
-its lips when it's done and lowers its head when something goes wrong. It rests
-on the chat's edge. On a first visit the page introduces itself in order: who I
-am, the glen waking up, then the cow, which says hello big in the hero and flies
-down to the chat; later visits that week get a 2s version, and any tap ends
-it. Quiet CC0 sounds answer what the visitor does, such as a pop when they ask,
-a soft typing loop while the answer types itself out, a chime when it ends and
-a moo when they pat the cow; they're on by default, and a mute button in the
-hero turns them off. The site is in
-English at `/` and Spanish at `/es`: visitors in Spain get Spanish by default,
-everyone else English, and the language toggle always wins. Under the intro,
-"Download CV" gets my CV as a PDF, with no phone number or email address in
-it, and "Contact" opens a form that emails me. The form is protected by
-Cloudflare Turnstile and a limit of 5 messages a day per visitor, and the
-message is never stored ([`docs/contact.md`](docs/contact.md)). A Projects
-page (`/projects`, `/es/projects`) shows this site and Form:at, each with why
-I made it and what it does, taken from the facts I've confirmed. A How it's
-built page (`/how-its-built`, `/es/how-its-built`) explains, for people who
-don't program, how the assistant is kept from making up my experience and
-how I built the site with Claude Code. The home page has a card for each,
-the inner pages' footers link to both, and moving between pages is a short
-view transition where the browser supports one.
+It's a TanStack Start app (React, TypeScript in strict mode, Tailwind CSS)
+that runs on Cloudflare Workers, in English at `/` and Spanish at `/es`.
+Visitors in Spain get Spanish by default, everyone else English, and the
+language toggle always wins. [`DESIGN.md`](DESIGN.md) describes how it looks,
+moves and sounds.
+
+- **The home page:** my pixel-art portrait, my name, my role, the chat with
+  the assistant, and a card for each page below. "Download CV" gets my CV as
+  a PDF, with no phone number or email address in it. "Contact" opens a form
+  that emails me, protected by Cloudflare Turnstile and a limit of 5 messages
+  a day per visitor; the message is never stored
+  ([`docs/contact.md`](docs/contact.md)).
+- **Projects** (`/projects`, `/es/projects`): this site and Form:at, each
+  with why I made it and what it does, taken from the facts I've confirmed.
+- **How it's built** (`/how-its-built`, `/es/how-its-built`): for people who
+  don't program, how the assistant is kept from making up my experience, and
+  how I built the site with Claude Code.
+- **The glen:** the hero is a live Highland glen. Its season follows the
+  date, its sky the sun's real height over Glasgow, and its weather Glasgow's
+  own: clouds, rain, snow, wind and haar, with leaves, petals, midges or frost
+  by season. A small herd grazes, and with a mouse the glen notices the
+  pointer: the midges chase it, the herd looks up and the pines sway. A gear
+  lets visitors play with the sky on their own screen until they go back to
+  live Glasgow.
+- **The theme** follows day and night in Glasgow. A visitor who picks one
+  with the toggle keeps it until Glasgow's next dusk or dawn, and the sun
+  sets when they switch to the dark theme.
+- **The assistant** is a Highland cow on the chat's edge. It listens while
+  you type, chews while it looks things up, talks while the answer types
+  itself out, licks its lips when it's done, and lowers its head when
+  something goes wrong.
+- **The wait for an answer** says what's happening: a status line ("Reading
+  3 confirmed facts…") and the facts it's reading, as chips. After 3 seconds
+  with no word, the cow puts on its glasses and reads a notebook.
+- **The first visit** introduces the page in order: who I am, the glen
+  waking up, then the cow, which says hello big in the hero and flies down to
+  the chat. Later visits that week get a 2s version, and any tap ends it.
+- **Sounds:** quiet CC0 sounds answer what the visitor does, such as a pop
+  when they ask, a soft typing loop while the answer types itself out, a
+  chime when it ends and a moo when they pat the cow. They're on by default,
+  and a mute button in the hero turns them off.
+- **Moving between pages** is a short view transition where the browser
+  supports one, and links to other sites open in a new tab.
 
 The weather comes from [Open-Meteo](https://open-meteo.com/) through our
 Worker, at `GET /api/weather`, so the visitor's IP never reaches Open-Meteo.
@@ -59,22 +65,28 @@ sky when it fails. The footer credits Open-Meteo, as its CC BY 4.0 terms ask.
 You ask a question and the answer streams in from Claude (Sonnet 5.5, through
 the Vercel AI SDK), which can only look up the facts I've confirmed. A
 suggested question asked again replays the model's stored answer at once,
-with no call and no cost. Each fact
-an answer cites shows as a numbered citation, and a "Check sources" link under
-the answer unfolds a chip for each one, such as "1 · CV · Cazoo · Redux →
-Zustand"; a citation only counts if the model looked that fact up while
-answering. Tapping a number or a chip opens the claim as I confirmed it, with
-the date I confirmed it; the model never sees that date.
-Answers type themselves out word by word and are followed by more questions
-to ask. On a phone the chat gets a compact
-bar and a composer fixed above the keyboard; screen readers hear each answer
-once, whole. A shared link shows a preview card in its language, the tab shows
-the cow's head, and search engines get a sitemap and a schema.org `Person`. Every question goes through two daily limits kept in Cloudflare
-D1: 30 questions per visitor, and about $3 of model spend across everyone.
-Visitors are counted by a hash that changes every day, never by their IP.
-The live site has its API key and its limits in place, so the chat answers on
+with no call and no cost. Answers type themselves out word by word and are
+followed by more questions to ask. On a phone the chat gets a compact bar and
+a composer fixed above the keyboard; screen readers hear each answer once,
+whole.
+
+Each fact an answer cites shows as a numbered citation, and a "Check
+sources" link under the answer unfolds a chip for each one, such as "1 · CV ·
+Cazoo · Redux → Zustand". A citation only counts if the model looked that
+fact up while answering. Tapping a number or a chip opens the claim as I
+confirmed it, with the date I confirmed it; the model never sees that date.
+[`docs/architecture.md`](docs/architecture.md) follows one question all the
+way.
+
+Every question goes through two daily limits kept in Cloudflare D1: 30
+questions per visitor, and about $3 of model spend across everyone. Visitors
+are counted by a hash that changes every day, never by their IP. The live
+site has its API key and its limits in place, so the chat answers on
 [julianpalomo.dev](https://julianpalomo.dev); without a key it says it isn't
 available.
+
+A shared link shows a preview card in its language, the tab shows the cow's
+head, and search engines get a sitemap and a schema.org `Person`.
 
 The site counts how it's used with its own small event log in D1, read with
 `pnpm stats`: where visits come from, what visitors ask, which questions had
@@ -95,7 +107,7 @@ What exists around it:
   confirmed facts and nothing else, the daily limits in D1, a cache in D1
   that answers a suggested question asked again at once, and a demo mode for
   previews and tests
-- Vitest for unit tests, and Playwright for the home page, the chat (in demo
+- Vitest for unit tests, and Playwright for every page, the chat (in demo
   mode) and a check that the browser bundle holds no API key or claims data
 - Evals: questions asked to the real assistant through the same code as the
   chat, with code checks and a second model that judges every answer sentence
@@ -224,11 +236,19 @@ version from `packageManager` in `package.json`.
 
 ## The plan
 
-The next steps are tracked as
-[GitHub issues](https://github.com/julian-palomo/julianpalomo.dev/issues), one per
-piece of work.
+The home page, Projects and How it's built are done. What's next:
 
-Each decision is recorded as it's made, one file each, in `docs/adr/`.
+- **Asking by voice** ([#141](https://github.com/julian-palomo/julianpalomo.dev/pull/141), a draft):
+  record a question, transcribe it in our Worker, and put the text in the
+  composer to send.
+- **More claims,** so the assistant can answer more about my work.
+- **The final pass** ([#115](https://github.com/julian-palomo/julianpalomo.dev/issues/115)):
+  a code review, true docs, and then performance.
+
+Each piece of work is a
+[GitHub issue](https://github.com/julian-palomo/julianpalomo.dev/issues), and
+each decision is recorded as it's made, one file each, in
+[`docs/adr/`](docs/adr/README.md).
 
 ## Docs
 
