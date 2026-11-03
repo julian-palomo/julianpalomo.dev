@@ -15,7 +15,7 @@ import { useLiveWeather } from "../../components/landscape/useLiveWeather";
 import { useSceneOverride } from "../../components/landscape/useSceneOverride";
 import { HeroControls } from "../../components/page/HeroControls";
 import { PageCards } from "../../components/page/PageCards";
-import { useHeroTransition } from "../../components/page/transition-names";
+import { PORTRAIT_TRANSITION, useHeroTransition } from "../../components/page/transition-names";
 import { SiteFooter } from "../../components/SiteFooter";
 import { SoundProvider } from "../../components/sound/Sound";
 import { parseRef } from "../../lib/analytics/events";
@@ -132,7 +132,7 @@ function Page() {
                 alt={t(locale, "portraitAlt")}
                 width={96}
                 height={120}
-                className={`enter-portrait ${portrait}`}
+                className={`enter-portrait ${portrait} ${PORTRAIT_TRANSITION}`}
               />
               <h1 className="enter-intro enter-intro-1 mt-4 font-display text-[34px] leading-tight font-extrabold tracking-[-0.02em] sm:text-[44px]">
                 {t(locale, "name")}

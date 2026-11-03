@@ -731,7 +731,7 @@ text, in both languages, in the pull request that adds it.
 | A shooting star                                             | 0.9s                                                                                                           | `ease-out`                                         |
 | Nessie rises, glides and sinks                              | About 4s                                                                                                       | `ease-in-out`                                      |
 | A window flickering like a candle                           | 0.8s                                                                                                           | `ease-in-out`                                      |
-| Moving to another page                                      | 250ms: the hero and the title morph, the rest cross-fades                                                      | `ease-out`                                         |
+| Moving to another page                                      | 250ms: the hero morphs, the rest cross-fades; the page's name moves to or from its title tab in 350ms          | `ease-out`                                         |
 
 ### Springs
 
@@ -1015,8 +1015,10 @@ language toggle goes to the same page in the other language.
   snapshot anchored to the bottom so the land doesn't squash; the card's
   name becomes the page's title tab, and back again; the rest cross-fades.
   The hero morphs only when it's on screen; from the bottom of the page it
-  cross-fades with the rest. Switching language, or a change to the
-  URL's query or hash, has no transition.
+  cross-fades with the rest. The home page's portrait fades in or out in
+  place, in front of the hero, so the growing landscape never covers it.
+  Switching language, or a change to the URL's query or hash, has no
+  transition.
 
 ### Projects
 

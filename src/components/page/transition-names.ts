@@ -19,6 +19,16 @@ const HERO_TRANSITION = "[view-transition-name:hero] in-data-entrance:[view-tran
 const CONTROLS_TRANSITION =
   "[view-transition-name:hero-controls] in-data-entrance:[view-transition-name:none]";
 
+/**
+ * The home page's portrait, which overlaps the hero's lower edge. In the root
+ * snapshot it would paint under the hero's group, which covers its top half
+ * as the hero grows, then jump back whole when the transition ends. Its own
+ * group paints above the hero's, and inner pages have none, so it fades in
+ * or out in place. No name while the entrance plays, like the hero's.
+ */
+export const PORTRAIT_TRANSITION =
+  "[view-transition-name:portrait] in-data-entrance:[view-transition-name:none]";
+
 /** A page's name on its home card and its title tab on the page: the one becomes the other. */
 export const PAGE_TITLE_TRANSITION = {
   projects: "[view-transition-name:page-title-projects]",

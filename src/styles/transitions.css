@@ -13,6 +13,17 @@
   animation-timing-function: ease-out;
 }
 
+/* A page's name moving between its card and its title tab takes a little
+   longer, so the move reads. */
+::view-transition-group(page-title-projects),
+::view-transition-old(page-title-projects),
+::view-transition-new(page-title-projects),
+::view-transition-group(page-title-how-its-built),
+::view-transition-old(page-title-how-its-built),
+::view-transition-new(page-title-how-its-built) {
+  animation-duration: 350ms;
+}
+
 /* The landscape crops its sky as its box gets shorter and keeps the ground
    (preserveAspectRatio="xMidYMax slice"), so its snapshots are anchored at
    the bottom too, filling the box as it changes height. */
