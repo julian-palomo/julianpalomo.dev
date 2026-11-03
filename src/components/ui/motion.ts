@@ -1,12 +1,17 @@
 /**
  * What the visitor's device allows to move, read at the moment it's needed,
- * so a change in the OS setting applies at once. Browser only: call them from
- * effects and handlers, never while rendering on the server.
+ * so a change in the OS setting applies at once.
  */
 
-/** The visitor asks for reduced motion (DESIGN.md section 11). */
+/**
+ * The visitor asks for reduced motion (DESIGN.md section 11). Safe while
+ * rendering: on the server, with no device to ask, it says no, as the
+ * chat's first render needs.
+ */
 export function motionReduced(): boolean {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return (
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 }
 
 /**
