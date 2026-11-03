@@ -672,8 +672,8 @@ mobile; desktop is the same inside the right-hand card.
    "Hide sources", which also closes an open claim. Each answer starts folded
    and keeps its own state while the page is open. Tapping a chip opens the
    claim exactly as Julian confirmed it, with "Confirmed by Julian on 27 Oct
-   2026 · from his CV". Under the answer: "Copy", and "Keep asking" with the
-   suggested questions not asked yet. Suggestion chips, the first three and
+   2026 · from his CV". Under the answer: "Keep asking" with the suggested
+   questions not asked yet. Suggestion chips, the first three and
    these, are centred at every width, wrapped rows too, and so is the "Keep
    asking" heading.
 5. **Out of questions, or something went wrong.** Errors are warm too: the cow
@@ -694,8 +694,6 @@ mobile; desktop is the same inside the right-hand card.
   ([`docs/adr/2026-10-31-sources-behind-a-link.md`](docs/adr/2026-10-31-sources-behind-a-link.md)). To show the claim's
   text and confirmation date, the `data-sources` part carries them; the
   model, the prompt and the tools don't change.
-- **Copy** copies the answer as plain text with its sources listed at the
-  end, ready to paste into an email.
 - **Screen readers:** "Answering…" is announced when an answer starts, and the
   full answer once when it has finished typing, never piece by piece. This settles the
   VoiceOver check left open in phase 4.

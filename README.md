@@ -65,8 +65,8 @@ the answer unfolds a chip for each one, such as "1 · CV · Cazoo · Redux →
 Zustand"; a citation only counts if the model looked that fact up while
 answering. Tapping a number or a chip opens the claim as I confirmed it, with
 the date I confirmed it; the model never sees that date.
-Answers type themselves out word by word, can be copied with their sources,
-and are followed by more questions to ask. On a phone the chat gets a compact
+Answers type themselves out word by word and are followed by more questions
+to ask. On a phone the chat gets a compact
 bar and a composer fixed above the keyboard; screen readers hear each answer
 once, whole. A shared link shows a preview card in its language, the tab shows
 the cow's head, and search engines get a sitemap and a schema.org `Person`. Every question goes through two daily limits kept in Cloudflare
