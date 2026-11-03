@@ -4,7 +4,7 @@
  */
 import type { AnswerOutcome } from "../../lib/analytics/events";
 import { type ChatErrorCode, chatErrorSchema } from "../../lib/bot/chat-error";
-import { chipLabel, parseCitations, type Source } from "../../lib/bot/citations";
+import { parseCitations, type Source } from "../../lib/bot/citations";
 import type { Locale } from "../../lib/i18n/locale";
 import { t } from "../../lib/i18n/t";
 
@@ -124,24 +124,17 @@ export function splitIntoChunks(
 }
 
 /**
- * The answer as plain text for the clipboard: citations removed, then the
- * numbered sources, ready to paste into an email.
+ * The answer as plain text for the screen-reader announcement: every
+ * citation marker removed, and the space before the punctuation it left.
  */
-export function answerAsText(
-  text: string,
-  chips: readonly { number: number; source: Source }[],
-  names: Record<Source["source"], string>,
-  sourcesHeading: string,
-): string {
-  const { segments } = parseCitations(text, new Set(chips.map(({ source }) => source.id)));
-  const prose = segments
+export function answerAsText(text: string): string {
+  // No id is allowed, so every marker is dropped, valid or not.
+  const { segments } = parseCitations(text, new Set());
+  return segments
     .flatMap((segment) => (segment.type === "text" ? [segment.text] : []))
     .join("")
     .replace(/[ \t]+([.,;:!?])/g, "$1")
     .trim();
-  if (chips.length === 0) return prose;
-  const lines = chips.map(({ number, source }) => `${number}. ${chipLabel(source, names)}`);
-  return `${prose}\n\n${sourcesHeading}\n${lines.join("\n")}`;
 }
 
 /**

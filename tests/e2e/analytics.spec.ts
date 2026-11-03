@@ -48,8 +48,8 @@ async function hideUntilSent(page: Page, sent: Sent[], expected: string[]) {
 async function ask(page: Page, question: string) {
   await page.getByLabel("Your question").fill(question);
   await page.getByRole("button", { name: "Send" }).click();
-  // Copy appears once the answer has finished typing itself out.
-  await expect(page.getByRole("button", { name: "Copy" })).toBeVisible();
+  // The announcer holds the whole answer once it has finished typing itself out.
+  await expect(page.getByTestId("chat-announcer")).toContainText(DEMO_ANSWER_INTRO);
 }
 
 test("a question sends a visit, then the question, then its answer, as one page load", async ({
@@ -85,7 +85,7 @@ test("a suggestion is sent with its place in the list", async ({ page }) => {
   const sent = await collectEvents(page);
   await page.goto("/");
   await page.getByRole("button", { name: "What is Form:at?" }).click();
-  await expect(page.getByRole("button", { name: "Copy" })).toBeVisible();
+  await expect(page.getByTestId("chat-announcer")).toContainText(DEMO_ANSWER_INTRO);
   await hide(page);
 
   await expect

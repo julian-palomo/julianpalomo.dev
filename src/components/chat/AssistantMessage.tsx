@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import type { ChatUIMessage } from "../../lib/bot/chat-message";
 import { chipLabel, type Source } from "../../lib/bot/citations";
 import { t } from "../../lib/i18n/t";
@@ -8,7 +8,6 @@ import { useLocale } from "../i18n/useLocale";
 import { useSoundEffects } from "../sound/Sound";
 import { boopOnHover } from "../ui/boop";
 import {
-  answerAsText,
   confirmationLine,
   messageText,
   nextSources,
@@ -43,7 +42,7 @@ type Props = {
 /**
  * One answer (DESIGN.md section 10): its text, typing itself out word by
  * word, each word fading in; citations as numbered buttons; once the last
- * word is on screen, a "Check sources" link and a Copy button. The link
+ * word is on screen, a "Check sources" link. The link
  * shows the numbered source chips, rising in. A number or a chip opens its
  * claim, exactly as Julian confirmed it, under the answer; a number also
  * shows the chips.
@@ -168,9 +167,6 @@ export function AssistantMessage({ message, typed }: Props) {
       <div id={claimId}>
         {opened && <Claim key={opened.number} number={opened.number} source={opened.source} />}
       </div>
-      {!streaming && text.length > 0 && (
-        <CopyButton text={answerAsText(text, chips, names, t(locale, "sourcesHeading"))} />
-      )}
     </article>
   );
 }
@@ -203,52 +199,5 @@ function StatusPill({ text }: { text: string }) {
         <span />
       </span>
     </p>
-  );
-}
-
-type CopyState = "idle" | "copied" | "failed";
-
-/** Copies the answer as plain text with its sources; says whether it worked, then resets. */
-function CopyButton({ text }: { text: string }) {
-  const locale = useLocale();
-  const [state, setState] = useState<CopyState>("idle");
-  const track = useTrack();
-
-  useEffect(() => {
-    if (state === "idle") return;
-    const timer = setTimeout(() => setState("idle"), 2000);
-    return () => clearTimeout(timer);
-  }, [state]);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      setState("copied");
-      track({ name: "copied" });
-    } catch {
-      // No permission, no focus, or no clipboard at all: say so instead.
-      setState("failed");
-    }
-  }
-
-  const label = {
-    idle: t(locale, "copy"),
-    copied: t(locale, "copied"),
-    failed: t(locale, "couldntCopy"),
-  }[state];
-
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={copy}
-        className="min-h-11 rounded-full border-[1.5px] border-border bg-field px-4 text-[13px] font-semibold hover:border-accent"
-      >
-        {label}
-      </button>
-      <span role="status" className="sr-only">
-        {state === "idle" ? "" : label}
-      </span>
-    </div>
   );
 }
