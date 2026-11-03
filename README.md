@@ -9,6 +9,10 @@ answer comes from, and says "I don't know" when it doesn't. I built it with
 Claude Code, under a written set of rules, hooks and reviewers that live in
 this repo too.
 
+![The home page: the live Glasgow glen at dusk, the portrait and the chat with the cow](public/images/projects/site-home.png)
+
+<img src="public/images/projects/site-home-phone.png" width="320" alt="The home page on a phone, in the dark theme">
+
 ## Status
 
 It's a TanStack Start app (React, TypeScript in strict mode, Tailwind CSS)
