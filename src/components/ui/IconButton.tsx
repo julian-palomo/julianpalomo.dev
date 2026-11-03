@@ -18,7 +18,7 @@ const looks: Record<Look, string> = {
   // For buttons that sit on the landscape.
   glass: "bg-glass text-foreground backdrop-blur-[6px]",
   // For buttons on a panel, such as the gear's panel's Close.
-  tint: "bg-tint text-foreground",
+  tint: "bg-tint text-foreground disabled:opacity-50",
 };
 
 /** A round, flat, icon-only button, 44px so it's easy to hit on touch. */

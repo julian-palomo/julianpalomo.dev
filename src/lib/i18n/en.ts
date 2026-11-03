@@ -85,6 +85,19 @@ export const en = {
   questionLabel: "Your question",
   send: "Send",
   stop: "Stop",
+  // Asking by voice: the microphone next to Send (DESIGN.md section 10).
+  askByVoice: "Ask by voice",
+  stopRecording: "Stop recording",
+  listening: "Listening…",
+  transcribing: "Transcribing…",
+  voiceErrors: {
+    denied: "The microphone wasn't allowed. You can type your question instead.",
+    noSpeech: "I didn't hear anything. Try again a little closer to the microphone.",
+    visitorLimit: (limit: number) =>
+      `That's today's ${numbers.format(limit)} voice questions. You can still type.`,
+    dailyLimit: "Voice questions are resting until tomorrow. You can still type.",
+    failed: "I couldn't make that out. Try again, or type your question.",
+  },
   counter: (length: number, limit: number) =>
     `${numbers.format(length)} / ${numbers.format(limit)}`,
   counterOver: (over: number, limit: number) =>

@@ -174,6 +174,25 @@ and the page sends them to `POST /api/events`, which stores them in D1
 path above: nothing in `src/lib/bot/` knows about it, and the request to
 `/api/chat` doesn't change.
 
+**Asking by voice.** A question can start as speech instead
+([`docs/adr/2026-11-02-voice-through-workers-ai.md`](adr/2026-11-02-voice-through-workers-ai.md)).
+The browser records it for at most 30s
+([`use-voice.ts`](../src/components/chat/use-voice.ts)), decodes the recording
+and turns it into a 16 kHz mono WAV
+([`src/lib/voice/wav.ts`](../src/lib/voice/wav.ts)), and posts it to
+`POST /api/transcribe`
+([`src/routes/api/transcribe.ts`](../src/routes/api/transcribe.ts)). The
+endpoint ([`src/lib/voice/endpoint.ts`](../src/lib/voice/endpoint.ts)) checks
+the size, the WAV and its length, counts the transcription in D1 against the
+visitor's 20 a day and the site's 150 minutes (migration
+[`0005`](../migrations/0005_transcriptions.sql), the same daily visitor hash as
+the chat's), and only then sends the audio to Whisper through the Workers AI
+binding (`env.AI`). The text comes back as `{ text }` and goes into the
+composer; the visitor sends it like a typed question, so from there it takes
+the path above. Neither the audio nor the text is stored or logged. With
+`BOT_DEMO` the endpoint still checks the WAV, then answers a fixed sentence
+without Workers AI or D1.
+
 **The evals.** [`evals/run-case.ts`](../evals/run-case.ts) asks the real model
 its questions through `handleChat` itself, with a request shaped like
 `useChat`'s, so every step above runs as it does in production: the

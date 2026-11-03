@@ -68,6 +68,18 @@ export const es: Messages = {
   questionLabel: "Tu pregunta",
   send: "Enviar",
   stop: "Parar",
+  askByVoice: "Pregunta por voz",
+  stopRecording: "Parar la grabación",
+  listening: "Escuchando…",
+  transcribing: "Transcribiendo…",
+  voiceErrors: {
+    denied: "No se ha permitido el micrófono. Puedes escribir la pregunta.",
+    noSpeech: "No he oído nada. Prueba otra vez, un poco más cerca del micrófono.",
+    visitorLimit: (limit: number) =>
+      `Ya has hecho las ${numbers.format(limit)} preguntas por voz de hoy. Aún puedes escribir.`,
+    dailyLimit: "Las preguntas por voz descansan hasta mañana. Aún puedes escribir.",
+    failed: "No he podido entenderlo. Prueba otra vez o escribe la pregunta.",
+  },
   counter: (length, limit) => `${numbers.format(length)} / ${numbers.format(limit)}`,
   counterOver: (over, limit) =>
     `${numbers.format(over)} ${over === 1 ? "carácter" : "caracteres"} de más (máximo ${numbers.format(limit)})`,

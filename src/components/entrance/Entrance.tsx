@@ -114,17 +114,28 @@ export function Entrance({ kind, greeting, hero, className, children }: Props) {
       setStage({ status: "over" });
       return;
     }
-    const end = () => setStage({ status: "over" });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let join: Join | undefined;
+    // Once it ends it stays ended: the next beat's timer is cleared, a beat
+    // that still fires does nothing, and so does a background tab shown
+    // later (`show`). Without these, a tap during the full entrance would end
+    // it only until its next beat, which would start it again, cow and all,
+    // and the next tap would moo again.
+    let ended = false;
+    const end = () => {
+      ended = true;
+      clearTimeout(timer);
+      setStage({ status: "over" });
+    };
     // The listeners stay after the entrance ends, so only a skip while the
     // root still has `data-entrance` moos.
     const skip = (event: Event) => {
       if (mooes(event) && element.hasAttribute("data-entrance")) moo();
       end();
     };
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    let join: Join | undefined;
 
     const tick = () => {
+      if (ended) return;
       const elapsed = typeof clock.currentTime === "number" ? clock.currentTime : 0;
       if (kind === "short") {
         setStage({ status: "short" });
@@ -145,9 +156,10 @@ export function Entrance({ kind, greeting, hero, className, children }: Props) {
       if (wait !== null) timer = setTimeout(tick, wait);
     };
 
-    // A background tab starts the entrance when it's first shown, from the beginning.
+    // A background tab starts the entrance when it's first shown, from the
+    // beginning, unless it has already ended.
     const show = () => {
-      if (document.visibilityState !== "visible") return;
+      if (ended || document.visibilityState !== "visible") return;
       document.removeEventListener("visibilitychange", show);
       restartEntrance(element);
       tick();

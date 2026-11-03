@@ -13,6 +13,7 @@
  */
 
 .cow .tilt,
+.cow .ear-r,
 .cow .jaw,
 .cow .lick-r,
 .cow .lick-l {
@@ -20,6 +21,10 @@
 }
 .cow .tilt {
   transform-origin: 100px 130px;
+}
+/* Where the right ear meets the head. */
+.cow .ear-r {
+  transform-origin: 131px 90px;
 }
 .cow .lick-r {
   transform-origin: 104px 148px;
@@ -63,6 +68,17 @@
   /* Listening: holds its head tilted. */
   .cow-live[data-state="listening"] .tilt {
     transform: rotate(-7deg);
+  }
+
+  /* Hearing a question asked by voice: the same tilt, with one ear raised. */
+  .cow-live .ear-r {
+    transition: transform 0.3s ease;
+  }
+  .cow-live[data-state="hearing"] .tilt {
+    transform: rotate(-7deg);
+  }
+  .cow-live[data-state="hearing"] .ear-r {
+    transform: rotate(-14deg);
   }
 
   /* Thinking: chews with a slight thoughtful tilt. */

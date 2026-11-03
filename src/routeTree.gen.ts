@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiEventsRouteImport } from './routes/api/events'
+import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as ApiWeatherRouteImport } from './routes/api/weather'
 import { Route as Char123LocaleChar125IndexRouteImport } from './routes/{-$locale}/index'
 import { Route as Char123LocaleChar125HowItsBuiltRouteImport } from './routes/{-$locale}/how-its-built'
@@ -24,6 +25,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
 const ApiEventsRoute = ApiEventsRouteImport.update({
   id: '/api/events',
   path: '/api/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTranscribeRoute = ApiTranscribeRouteImport.update({
+  id: '/api/transcribe',
+  path: '/api/transcribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiWeatherRoute = ApiWeatherRouteImport.update({
@@ -53,6 +59,7 @@ const Char123LocaleChar125ProjectsRoute =
 export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/api/events': typeof ApiEventsRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
   '/api/weather': typeof ApiWeatherRoute
   '/{-$locale}/how-its-built': typeof Char123LocaleChar125HowItsBuiltRoute
   '/{-$locale}/projects': typeof Char123LocaleChar125ProjectsRoute
@@ -61,6 +68,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/api/events': typeof ApiEventsRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
   '/api/weather': typeof ApiWeatherRoute
   '/{-$locale}/how-its-built': typeof Char123LocaleChar125HowItsBuiltRoute
   '/{-$locale}/projects': typeof Char123LocaleChar125ProjectsRoute
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/api/chat': typeof ApiChatRoute
   '/api/events': typeof ApiEventsRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
   '/api/weather': typeof ApiWeatherRoute
   '/{-$locale}/how-its-built': typeof Char123LocaleChar125HowItsBuiltRoute
   '/{-$locale}/projects': typeof Char123LocaleChar125ProjectsRoute
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/api/chat'
     | '/api/events'
+    | '/api/transcribe'
     | '/api/weather'
     | '/{-$locale}/how-its-built'
     | '/{-$locale}/projects'
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
   to:
     | '/api/chat'
     | '/api/events'
+    | '/api/transcribe'
     | '/api/weather'
     | '/{-$locale}/how-its-built'
     | '/{-$locale}/projects'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/api/chat'
     | '/api/events'
+    | '/api/transcribe'
     | '/api/weather'
     | '/{-$locale}/how-its-built'
     | '/{-$locale}/projects'
@@ -105,6 +117,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   ApiEventsRoute: typeof ApiEventsRoute
+  ApiTranscribeRoute: typeof ApiTranscribeRoute
   ApiWeatherRoute: typeof ApiWeatherRoute
   Char123LocaleChar125HowItsBuiltRoute: typeof Char123LocaleChar125HowItsBuiltRoute
   Char123LocaleChar125ProjectsRoute: typeof Char123LocaleChar125ProjectsRoute
@@ -125,6 +138,13 @@ declare module '@tanstack/react-router' {
       path: '/api/events'
       fullPath: '/api/events'
       preLoaderRoute: typeof ApiEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/transcribe': {
+      id: '/api/transcribe'
+      path: '/api/transcribe'
+      fullPath: '/api/transcribe'
+      preLoaderRoute: typeof ApiTranscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/weather': {
@@ -161,6 +181,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   ApiEventsRoute: ApiEventsRoute,
+  ApiTranscribeRoute: ApiTranscribeRoute,
   ApiWeatherRoute: ApiWeatherRoute,
   Char123LocaleChar125HowItsBuiltRoute: Char123LocaleChar125HowItsBuiltRoute,
   Char123LocaleChar125ProjectsRoute: Char123LocaleChar125ProjectsRoute,

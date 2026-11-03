@@ -60,6 +60,11 @@
   // address, and the address comes from the CONTACT_TO secret, so it never
   // appears in the repo. Not repeated under `env.e2e`, which sends nothing.
   "send_email": [{ "name": "EMAIL" }],
+  // Workers AI, for the voice questions' transcription (src/lib/voice/).
+  // Always remote, so it bills even from a local Worker: previews, e2e and a
+  // .dev.vars with BOT_DEMO="1" answer the fixed demo sentence instead and
+  // never call it. Not repeated under `env.e2e`.
+  "ai": { "binding": "AI" },
   "observability": {
     "enabled": true
   }

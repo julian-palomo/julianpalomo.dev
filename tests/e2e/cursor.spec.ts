@@ -28,6 +28,7 @@ test("buttons, the cow and a suggestion show the hand; a disabled Send and the b
   for (const pressable of [
     page.getByRole("button", { name: "Contact", exact: true }),
     page.getByRole("button", { name: "Pat the cow" }),
+    page.getByRole("button", { name: "Ask by voice" }),
     page.locator("[data-suggestion]").first(),
   ]) {
     expect(await cursor(pressable)).toBe("pointer");
