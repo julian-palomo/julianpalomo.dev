@@ -3,6 +3,7 @@ import { site } from "../../lib/site";
 import { useTrack } from "../analytics/Analytics";
 import { useContact } from "../contact/Contact";
 import { useLocale } from "../i18n/useLocale";
+import { OutsideLink } from "../ui/OutsideLink";
 import { chatErrorMessage, revealOnMount } from "./chat-view";
 
 type Props = { error: Error };
@@ -36,13 +37,13 @@ export function ChatErrorNotice({ error }: Props) {
           {WAYS.map((way, index) => (
             <span key={way.name}>
               {index > 0 && ` ${contact.between} `}
-              <a
+              <OutsideLink
                 href={way.href}
                 onClick={() => track({ name: "outbound", to: way.to })}
                 className="font-medium text-accent underline"
               >
                 {way.name}
-              </a>
+              </OutsideLink>
             </span>
           ))}
           {contact.after}

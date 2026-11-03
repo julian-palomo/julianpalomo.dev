@@ -1,6 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 import { chatErrorBody } from "../../src/lib/bot/chat-error";
 import { en } from "../../src/lib/i18n/en";
+import { es } from "../../src/lib/i18n/es";
 
 // The CV and the contact form (DESIGN.md section 14). The e2e build sets
 // CONTACT_DEMO (wrangler.jsonc), so the form renders Turnstile with
@@ -96,6 +97,20 @@ test("on a phone the buttons are centred; from 1024px they keep the intro's left
     .boundingBox();
   if (!intro || !atIntro) throw new Error("not on screen");
   expect(Math.abs(atIntro.x - intro.x)).toBeLessThan(1);
+});
+
+test("the form says Julian reads and replies to every message, in both languages", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await openContact(page);
+  await expect(dialog(page)).toContainText(en.contactSubtitle);
+  await page.goto("/es");
+  await expect(async () => {
+    await page.getByRole("button", { name: es.contactOpen, exact: true }).click();
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 500 });
+  }).toPass({ timeout: 5000 });
+  await expect(page.getByRole("dialog")).toContainText(es.contactSubtitle);
 });
 
 test("Turnstile loads only when the form opens", async ({ page }) => {

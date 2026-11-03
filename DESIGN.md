@@ -654,7 +654,7 @@ mobile; desktop is the same inside the right-hand card.
    of the answer is on screen, its bubble holds:
    - **A status pill** that says what's happening, in words, with a light
      sweeping through them from right to left: "Reading your question…";
-     "Looking up claims…" while a tool runs; "Reading 3 confirmed facts…"
+     "Looking up confirmed facts…" while a tool runs; "Reading 3 confirmed facts…"
      once the tool has found them ("Reading", not "Using": the answer may
      not cite them all); "Writing the answer…" when it found none; and
      "Chewing it over properly…" once 3s have passed with no word, when the
@@ -942,6 +942,9 @@ centred and the background left exactly as it is: no blur, no fade.
 - **Only these two:** the row holds the actions. The inner pages are places,
   and have their own cards (section 18).
 - **"Contact"** opens a form: a bottom sheet on mobile, a dialog on desktop.
+  Under its title, "Write to Julian", it says plainly that he answers: "He
+  reads every message and replies to each one himself." ("Lee todos los
+  mensajes y responde a cada uno él mismo."), with no reply time.
   Fields: name, email (so Julian can reply), message (up to 2,000
   characters). Protected by Cloudflare Turnstile and a hidden honeypot field,
   and limited per visitor per day like the chat. The message goes to Julian's
@@ -980,6 +983,10 @@ centred and the background left exactly as it is: no blur, no fade.
 - `lang` on `<html>` matches the page's language, and each page links its
   other language with `hreflang`.
 - Reduced motion (section 11) and muted sound (section 12) lose nothing.
+- Links to other sites (the projects' links, Open-Meteo's credit, LinkedIn
+  and GitHub, the repo's files) open in a new tab, and say so to screen
+  readers (", opens in a new tab"), so the chat stays where it was. Links
+  between the site's own pages, and "Download CV", don't.
 - Every icon-only button has a label ("Switch to dark theme", "Mute sounds",
   "Ver en español").
 

@@ -70,8 +70,10 @@ export const en = {
   checkSources: (count: number) => `Check sources (${count})`,
   hideSources: "Hide sources",
   sourceNames: { cv: "CV", julian: "Julian" },
+  // After a link's text, for screen readers, on every link to another site.
+  opensInNewTab: ", opens in a new tab",
   demo: "Demo",
-  lookingUpClaims: "Looking up claims…",
+  lookingUpClaims: "Looking up confirmed facts…",
   checkingTopics: "Checking what topics exist…",
   // The pill's line from sending to the first word (DESIGN.md section 10).
   readingQuestion: "Reading your question…",
@@ -201,7 +203,7 @@ export const en = {
   downloadCv: "Download CV",
   contactOpen: "Contact",
   contactTitle: "Write to Julian",
-  contactSubtitle: "He reads every message and answers by email.",
+  contactSubtitle: "He reads every message and replies to each one himself.",
   contactName: "Name",
   contactEmail: "Email",
   contactEmailHint: "So Julian can reply.",

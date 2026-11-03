@@ -110,7 +110,9 @@ describe("waitLine", () => {
   });
 
   it("names the running tool in plain words", () => {
-    expect(waitLine([running("tool-get_claims")], 0, false, "en")).toBe("Looking up claims…");
+    expect(waitLine([running("tool-get_claims")], 0, false, "en")).toBe(
+      "Looking up confirmed facts…",
+    );
     expect(waitLine([{ type: "tool-list_topics", state: "input-streaming" }], 0, false, "en")).toBe(
       "Checking what topics exist…",
     );
@@ -129,7 +131,7 @@ describe("waitLine", () => {
 
   it("says a second tool is running even after facts arrived", () => {
     const parts = [done("tool-get_claims"), running("tool-search_claims")];
-    expect(waitLine(parts, 4, false, "en")).toBe("Looking up claims…");
+    expect(waitLine(parts, 4, false, "en")).toBe("Looking up confirmed facts…");
   });
 
   it("writes the answer once a tool has come back with no claims", () => {

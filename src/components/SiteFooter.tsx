@@ -1,6 +1,7 @@
 import { t } from "../lib/i18n/t";
 import { useLocale } from "./i18n/useLocale";
 import { PageLinks } from "./page/PageLinks";
+import { OutsideLink } from "./ui/OutsideLink";
 
 /**
  * Every page's footer: the links to the inner pages (DESIGN.md section 18),
@@ -27,9 +28,9 @@ export function SiteFooter({
       )}
       <p>
         {credit.before}{" "}
-        <a href="https://open-meteo.com/" className="font-medium text-accent underline">
+        <OutsideLink href="https://open-meteo.com/" className="font-medium text-accent underline">
           {credit.link}
-        </a>
+        </OutsideLink>
       </p>
     </footer>
   );
