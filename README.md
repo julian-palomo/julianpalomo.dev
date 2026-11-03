@@ -180,7 +180,7 @@ CI runs `pnpm eval` once when the `run-evals` label is added to a pull
 request that changes the assistant's code, the claims, the evals or the
 dependencies, never on a push. It runs on a separate API key and writes the
 score, the critical failures and the cost to the job's summary.
-There a pass rate below 90% is a warning, not a failure: one run of 40 answers
+There a pass rate below 90% is a warning, not a failure: one run of 51 answers
 is too small to tell a real drop from noise. Every other reason still fails
 the job.
 
