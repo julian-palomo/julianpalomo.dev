@@ -152,6 +152,16 @@ server keeps reading the stream to its end inside `waitUntil`, so the write to
 D1 still lands after they've gone. A
 step cut off halfway isn't counted ([`docs/tech-debt.md`](tech-debt.md)).
 
+**The wait before the first word.** From the moment the question is sent
+until its first word is on screen, the answer's bubble shows what's happening,
+from the parts that have arrived:
+[`WaitStatus.tsx`](../src/components/chat/WaitStatus.tsx) takes its line from
+`waitLine` in [`chat-view.ts`](../src/components/chat/chat-view.ts) (a tool
+running, how many claims the `data-sources` part holds, or a long wait after
+`LONG_WAIT_MS`), and lists those claims with `waitChips`. Nothing on the
+server changes for it. What the visitor sees is in
+[`DESIGN.md`](../DESIGN.md#10-the-chat), section 10.
+
 **The answer on the page.** [`AssistantMessage.tsx`](../src/components/chat/AssistantMessage.tsx)
 renders the text with the same parser. A citation becomes a numbered button and
 a source chip with the same number, such as "1 · CV · Cazoo · Redux → Zustand",
