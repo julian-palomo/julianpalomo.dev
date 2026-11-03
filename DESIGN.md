@@ -148,6 +148,10 @@ in `.claude/rules/styling.md`. UI components still never use a colour literal.
   ("Download CV", "Contact"), each with a 16px line icon before its words: a
   sheet with a folded corner and an envelope. Never a 3D edge or a drop
   shadow.
+- **The hand cursor** shows on everything that can be pressed: buttons,
+  summaries that open, and the sky panel's options; never on a disabled
+  button, a field or plain text. A slider's thumb shows the open hand, closed
+  while it's dragged.
 - **Gestures on hover.** With a mouse, a button answers the pointer with a
   small gesture on a spring (section 11), about 0.3s, back to rest:
 
@@ -186,9 +190,8 @@ From top to bottom:
    its height, 20px from the left, with a 4px ring in `background`.
 3. **Name, role and one line** ("Ask about my experience. Answers come only
    from facts I've confirmed, with their sources."). On a phone, **"Download
-   CV"** and **"Contact"**, with the inner pages' text links beside them,
-   sit at the end of the page, above the footer, so the chat's first
-   suggestions still show above the fixed composer (sections 14 and 18).
+   CV"** and **"Contact"** sit after the chat, so the chat's first
+   suggestions still show above the fixed composer (section 14).
 4. **The chat** (section 10). At its top, the cow (100 × 79px on a phone) rests
    its chin on the chat's edge, like a fence, with its two front hooves over it:
    on a phone the edge is a 3px line in `border` with rounded ends, across
@@ -196,6 +199,8 @@ From top to bottom:
    (Bricolage, 16px, `foreground`) over "Ready when you are" (13px, `muted`).
    Under the edge, the greeting, three suggested questions and the composer.
    The answers have no cow of their own, so their bubbles get the full width.
+5. **The inner pages' cards** ("Projects", "How it's built"), at the end of
+   the page, above the footer (section 18).
 
 Once the visitor sends a first question, the page scrolls so the chat fills
 the screen, with the cow on its edge just under the bar (the chat is at least a
@@ -212,13 +217,15 @@ the on-screen keyboard.
   and the slice shows more of it (a distant cow on the right hill, for
   example).
 - **Two columns** under the hero: on the left (about 300px) the portrait at
-  120 × 150px overlapping the hero, the name, the role, the line, the two
-  buttons and the inner pages' links (section 18); on the right, the chat in
+  120 × 150px overlapping the hero, the name, the role, the line and the two
+  buttons (section 14); on the right, the chat in
   a card with a 2px `border` and a 20px radius. The card's top border is the
   cow's edge: the cow sits on it, 28px
   from its left edge, overlapping it from above, with the heading beside it,
   so the card starts about 7.5rem lower to make room.
 - The gear's panel opens as a popover under the gear (section 8).
+- **The inner pages' cards** sit under both columns, across their width,
+  above the footer (section 18).
 
 ### Between the two
 
@@ -771,6 +778,7 @@ text, in both languages, in the pull request that adds it.
 | A shooting star                                             | 0.9s                                                                                                           | `ease-out`                                         |
 | Nessie rises, glides and sinks                              | About 4s                                                                                                       | `ease-in-out`                                      |
 | A window flickering like a candle                           | 0.8s                                                                                                           | `ease-in-out`                                      |
+| Moving to another page                                      | 250ms: the hero morphs, the rest cross-fades; the page's name moves to or from its title tab in 350ms          | `ease-out`                                         |
 | The cow raising its ear while it hears (section 10)         | 0.3s                                                                                                           | `ease`                                             |
 | The time on the recording button                            | Every 0.25s, up to 0:30                                                                                        | None                                               |
 
@@ -857,6 +865,7 @@ With `prefers-reduced-motion: reduce`:
 - answer text appears as it arrives, without typing itself out or fading;
   sources appear without rising;
 - the gear appears without spinning or pulsing;
+- moving to another page changes it at once, with no transition;
 - no gesture on hover, the cow doesn't follow the pointer, the valley
   doesn't answer it, and Nessie never rises.
 
@@ -940,9 +949,15 @@ centred and the background left exactly as it is: no blur, no fade.
   this site as contact. Julian provides the PDF; it never contains private
   data, because the repo is public.
 - **Where they sit:** from 1024px, the two secondary buttons sit under the
-  intro, aligned with its left edge. Below 1024px they sit at the end of the
-  page, above the footer, centred: under the intro they'd push the chat's
-  first suggestions below the fixed composer on a 390 × 844 phone.
+  intro, aligned with its left edge. Below 1024px they sit after the chat,
+  centred, before the inner pages' cards: under the intro they'd push the
+  chat's first suggestions below the fixed composer on a 390 × 844 phone.
+  They share a line from 360px, desktop included; narrower, they stack, both
+  full width. In the intro's 300px column the pills' padding is 16px, and
+  the row never wraps: a font that renders wider runs into the 48px gap
+  beside the column instead.
+- **Only these two:** the row holds the actions. The inner pages are places,
+  and have their own cards (section 18).
 - **"Contact"** opens a form: a bottom sheet on mobile, a dialog on desktop.
   Fields: name, email (so Julian can reply), message (up to 2,000
   characters). Protected by Cloudflare Turnstile and a hidden honeypot field,
@@ -1035,23 +1050,35 @@ language toggle goes to the same page in the other language.
   `border`, as on the chat's edge, with "Anything else? Ask me" ("¿Algo más?
   Pregúntame") beside it, linking to the chat the same way. It can be patted.
   With reduced motion it's still.
-- **The footer** carries the links to the inner pages on every page, above
-  Open-Meteo's credit.
+- **The footer** carries the links to the inner pages, above Open-Meteo's
+  credit. The home page's footer has only the credit, since its cards link
+  to them.
 
 ### Navigation
 
-- **On the home page,** the inner pages' text links ("Projects",
-  "Proyectos"; "How it's built", "Cómo está hecha") sit beside "Download
-  CV" and "Contact", in `accent`, as tall as the buttons, wherever the row
-  sits (section 14).
-- **In the footer,** the same links, on every page.
+- **On the home page,** the inner pages are two cards at the end of the
+  page, above the footer, side by side from 640px and stacked below it.
+  Each card is one link in `tint` with a 20px radius: the page's name in
+  Bricolage in `accent`, followed by an arrow, and one line on what's
+  inside. Their names: "Projects" ("Proyectos") and "How it's built" ("Cómo
+  está hecha").
+- **In the footer** of every inner page, links to both pages.
+- **Between pages,** a view transition (section 11) where the browser has
+  one; others just change page. The hero stays put and changes height, its
+  snapshot anchored to the bottom so the land doesn't squash; the card's
+  name becomes the page's title tab, and back again; the rest cross-fades.
+  The hero morphs only when it's on screen; from the bottom of the page it
+  cross-fades with the rest. The home page's portrait fades in or out in
+  place, in front of the hero, so the growing landscape never covers it.
+  Switching language, or a change to the URL's query or hash, has no
+  transition.
 
 ### Projects
 
-- **One card per project:** Form:at, then julianpalomo.dev. Each card has the
-  chat card's 2px `border` and 20px radius, and holds the name (Bricolage,
-  24px), when and how it was made, the "why" in Julian's own words, three to
-  five points, and its links.
+- **One card per project,** newest first: julianpalomo.dev, then Form:at.
+  Each card has the chat card's 2px `border` and 20px radius, and holds the
+  name (Bricolage, 24px), when and how it was made, the "why" in Julian's
+  own words, three to five points, and its links.
 - **Every point is taken from one of Julian's confirmed claims,** shortened
   and adding nothing: no figure, purpose or result the claim doesn't state.
   Julian approves the copy in both languages.

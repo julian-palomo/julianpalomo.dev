@@ -339,7 +339,8 @@ function useAtEnd(end: RefObject<HTMLElement | null>): boolean {
  * "← Ask the cow" on an inner page lands here with `#ask`: the composer takes
  * focus, then the hash goes, so a reload or going back doesn't focus it
  * again. Dropped through the router, like `?ref=` (useCleanUrl), so its own
- * location never brings it back.
+ * location never brings it back, and with no view transition of its own:
+ * one would skip the page change's, still running, and throw.
  */
 function useAskFromLink(input: RefObject<HTMLTextAreaElement | null>) {
   const hash = useLocation({ select: (location) => location.hash });
@@ -347,6 +348,6 @@ function useAskFromLink(input: RefObject<HTMLTextAreaElement | null>) {
   useEffect(() => {
     if (hash !== "ask") return;
     input.current?.focus();
-    void navigate({ to: ".", search: true, replace: true });
+    void navigate({ to: ".", search: true, replace: true, viewTransition: false });
   }, [hash, input, navigate]);
 }

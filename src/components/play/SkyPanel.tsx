@@ -203,7 +203,7 @@ function SeasonPicker({ value, onChange }: { value: Season; onChange: (season: S
           return (
             <label
               key={season}
-              className={`flex min-h-11 cursor-pointer items-center justify-center rounded-full px-2 text-[13px] font-semibold has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent ${look}`}
+              className={`flex min-h-11 items-center justify-center rounded-full px-2 text-[13px] font-semibold has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent ${look}`}
             >
               <input
                 type="radio"

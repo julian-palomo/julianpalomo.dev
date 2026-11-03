@@ -41,12 +41,13 @@ everyone else English, and the language toggle always wins. Under the intro,
 it, and "Contact" opens a form that emails me. The form is protected by
 Cloudflare Turnstile and a limit of 5 messages a day per visitor, and the
 message is never stored ([`docs/contact.md`](docs/contact.md)). A Projects
-page (`/projects`, `/es/projects`) shows Form:at and this site, each with why
+page (`/projects`, `/es/projects`) shows this site and Form:at, each with why
 I made it and what it does, taken from the facts I've confirmed. A How it's
 built page (`/how-its-built`, `/es/how-its-built`) explains, for people who
 don't program, how the assistant is kept from making up my experience and
-how I built the site with Claude Code. The home page and every footer link to
-both.
+how I built the site with Claude Code. The home page has a card for each,
+the inner pages' footers link to both, and moving between pages is a short
+view transition where the browser supports one.
 
 The weather comes from [Open-Meteo](https://open-meteo.com/) through our
 Worker, at `GET /api/weather`, so the visitor's IP never reaches Open-Meteo.
@@ -56,7 +57,9 @@ needs no key and no cron. The page fetches it after it loads and keeps a clear
 sky when it fails. The footer credits Open-Meteo, as its CC BY 4.0 terms ask.
 
 You ask a question and the answer streams in from Claude (Sonnet 5.5, through
-the Vercel AI SDK), which can only look up the facts I've confirmed. Each fact
+the Vercel AI SDK), which can only look up the facts I've confirmed. A
+suggested question asked again replays the model's stored answer at once,
+with no call and no cost. Each fact
 an answer cites shows as a numbered citation, and a "Check sources" link under
 the answer unfolds a chip for each one, such as "1 · CV · Cazoo · Redux →
 Zustand"; a citation only counts if the model looked that fact up while
@@ -95,8 +98,9 @@ What exists around it:
 - A data file with those facts (claims), a Zod schema that validates it, and a
   filter that hands out only the facts I've confirmed
 - The chat endpoint, with three read-only tools that hand the model those
-  confirmed facts and nothing else, the daily limits in D1, and a demo mode
-  for previews and tests
+  confirmed facts and nothing else, the daily limits in D1, a cache in D1
+  that answers a suggested question asked again at once, and a demo mode for
+  previews and tests
 - Vitest for unit tests, and Playwright for the home page, the chat (in demo
   mode) and a check that the browser bundle holds no API key or claims data
 - Evals: questions asked to the real assistant through the same code as the

@@ -1,5 +1,5 @@
 import { getRouteApi, useSearch } from "@tanstack/react-router";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import { type PageName, parseRef } from "../../lib/analytics/events";
 import { t } from "../../lib/i18n/t";
 import { useMarkPageRendered } from "../../lib/page-load";
@@ -14,6 +14,7 @@ import { SoundProvider } from "../sound/Sound";
 import { AskTheCow } from "./AskTheCow";
 import { CowPeek } from "./CowPeek";
 import { HeroControls } from "./HeroControls";
+import { PAGE_TITLE_TRANSITION, useHeroTransition } from "./transition-names";
 
 const rootRoute = getRouteApi("__root__");
 
@@ -46,7 +47,9 @@ export function InnerPage({ page, title, children }: Props) {
   return (
     <Analytics on={track} visit={visit}>
       <SoundProvider initialOn={sound}>
-        <Shell title={title}>{children}</Shell>
+        <Shell page={page} title={title}>
+          {children}
+        </Shell>
       </SoundProvider>
     </Analytics>
   );
@@ -58,7 +61,15 @@ export function InnerPage({ page, title, children }: Props) {
 const titleTab =
   "relative z-10 -mt-7 inline-block self-start rounded-[20px] bg-background px-4 py-1 font-display text-[34px] leading-tight font-extrabold tracking-[-0.02em] lg:-mt-8 lg:text-[40px]";
 
-function Shell({ title, children }: { title: string; children: ReactNode }) {
+// Each inner page's title tab, named like its card on the home page.
+const TITLE_TRANSITION: Record<Props["page"], string> = {
+  projects: PAGE_TITLE_TRANSITION.projects,
+  how_its_built: PAGE_TITLE_TRANSITION["how-its-built"],
+};
+
+function Shell({ page, title, children }: Omit<Props, "children"> & { children: ReactNode }) {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const heroTransition = useHeroTransition(heroRef);
   const locale = useLocale();
   const { sky } = useSearch({ strict: false });
   const override = useSceneOverride(typeof sky === "string" ? sky : undefined);
@@ -67,13 +78,16 @@ function Shell({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="pb-12">
       <header>
-        <div className="relative h-[140px] overflow-hidden bg-tint lg:h-[200px]">
+        <div
+          ref={heroRef}
+          className={`relative h-[140px] overflow-hidden bg-tint lg:h-[200px] ${heroTransition.hero}`}
+        >
           <HeroLandscape override={override} weather={weather} />
-          <HeroControls override={override} weather={weather} />
+          <HeroControls override={override} weather={weather} className={heroTransition.controls} />
         </div>
       </header>
       <main className="mx-auto flex max-w-[680px] flex-col px-4 sm:px-6 lg:px-0">
-        <h1 className={titleTab}>{title}</h1>
+        <h1 className={`${titleTab} ${TITLE_TRANSITION[page]}`}>{title}</h1>
         <AskTheCow className="mt-4 w-fit text-[14px] font-medium text-accent hover:underline">
           {t(locale, "askTheCow")}
         </AskTheCow>

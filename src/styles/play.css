@@ -48,6 +48,7 @@
 }
 .sky-range::-webkit-slider-thumb {
   appearance: none;
+  cursor: grab;
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -55,11 +56,20 @@
   border: 3px solid var(--color-foreground);
 }
 .sky-range::-moz-range-thumb {
+  cursor: grab;
   width: 18px;
   height: 18px;
   border-radius: 50%;
   background: var(--color-field);
   border: 3px solid var(--color-foreground);
+}
+/* The thumb is what's dragged: an open hand over it, closed while it's held.
+   The track keeps the arrow. */
+.sky-range:active::-webkit-slider-thumb {
+  cursor: grabbing;
+}
+.sky-range:active::-moz-range-thumb {
+  cursor: grabbing;
 }
 .sky-range.track-time {
   --track: linear-gradient(

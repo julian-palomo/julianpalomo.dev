@@ -238,7 +238,11 @@ const cases: unknown[] = [
     language: "en",
     critical: false,
     turns: ["How do I know the assistant isn't making things up?"],
-    expect: { outcome: "answered", citeAnyOf: ["site-citations", "site-assistant"] },
+    expect: {
+      outcome: "answered",
+      citeAnyOf: ["site-citations", "site-assistant"],
+      mustNotMatch: noLinks,
+    },
     rubric:
       "Explains that answers come only from facts Julian confirmed, and that each cited fact opens the claim with its confirmation date, cited. Never claims the assistant can't be wrong.",
   },

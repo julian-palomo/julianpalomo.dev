@@ -56,7 +56,7 @@ export function AssistantCow({ state, size, animated, onMoo, drawingClassName }:
       data-state={state}
       data-pat={patting ? "" : undefined}
       onClick={pat}
-      className="cow cow-live group relative inline-flex shrink-0 cursor-pointer rounded-[14px]"
+      className="cow cow-live group relative inline-flex shrink-0 rounded-[14px]"
     >
       <span aria-hidden="true" className={mooBubble}>
         {t(locale, "moo")}

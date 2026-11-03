@@ -18,7 +18,13 @@ flowchart TD
   validate -->|yes| limits{Today's limits<br/>in D1}
   limits -->|over| r429[429 visitor_limit<br/>or daily_budget]
   limits -->|under| count[Count the question]
-  count --> model[Claude Sonnet 5.5]
+  count --> suggestion{A suggested<br/>question?}
+  suggestion -->|no| model[Claude Sonnet 5.5]
+  suggestion -->|yes| cached{Stored answer<br/>for this version?}
+  cached -->|yes| replay[Replay the stored answer<br/>no model call, no cost]
+  cached -->|no, or the cache fails| model
+  model -->|a suggestion's clean answer| store[(Store it in<br/>cached_answers)]
+  replay --> render
   model <-->|read-only tools| tools[list_topics, get_claims,<br/>search_claims]
   demo <-->|get_claims| tools
   tools --> claims[(Confirmed claims)]
@@ -82,6 +88,35 @@ a SHA-256 hash of their IP, the UTC date and a secret salt, so no IP is stored
 and nobody can be followed from one day to the next. For an IPv6 address the
 hash takes its /64 instead, since one person can rotate through all of it. Over a limit, the endpoint
 answers `429` without calling the model.
+
+**The suggested questions.** A question whose text, trimmed, is exactly one of
+the page language's suggestions is answered from a cache
+([`src/lib/bot/answer-cache.ts`](../src/lib/bot/answer-cache.ts), the
+`cached_answers` table in
+[`migrations/0004_cached_answers.sql`](../migrations/0004_cached_answers.sql),
+[`docs/adr/2026-11-02-cached-suggestion-answers.md`](adr/2026-11-02-cached-suggestion-answers.md)).
+It comes after the limits, so it counts as one of the visitor's questions
+and is refused at a limit, but a replay adds $0 to the day's spend. The
+history is ignored for these. A stored answer for the current version is
+replayed at once, as the same stream a model answer makes: its sources, then
+its text. Without one, the model answers the suggestion alone, and the answer
+is stored only if it finished normally with every citation valid. The version
+is a SHA-256 of the model, its settings, the prompt, the language notes, the
+tools and the confirmed claims, so a change to any of them starts a fresh set.
+Reading or writing the cache fails open: an error is logged and the model
+answers. Demo mode and the evals never touch it.
+
+To read the stored answers, or delete one so the next visitor gets a fresh
+answer (Julian only; agents never run these against production):
+
+```bash
+pnpm wrangler d1 execute julianpalomo-dev --remote --command "SELECT locale, question, created_at, text FROM cached_answers ORDER BY created_at DESC"
+pnpm wrangler d1 execute julianpalomo-dev --remote --command "DELETE FROM cached_answers WHERE locale = 'en' AND question = 'What did Julian do at Cazoo?'"
+```
+
+`--command` takes plain SQL with no bound values, so a question with an
+apostrophe doubles it: `'Julian''s…'`. Rows from older versions are never
+read again.
 
 **The model and its tools.** Claude Sonnet 5.5, set in
 [`src/lib/bot/model.ts`](../src/lib/bot/model.ts), answers with the system

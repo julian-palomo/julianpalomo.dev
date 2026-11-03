@@ -7,7 +7,7 @@ paths:
 # Styling
 
 Tailwind CSS 4 through `@tailwindcss/vite`. `src/styles/app.css` imports
-Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `cow.css`, `entrance.css` and `contact.css`;
+Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `cow.css`, `entrance.css`, `contact.css` and `transitions.css`;
 `src/routes/__root.tsx` links `app.css`.
 
 ## Fonts live only in `src/styles/fonts.css`
@@ -64,9 +64,15 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - Every beat of both entrances (`DESIGN.md` section 11, "Entrance") as a CSS animation, keyed by the `data-entrance` the server renders on the page's root and timed from the first paint, inside `prefers-reduced-motion: no-preference`. Keyframes, prefixed `entrance-`, name only where they start, so each part ends as it is without the entrance: never give one a `to` that would override a part's own state, like a haar that's off. It targets `enter-*` classes (in the landscape, groups that wrap its parts, so a part's own animation is never replaced) and the chat's `edge-cow`, `chat-frame` and `chat-line`.
 - `src/components/entrance/Entrance.tsx` reads the time from the root's `entrance-clock` animation and removes `data-entrance` to end the entrance; the cow's flight runs with the Web Animations API in `ChatEdge.tsx`, over the CSS. `src/lib/entrance.ts` holds the same beats; change a time in both.
 
+## The change of page lives in `src/styles/transitions.css`
+
+- The view transition between pages (`DESIGN.md` sections 11 and 18): the timing of every `::view-transition-*` pseudo-element, the hero's snapshots anchored at the bottom, and `animation: none` under reduced motion. The router decides when a transition runs (`src/router.tsx`, `src/lib/page-transition.ts`).
+- The names live in `src/components/page/transition-names.ts`, as Tailwind classes. A name may be on one element per page only; the hero's is set only while it's on screen.
+
 ## Focus
 
 - `app.css` gives every `:focus-visible` element a 3px `accent` outline 2px away (`DESIGN.md` section 15). Never remove it without a replacement.
+- `app.css`'s `@layer base` also gives the hand cursor to every button that isn't disabled or `aria-disabled`, `[role="button"]`, `summary`, and a `label` that wraps a radio or checkbox (`DESIGN.md` section 4). Never add `cursor-pointer` to one element at a time: a pressable element that lacks the hand belongs in that rule. The sliders' thumbs get `grab` and `grabbing` in `play.css`.
 - A field shows focus on its box instead: the border turns `accent` with a 4px `ring-accent/22` glow, and the field keeps a transparent 2px outline, which is what Windows high-contrast mode paints when it drops the glow. `src/components/chat/Composer.tsx` is the exemplar.
 
 ## Shared pieces live in `src/components/ui/`
@@ -85,4 +91,4 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - Semantic elements first (`main`, `h1`, `nav`, `button`); the e2e test finds the page by role (`tests/e2e/home.spec.ts`).
 - The layout works at 375px wide (small phone) before anything else.
 
-If `tokens.css`, `fonts.css`, `cow.css`, `landscape.css`, `play.css`, `chat.css`, `entrance.css`, `contact.css`, `app.css`, `src/lib/scene/palette.ts` or `src/components/ui/` change shape, update this rule.
+If `tokens.css`, `fonts.css`, `cow.css`, `landscape.css`, `play.css`, `chat.css`, `entrance.css`, `contact.css`, `transitions.css`, `app.css`, `src/lib/scene/palette.ts` or `src/components/ui/` change shape, update this rule.

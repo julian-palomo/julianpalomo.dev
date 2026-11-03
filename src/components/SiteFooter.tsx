@@ -4,18 +4,27 @@ import { PageLinks } from "./page/PageLinks";
 
 /**
  * Every page's footer: the links to the inner pages (DESIGN.md section 18),
- * and the credit Open-Meteo's CC BY 4.0 terms ask for.
+ * and the credit Open-Meteo's CC BY 4.0 terms ask for. The home page has
+ * the inner pages as cards instead, so it leaves the links out.
  */
-export function SiteFooter({ className }: { className?: string }) {
+export function SiteFooter({
+  className,
+  pageLinks = true,
+}: {
+  className?: string;
+  pageLinks?: boolean;
+}) {
   const locale = useLocale();
   const credit = t(locale, "weatherCredit");
   return (
     <footer
       className={`flex flex-col gap-3 px-4 pt-10 text-[12.5px] text-muted sm:px-6 ${className ?? ""}`}
     >
-      <nav aria-label={t(locale, "pagesLabel")} className="flex flex-wrap gap-x-5 gap-y-2">
-        <PageLinks className="font-medium text-accent underline" />
-      </nav>
+      {pageLinks && (
+        <nav aria-label={t(locale, "pagesLabel")} className="flex flex-wrap gap-x-5 gap-y-2">
+          <PageLinks className="font-medium text-accent underline" />
+        </nav>
+      )}
       <p>
         {credit.before}{" "}
         <a href="https://open-meteo.com/" className="font-medium text-accent underline">

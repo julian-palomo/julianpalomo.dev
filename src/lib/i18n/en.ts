@@ -238,6 +238,9 @@ export const en = {
   pagesLabel: "Pages",
   projectsTitle: "Projects",
   howItsBuiltTitle: "How it's built",
+  // The inner pages' cards at the end of the home page.
+  projectsCard: "This site and Form:at, with screenshots and why I made each one.",
+  howItsBuiltCard: "How the cow is built so it can't make up my experience.",
   // The How it's built page (DESIGN.md section 18), for readers who don't
   // program. Every sentence is true to the code and the docs; the numbers
   // come from the code.
@@ -359,34 +362,6 @@ export const en = {
   // "why" lines are Julian's own words.
   projects: [
     {
-      id: "format",
-      name: "Form:at",
-      meta: "Personal project, built solo · May 2026 – present",
-      why: "I feel close to Form:at, a Glasgow music collective. To get away from the big platforms, many of them paid, like SoundCloud, YouTube and Mixcloud, we decided it would be great to have our own player. From there I kept adding features that other platforms charge for, and here they're free.",
-      points: [
-        {
-          claim: "format-offline",
-          text: "Saves 90-minute mixes (100–220MB each) to play with no signal: IndexedDB with a storage check first, a service worker that serves Range requests for seeking, and lock-screen playback.",
-        },
-        {
-          claim: "format-cloudflare",
-          text: "All on Cloudflare: TanStack Start on Pages/Workers, D1 for the catalogue and analytics, R2 for audio, presigned uploads straight to R2 for 220MB files, and Web Push from Workers.",
-        },
-        {
-          claim: "format-admin",
-          text: "An admin dashboard behind Cloudflare Access, with server-side JWT checks on every write.",
-        },
-        {
-          claim: "format-tooling",
-          text: "A pnpm and Turborepo monorepo with a shared design system (Storybook, Chromatic), Vitest and Playwright on Chromium and WebKit, and CI/CD on GitHub Actions; built with Claude Code.",
-        },
-      ],
-      links: [
-        { label: "formatglasgow.com", href: "https://formatglasgow.com/" },
-        { label: "Code on GitHub", href: "https://github.com/julian-palomo/form-at" },
-      ],
-    },
-    {
       id: "site",
       name: "julianpalomo.dev",
       meta: "Personal project · October 2026 – present",
@@ -415,6 +390,34 @@ export const en = {
       ],
       links: [
         { label: "Code on GitHub", href: "https://github.com/julian-palomo/julianpalomo.dev" },
+      ],
+    },
+    {
+      id: "format",
+      name: "Form:at",
+      meta: "Personal project, built solo · May 2026 – present",
+      why: "I feel close to Form:at, a Glasgow music collective. To get away from the big platforms, many of them paid, like SoundCloud, YouTube and Mixcloud, we decided it would be great to have our own player. From there I kept adding features that other platforms charge for, and here they're free.",
+      points: [
+        {
+          claim: "format-offline",
+          text: "Saves 90-minute mixes (100–220MB each) to play with no signal: IndexedDB with a storage check first, a service worker that serves Range requests for seeking, and lock-screen playback.",
+        },
+        {
+          claim: "format-cloudflare",
+          text: "All on Cloudflare: TanStack Start on Pages/Workers, D1 for the catalogue and analytics, R2 for audio, presigned uploads straight to R2 for 220MB files, and Web Push from Workers.",
+        },
+        {
+          claim: "format-admin",
+          text: "An admin dashboard behind Cloudflare Access, with server-side JWT checks on every write.",
+        },
+        {
+          claim: "format-tooling",
+          text: "A pnpm and Turborepo monorepo with a shared design system (Storybook, Chromatic), Vitest and Playwright on Chromium and WebKit, and CI/CD on GitHub Actions; built with Claude Code.",
+        },
+      ],
+      links: [
+        { label: "formatglasgow.com", href: "https://formatglasgow.com/" },
+        { label: "Code on GitHub", href: "https://github.com/julian-palomo/form-at" },
       ],
     },
   ],
