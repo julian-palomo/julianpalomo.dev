@@ -56,7 +56,9 @@ needs no key and no cron. The page fetches it after it loads and keeps a clear
 sky when it fails. The footer credits Open-Meteo, as its CC BY 4.0 terms ask.
 
 You ask a question and the answer streams in from Claude (Sonnet 5.5, through
-the Vercel AI SDK), which can only look up the facts I've confirmed. Each fact
+the Vercel AI SDK), which can only look up the facts I've confirmed. A
+suggested question asked again replays the model's stored answer at once,
+with no call and no cost. Each fact
 an answer cites shows as a numbered citation, and a "Check sources" link under
 the answer unfolds a chip for each one, such as "1 · CV · Cazoo · Redux →
 Zustand"; a citation only counts if the model looked that fact up while
