@@ -72,6 +72,7 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 ## Focus
 
 - `app.css` gives every `:focus-visible` element a 3px `accent` outline 2px away (`DESIGN.md` section 15). Never remove it without a replacement.
+- `app.css`'s `@layer base` also gives the hand cursor to every button that isn't disabled or `aria-disabled`, `[role="button"]`, `summary`, and a `label` that wraps a radio or checkbox (`DESIGN.md` section 4). Never add `cursor-pointer` to one element at a time: a pressable element that lacks the hand belongs in that rule. The sliders' thumbs get `grab` and `grabbing` in `play.css`.
 - A field shows focus on its box instead: the border turns `accent` with a 4px `ring-accent/22` glow, and the field keeps a transparent 2px outline, which is what Windows high-contrast mode paints when it drops the glow. `src/components/chat/Composer.tsx` is the exemplar.
 
 ## Shared pieces live in `src/components/ui/`

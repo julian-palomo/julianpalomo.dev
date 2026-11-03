@@ -89,7 +89,7 @@ export function HowItsBuilt() {
       <details className="group rounded-[20px] border-2 border-border">
         {/* `flex` hides the browser's own triangle, so the chevron shows it
             opens, and turns when it does. */}
-        <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-[18px] px-5 font-display text-lg font-bold">
+        <summary className="flex min-h-11 items-center justify-between gap-3 rounded-[18px] px-5 font-display text-lg font-bold">
           {copy.forDevelopers}
           <svg
             aria-hidden="true"
