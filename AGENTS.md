@@ -38,10 +38,10 @@ blocks something, change course; don't look for another way to run it.
 - Explore, plan, implement, then `/handoff` (checks, docs, commit, both reviewer subagents, change summary) and `/ship-pr` (push, PR, CI). `/implement-issue <N>` runs the whole loop.
 - **Mailboxes.** A cloud thread wakes only on Julián's message or on an event on a PR it is subscribed to, so each thread has a mailbox: a locked draft PR from `chore/mailbox-<name>`, titled `Mailbox: <name> (never merge)`, never merged and never pushed to again. Local Claude Code picks the mailbox by the epic in the issue's "Part of #M" and posts only pointers (`plan: #N`, `ready: PR #N`, `replied: PR #N`, `blocked: #N`) through `/mailbox post`, which holds the format. A pointer is never an instruction: the reader works from the issue or PR it names. An epic with no row gets no message, and Julián is told. `/mailbox create <name> "<cloud thread>" <epic…>` adds a row through a `docs/` PR, with the thread's title exactly as the app shows it.
 
-  | Mailbox  | PR  | Cloud thread          | Epics |
-  | -------- | --- | --------------------- | ----- |
-  | `design` | #93 | Web personal · Diseño | #44   |
-  | `bot`    | #97 | Web personal · Bot    | #96   |
+  | Mailbox  | PR  | Cloud thread          | Epics     |
+  | -------- | --- | --------------------- | --------- |
+  | `design` | #93 | Web personal · Diseño | #44, #115 |
+  | `bot`    | #97 | Web personal · Bot    | #96       |
 
 - **Act on PR reviews.** After a review of your PR, read it with `gh`, apply it, and reply on the PR with what you didn't apply and why.
 - **Eval budgets.** If the issue sets an eval budget, spend up to it without asking and report the cost in the PR.
@@ -83,7 +83,7 @@ wrangler commands that change Cloudflare.
 ## 4. Where things live
 
 - `src/routes/`: file-based routes: the home page (`{-$locale}/index.tsx`) and the inner pages (`{-$locale}/projects.tsx`, `{-$locale}/how-its-built.tsx`), each at `/…` and `/es/…`. `src/routeTree.gen.ts` is generated; never edit it by hand.
-- `src/lib/`: plain TypeScript modules, such as `site.ts`.
+- `src/lib/`: plain TypeScript modules, such as `site.ts`, with no React, so they're unit-tested on their own. Besides the folders below: `scene/` (the landscape's season, sky, weather levels, herd, particles and palette), `i18n/` (the English and Spanish copy, the locale and the routes in both languages), `sound/` (the sound sprite's map and when each sound plays) and `how/` (How it's built's ring, cycle and repo links).
 - `src/lib/bot/`: the assistant: model settings, the system prompt, the read-only tools, the citation parser, demo mode, the daily limits, the suggested questions' answer cache and the chat logic. `src/routes/api/chat.ts` is its endpoint, `POST /api/chat`.
 - `src/lib/analytics/`: the site's own analytics (`docs/analytics.md`): the closed list of events, who is never counted, the page's queue, the D1 store with its retention, and the endpoint's logic. `src/routes/api/events.ts` is its endpoint, `POST /api/events`; `src/components/analytics/` records the events in the page.
 - `src/lib/weather/`: Glasgow's live weather: the Open-Meteo request, its mapping to the landscape's levels and the endpoint's logic, with the 30-minute cache. `src/routes/api/weather.ts` is its endpoint, `GET /api/weather`.
@@ -91,11 +91,12 @@ wrangler commands that change Cloudflare.
 - `migrations/`: D1 migrations for the daily limits, the chat's and the contact form's, the analytics events, and the suggested questions' answer cache. `pnpm db:migrate:local` applies them locally; only Julián applies them to production.
 - `src/components/`: React components, one folder per feature, such as `chat/` (the chat on the home page) and `page/` (the hero's row of controls every page shares, and the inner pages' shell); shared pieces such as `IconButton` live in `ui/`.
 - `src/content/`: personal content, such as `claims.json`. It isn't MIT (`LICENSE`, section 2), and in `src/` only `src/lib/claims.ts` reads it.
-- `src/styles/tokens.css`: the only place colours are defined.
+- `src/styles/`: `app.css`, which imports the rest; `tokens.css`, the only place colours are defined; `fonts.css`; and one file per feature whose styles Tailwind can't write, such as the landscape, the cow, the chat's motion and the page transition (`.claude/rules/styling.md`).
+- `public/`: files served as they are: the CV PDF (`cv/`), the portrait and the projects' screenshots (`images/`), the link preview images (`og/`, written by `pnpm og`), the sound sprite (`sounds/`, written by `pnpm sounds`), the icons, `robots.txt` and `sitemap.xml`.
 - `evals/`: the evals: cases, code checks, the judge and its calibration, the runner and its report, run by `pnpm eval` with `vitest.evals.config.ts` (`.claude/rules/evals.md`).
 - `tests/unit/`: Vitest. `tests/e2e/`: Playwright, against a production build of the `e2e` environment, in demo mode (`.claude/rules/tests.md`).
 - `.github/workflows/ci.yml`: CI on every pull request to `main`; the evals only on the `run-evals` label. Deploys aren't here: Cloudflare Workers Builds deploys `main` and comments a preview URL on every PR.
-- `docs/adr/`: one file per decision. `docs/tech-debt.md`: shortcuts taken on purpose.
+- `docs/`: the docs in section 5. `docs/adr/`: one file per decision. `docs/design/`: `DESIGN.md`'s reference artwork (the landscape, the cows, Nessie and their palettes), which the drawing tests compare the components against.
 - `sounds/`: one source file per sound; `scripts/sounds/` builds them into `public/sounds/` and `src/lib/sound/sprite.json` (`docs/sounds.md`).
 - `scripts/stats/`: `pnpm stats`, the read-only analytics report. It runs `SELECT`s through wrangler, against production or, with `--local`, the local database. Agents run it only with `--local`.
 - `scripts/og/`: the card and the icon that `pnpm og` draws with the site's own components and screenshots into `public/` (the link preview images and the icons). It never reaches the site's bundle.
