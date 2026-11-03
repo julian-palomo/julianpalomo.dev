@@ -164,7 +164,8 @@ export function AssistantMessage({ message, typed }: Props) {
           </div>
         </>
       )}
-      <div id={claimId}>
+      {/* Always there, so aria-controls names an element; empty, it takes no gap under the link. */}
+      <div id={claimId} className="empty:hidden">
         {opened && <Claim key={opened.number} number={opened.number} source={opened.source} />}
       </div>
     </article>
