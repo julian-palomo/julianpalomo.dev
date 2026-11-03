@@ -60,6 +60,18 @@ test("the bubble shows on a first visit only", async ({ page }) => {
   await expect(bubble).toHaveCount(0);
 });
 
+for (const width of [320, 390]) {
+  test(`on an inner page at ${width}px the bubble stays clear of the title`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto("/how-its-built");
+    const bubble = page.getByText("Psst… you can change the weather");
+    await expect(bubble).toBeVisible({ timeout: GEAR_WAIT });
+    const hint = await bubble.boundingBox();
+    const title = await page.getByRole("heading", { level: 1 }).boundingBox();
+    expect(hint && title && hint.y + hint.height).toBeLessThanOrEqual(title?.y ?? 0);
+  });
+}
+
 test("opening and closing the panel leaves the live sky, the live chip and the theme cookie", async ({
   page,
   context,

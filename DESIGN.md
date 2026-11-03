@@ -542,7 +542,9 @@ Comeau's blog. It's a toy, and it's honest about being one.
   entrance ends (section 11; 2s after the page is ready with reduced motion) and pulses three
   times so it's noticed. On a first visit, a small bubble under it, its tail
   pointing up at the gear, says "Psst… you can change the weather" and goes
-  away after 5s or on any tap; the site remembers it was shown.
+  away after 5s or on any tap; the site remembers it was shown. Below 1024px
+  it keeps to one line, so it ends above the inner pages' title tab; from
+  1024px it wraps at 220px.
 - **The panel** is a bottom sheet on mobile and a popover under the gear on
   desktop (about 380px wide), with a "Close" button in its header. Title
   "Play with the sky", subtitle "Only on your screen, for as long as you
