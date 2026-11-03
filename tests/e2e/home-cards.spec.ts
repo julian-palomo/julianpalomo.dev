@@ -4,7 +4,7 @@ import { es } from "../../src/lib/i18n/es";
 import { site } from "../../src/lib/site";
 
 // The home page's actions and places (DESIGN.md sections 14 and 18): a row
-// with the two actions, the inner pages as cards, and a view transition
+// with the three actions, the inner pages as cards, and a view transition
 // between pages (section 11).
 
 test.beforeEach(async ({ page }) => {

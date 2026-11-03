@@ -81,6 +81,7 @@ are their values and the new ones.
 | `glass`                                                | `rgb(246 248 243 / 86%)`                   | `rgb(14 21 17 / 80%)` | Chips and buttons that sit on the landscape, with a 6px blur |
 | `danger`                                               | `#B7191C`                                  | `#FD7468`             | Only for a broken field in the contact form                  |
 | `live`                                                 | `#E5484D`                                  | `#E5484D`             | The small "live" dot in "Back to live Glasgow"               |
+| `github-mark`                                          | `#000000`                                  | `#FFFFFF`             | GitHub's mark on its pill (section 14)                       |
 | `track-night`, `track-dawn`, `track-day`, `track-dusk` | `#0E1A24`, `#F5C49A`, `#CFE4EC`, `#A9B7CF` | The same              | The time-of-day slider's track, night to night (section 8)   |
 | `track-clear`, `track-overcast`                        | `#CFE4EC`, `#8A969C`                       | The same              | The clouds slider's track                                    |
 | `track-dry`, `track-wet`                               | `#E6EEF0`, `#2E4A6B`                       | The same              | The rain slider's track                                      |
