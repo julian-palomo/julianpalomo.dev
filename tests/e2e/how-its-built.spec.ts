@@ -116,7 +116,8 @@ test.describe("the ring", () => {
       test(`${path}: no two parts overlap at ${width}px`, async ({ page }) => {
         await page.setViewportSize({ width, height: 900 });
         await page.goto(path);
-        await expectApart(ring(page, messages).locator("button[aria-pressed]"));
+        // The stops, the centre, the shortcut and Pause; the cards' disclosures have aria-expanded.
+        await expectApart(ring(page, messages).locator("button:not([aria-expanded])"));
         await expectApart(cycle(page, messages).locator("[data-actor]"));
       });
     }

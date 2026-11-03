@@ -217,10 +217,12 @@ export function Ring({ headingClass }: { headingClass: string }) {
           </button>
         </div>
 
+        {/* Below lg, pulled up over the square drawing's empty bottom, so the
+            control sits as close to the ring as the cycle's buttons do to it. */}
         <button
           type="button"
           onClick={() => setPlaying((current) => !current)}
-          className="inline-flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-border bg-field px-4 text-sm font-semibold hover:border-accent motion-safe:active:scale-[0.97]"
+          className="-mt-7 inline-flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-border bg-field px-4 text-sm font-semibold hover:border-accent motion-safe:active:scale-[0.97] lg:mt-0"
         >
           {playing ? <PauseIcon /> : <PlayIcon />}
           {playLabel}
