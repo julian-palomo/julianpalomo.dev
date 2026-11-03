@@ -210,6 +210,9 @@ test("the chat's warm error opens the form with “write to me”", async ({ pag
   await page.route("**/api/chat", (route) =>
     route.fulfill({ status: 429, json: chatErrorBody("visitor_limit") }),
   );
+  // The entrance ends only once the page's JavaScript runs: a question sent
+  // before hydration would submit nothing, and the alert would never come.
+  await expect(page.locator("[data-entrance]")).toHaveCount(0);
   await page.getByLabel("Your question").fill("One more?");
   await page.getByRole("button", { name: "Send" }).click();
   await page.getByRole("alert").getByRole("button", { name: "write to me" }).click();
