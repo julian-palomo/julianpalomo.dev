@@ -103,7 +103,7 @@ test.describe("with the sprite loaded", () => {
     await expect(unmute(page)).toBeVisible();
     await ask(page, "What has Julian worked on?");
     await expect(page.getByRole("article", { name: "Answer" })).toContainText(DEMO_ANSWER_INTRO);
-    await expect(page.getByRole("button", { name: "Copy" })).toBeVisible();
+    await expect(page.getByTestId("chat-announcer")).toContainText(DEMO_ANSWER_INTRO);
     expect(await soundsStarted(page)).toBe(0);
   });
 
@@ -113,7 +113,7 @@ test.describe("with the sprite loaded", () => {
     await ask(page, "What has Julian worked on?");
     await typing;
     await expect.poll(async () => (await counted(page)).loopsPlaying).toBe(1);
-    await expect(page.getByRole("button", { name: "Copy" })).toBeVisible();
+    await expect(page.getByTestId("chat-announcer")).toContainText(DEMO_ANSWER_INTRO);
     await expect.poll(async () => (await counted(page)).loopsPlaying).toBe(0);
     expect((await counted(page)).loopsStarted).toBeGreaterThan(0);
   });
@@ -133,7 +133,7 @@ test.describe("with reduced motion", () => {
     await sprite;
     await page.getByLabel("Your question").click();
     await ask(page, "What has Julian worked on?");
-    await expect(page.getByRole("button", { name: "Copy" })).toBeVisible();
+    await expect(page.getByTestId("chat-announcer")).toContainText(DEMO_ANSWER_INTRO);
     await expect.poll(() => soundsStarted(page)).toBeGreaterThan(0);
     expect(typing).toEqual([]);
     expect((await counted(page)).loopsStarted).toBe(0);

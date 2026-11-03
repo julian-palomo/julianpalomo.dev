@@ -53,11 +53,6 @@ export const en = {
   ],
   conversationLabel: "Conversation",
   keepAsking: "Keep asking",
-  copy: "Copy",
-  copied: "Copied",
-  couldntCopy: "Couldn't copy",
-  // The heading of the sources in a copied answer.
-  sourcesHeading: "Sources:",
   citationLabel: (number: number, label: string) => `Source ${number}: ${label}`,
   confirmedBy: (date: string, from: string) => `Confirmed by Julian on ${date} · ${from}`,
   fromCv: "from his CV",

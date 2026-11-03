@@ -66,7 +66,6 @@ export const eventSchema = z.discriminatedUnion("name", [
     outcome: z.enum(OUTCOMES),
   }),
   z.strictObject({ name: z.literal("sources_opened") }),
-  z.strictObject({ name: z.literal("copied") }),
   toySchema,
   z.strictObject({ name: z.literal("cv_download") }),
   z.strictObject({ name: z.literal("contact_sent") }),

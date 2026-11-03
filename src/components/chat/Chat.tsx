@@ -213,7 +213,7 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
   if (reveal.revealing !== wasRevealing) {
     setWasRevealing(reveal.revealing);
     if (!reveal.revealing) {
-      setAnnouncement(answerAsText(latestText, [], t(locale, "sourceNames"), ""));
+      setAnnouncement(answerAsText(latestText));
     }
   }
 

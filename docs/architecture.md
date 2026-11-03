@@ -162,8 +162,8 @@ Either one opens the claim under the answer, with its text and when Julian
 confirmed it.
 The text doesn't show at the stream's pace: what has arrived waits in a buffer
 in the browser and types itself out word by word
-([`reveal.ts`](../src/components/chat/reveal.ts)), and the sources link, Copy
-and the screen-reader announcement wait for the last word. The server and the model
+([`reveal.ts`](../src/components/chat/reveal.ts)), and the sources link and
+the screen-reader announcement wait for the last word. The server and the model
 know nothing of it.
 
 **The analytics.** The chat records each question and how its answer ended
