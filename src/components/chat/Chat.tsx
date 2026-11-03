@@ -44,8 +44,7 @@ const transport = new DefaultChatTransport<ChatUIMessage>({
   }),
 });
 
-/** The chat with the assistant. */
-/** `onStarted` runs when the visitor sends their first question. */
+/** The chat with the assistant. `onStarted` runs when the visitor sends their first question. */
 export function Chat({ onStarted }: { onStarted?: () => void }) {
   const locale = useLocale();
   const entrance = useEntrance();
@@ -145,9 +144,6 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
     longWait: wait?.longWait,
   });
 
-  // Sending swaps Send for Stop, a suggestion removes its own button, and
-  // stopping removes Stop. Each would leave keyboard focus on the page, so it
-  // goes back to the question box instead.
   // The question a suggestion chip sent, and where the chip was: its bubble
   // flies in from there.
   const [flight, setFlight] = useState<{ text: string; from: DOMRect } | null>(null);
@@ -159,7 +155,9 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
   const awaiting = useRef<number | null>(null);
 
   // A suggestion chip clicks instead of the send pop: both at once would be
-  // within 150ms, which plays only the first.
+  // within 150ms, which plays only the first. Sending swaps Send for Stop and
+  // a suggestion removes its own button, so focus goes back to the question
+  // box rather than staying on the page; stopping does the same.
   function send(text: string, from?: DOMRect) {
     play(from ? "suggestion" : "send");
     const nth = messages.filter((message) => message.role === "user").length + 1;

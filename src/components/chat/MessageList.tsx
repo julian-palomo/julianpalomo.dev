@@ -12,14 +12,12 @@ type Props = {
   typing: { id: string | undefined; shown: number } | undefined;
   /** The question a suggestion chip sent, and where the chip was. */
   flight: { text: string; from: DOMRect } | null;
-  /** Called once when the visitor's newest bubble appears, so a sound can play with it. */
-  onBubbleShown?: () => void;
   /** The newest answer's wait, before its first word; before the answer arrives, a placeholder shows it. */
   wait: Wait | undefined;
 };
 
 /** The conversation in order. The answers have no cow: the one on the chat's edge is theirs. */
-export function MessageList({ messages, typing, flight, onBubbleShown, wait }: Props) {
+export function MessageList({ messages, typing, flight, wait }: Props) {
   const locale = useLocale();
   const newestQuestion = messages.filter((message) => message.role === "user").at(-1)?.id;
   const last = messages.at(-1);
@@ -31,11 +29,7 @@ export function MessageList({ messages, typing, flight, onBubbleShown, wait }: P
           const newest = message.id === newestQuestion;
           return (
             <li key={message.id}>
-              <Question
-                text={text}
-                from={newest && flight?.text === text ? flight.from : null}
-                onShown={newest ? onBubbleShown : undefined}
-              />
+              <Question text={text} from={newest && flight?.text === text ? flight.from : null} />
             </li>
           );
         }
@@ -70,21 +64,12 @@ const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)"
  * its place, then animated from the chip's position with `transform` only).
  * With reduced motion it simply appears.
  */
-function Question({
-  text,
-  from,
-  onShown,
-}: {
-  text: string;
-  from: DOMRect | null;
-  onShown: (() => void) | undefined;
-}) {
+function Question({ text, from }: { text: string; from: DOMRect | null }) {
   const ref = useRef<HTMLParagraphElement>(null);
 
   // Runs once, when the bubble mounts: measure, then animate from the chip.
   // biome-ignore lint/correctness/useExhaustiveDependencies: a bubble flies in only when it first appears.
   useLayoutEffect(() => {
-    onShown?.();
     const bubble = ref.current;
     if (!bubble || !from || reducedMotion()) return;
     const to = bubble.getBoundingClientRect();
