@@ -110,6 +110,8 @@ export function Ring({ headingClass }: { headingClass: string }) {
     shortcut: { ...ring.shortcut, plain: ring.shortcut.plain(MAX_VISITOR_MESSAGES_PER_DAY) },
   };
   const fetching = state.selected === "claude";
+  // While Claude reads them, the facts' outline turns accent, with or without the glow.
+  const factsFetched = fetching ? "border-accent" : "";
   const playLabel = playing ? ring.pause : ring.play;
 
   return (
@@ -196,7 +198,7 @@ export function Ring({ headingClass }: { headingClass: string }) {
             aria-controls={cardId}
             onClick={() => choose("facts")}
             style={at({ x: CENTRE, y: CENTRE })}
-            className={`absolute flex w-[min(5.5rem,27cqw)] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-0.5 rounded-[14px] border-dashed px-2 py-1.5 text-center text-[clamp(11px,3.6cqw,12px)] ${chip} ${look(state.selected === "facts")} ${fetching && state.selected !== "facts" ? "border-accent" : ""}`}
+            className={`absolute flex w-[min(5.5rem,27cqw)] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-0.5 rounded-[14px] border-dashed px-2 py-1.5 text-center text-[clamp(11px,3.6cqw,12px)] ${chip} ${look(state.selected === "facts")} ${factsFetched}`}
           >
             {fetching && <span aria-hidden="true" key={state.rotation} className="how-glow" />}
             <BookIcon />

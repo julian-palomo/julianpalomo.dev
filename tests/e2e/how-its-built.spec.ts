@@ -186,7 +186,7 @@ test("every document link points at a file in the repo, and none of the old ones
     const file = doc.split("#")[0] ?? "";
     expect(existsSync(file), file).toBe(true);
   }
-  // The files the closed "For developers" box linked to; an anchor in the same file covers one.
+  // Files the page must keep linking to, so the technical side never loses one; a link to an anchor in the same file covers it.
   const files = new Set(docs.map((doc) => doc.split("#")[0]));
   for (const old of [
     "docs/architecture.md",
