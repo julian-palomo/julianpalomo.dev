@@ -401,6 +401,16 @@ export const en = {
     newTab: ", on GitHub, opens in a new tab",
   },
   askTheCow: "← Ask the cow",
+  // The page an unknown URL gets, and the one an error while rendering gets.
+  notFound: {
+    title: "Page not found",
+    line: "I've looked everywhere: this page isn't in the glen.",
+  },
+  pageError: {
+    title: "Something went wrong",
+    line: "It's on my side, not yours. Try again in a moment.",
+    tryAgain: "Try again",
+  },
   anythingElse: "Anything else? Ask me",
   // What each screenshot on the Projects page shows (src/components/projects/shots.ts).
   projectShots: {

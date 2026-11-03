@@ -362,6 +362,15 @@ export const es: Messages = {
     newTab: ", en GitHub, se abre en una pestaña nueva",
   },
   askTheCow: "← Pregunta a la vaca",
+  notFound: {
+    title: "Página no encontrada",
+    line: "He buscado por todas partes: esta página no está en el valle.",
+  },
+  pageError: {
+    title: "Algo ha salido mal",
+    line: "Es cosa mía, no tuya. Prueba otra vez en un momento.",
+    tryAgain: "Probar otra vez",
+  },
   anythingElse: "¿Algo más? Pregúntame",
   projectShots: {
     "format-player":

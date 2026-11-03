@@ -1063,6 +1063,18 @@ language toggle goes to the same page in the other language.
   Switching language, or a change to the URL's query or hash, has no
   transition.
 
+### Not found, and errors
+
+- **An unknown URL** shows a not-found page with HTTP status 404, in the
+  language of its path (`/es/…` in Spanish, the rest in English), inside the
+  inner pages' shell: the hero, its row of controls, the title tab and the
+  way back. One line under the title, and the cow at the end of the page
+  reading its notebook, as if it had looked for the page.
+- **An error while rendering a page** shows an error page the same way, with
+  a "Try again" ("Probar otra vez") button and the cow at the end sorry. The
+  error itself is never shown.
+- Neither records a visit (`docs/analytics.md`).
+
 ### Projects
 
 - **One card per project,** newest first: julianpalomo.dev, then Form:at.

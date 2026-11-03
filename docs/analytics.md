@@ -27,7 +27,7 @@ else gets a `400` and isn't stored.
 | `cv_download`, `contact_sent` | none                                                                                                                                                       | CV downloads and messages: a press on "Download CV", and a message that went (never one that failed) |
 | `outbound`                    | `to` (`linkedin` or `github`)                                                                                                                              | Where people go next, from the links in the chat's error notice                                      |
 - **`ref`** comes from `?ref=` in the link. The page reads it once, then removes it from the address bar through the router, so a copied link doesn't carry it on.
-- **`page`** is the page that was loaded. A visit sent without it, from a tab opened before it existed, counts as `home`.
+- **`page`** is the page that was loaded. A visit sent without it, from a tab opened before it existed, counts as `home`. The not-found and error pages record no visit, and no other event.
 - **`returning`** means the visitor came back **within 7 days of their last visit**. It's the `visited` cookie that picks the entrance: it lasts a week and is refreshed on every visit, and the server reads it before refreshing it. Someone who comes back after two weeks counts as new.
 - **`moo`** is a press on the cow on the chat's edge, not the moo that ends the entrance.
 - **The season and the snow and haar switches** in the sky panel aren't recorded.
