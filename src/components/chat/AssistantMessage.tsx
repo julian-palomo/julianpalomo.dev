@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { type ReactNode, useEffect, useId, useState } from "react";
 import type { ChatUIMessage } from "../../lib/bot/chat-message";
 import { chipLabel, type Source } from "../../lib/bot/citations";
 import { t } from "../../lib/i18n/t";
@@ -18,8 +18,9 @@ import {
   type SourcesEvent,
   sourcesLinkLabel,
   splitIntoChunks,
-  toolStatus,
+  type Wait,
 } from "./chat-view";
+import { WaitStatus } from "./WaitStatus";
 
 // On hover over "Check sources", the answer's citation numbers hop, one after another.
 const onSourcesHover = boopOnHover({
@@ -38,6 +39,8 @@ type Props = {
   message: ChatUIMessage;
   /** While the answer types itself out, how much of its text is on screen; undefined once it's done. */
   typed: number | undefined;
+  /** Before its first word, and for the fade as that word comes: what it's doing. */
+  wait: Wait | undefined;
 };
 
 /**
@@ -48,7 +51,7 @@ type Props = {
  * claim, exactly as Julian confirmed it, under the answer; a number also
  * shows the chips.
  */
-export function AssistantMessage({ message, typed }: Props) {
+export function AssistantMessage({ message, typed, wait }: Props) {
   const locale = useLocale();
   const claimId = useId();
   const listId = useId();
@@ -61,7 +64,6 @@ export function AssistantMessage({ message, typed }: Props) {
     sources,
     streaming,
   );
-  const status = streaming ? toolStatus(message.parts, locale) : undefined;
   const isDemo = message.metadata?.demo === true;
 
   // Where the text had got to on each render while it typed itself out. Each
@@ -94,16 +96,17 @@ export function AssistantMessage({ message, typed }: Props) {
   };
 
   return (
-    <article
-      className="flex w-fit max-w-[92%] min-w-0 flex-col gap-2 rounded-[20px] rounded-bl-[6px] bg-tint px-4 py-3"
-      aria-label={t(locale, "answerLabel")}
-    >
+    <article className={answerBubble} aria-label={t(locale, "answerLabel")}>
       {isDemo && (
         <p className="w-fit rounded-full border border-border px-2 text-xs font-semibold text-muted">
           {t(locale, "demo")}
         </p>
       )}
-      {status && <StatusPill text={status} />}
+      {wait && (
+        <AnswerWait wait={wait}>
+          <WaitStatus parts={message.parts} sources={sources} longWait={wait.longWait} />
+        </AnswerWait>
+      )}
       <p className="whitespace-pre-wrap break-words" data-testid="answer-text">
         {chunks.map((chunk) =>
           chunk.type === "text" ? (
@@ -192,17 +195,21 @@ function Claim({ number, source }: { number: number; source: Source }) {
   );
 }
 
-/** What the answer is doing, in words, with three bouncing dots (still with reduced motion). */
-function StatusPill({ text }: { text: string }) {
+/** An answer's bubble, and the placeholder that stands in for it until the answer arrives. */
+export const answerBubble =
+  "relative flex w-fit max-w-[92%] min-w-0 flex-col gap-2 rounded-[20px] rounded-bl-[6px] bg-tint px-4 py-3";
+
+/**
+ * Holds the wait's pill and chips. As the first word comes they leave the
+ * flow, over the top of the bubble, and fade out on top of the text, so the
+ * text starts in its final place. The same element either way, so nothing in
+ * it remounts or rises again.
+ */
+export function AnswerWait({ wait, children }: { wait: Wait; children: ReactNode }) {
   return (
-    <p className="flex w-fit items-center gap-2 rounded-full bg-background px-3 py-1 text-[12.5px] font-medium text-muted">
-      {text}
-      <span aria-hidden="true" className="status-dots">
-        <span />
-        <span />
-        <span />
-      </span>
-    </p>
+    <div className={wait.leaving ? "wait-leave pointer-events-none absolute inset-x-4 top-3" : ""}>
+      {children}
+    </div>
   );
 }
 

@@ -77,6 +77,14 @@ export const en = {
   demo: "Demo",
   lookingUpClaims: "Looking up claims…",
   checkingTopics: "Checking what topics exist…",
+  // The pill's line from sending to the first word (DESIGN.md section 10).
+  readingQuestion: "Reading your question…",
+  readingFacts: (count: number) =>
+    count === 1 ? "Reading 1 confirmed fact…" : `Reading ${count} confirmed facts…`,
+  writingAnswer: "Writing the answer…",
+  chewingItOver: "Chewing it over properly…",
+  waitChipsLabel: "Reading",
+  moreFacts: (count: number) => `+${count} more`,
 
   questionLabel: "Your question",
   send: "Send",

@@ -2,8 +2,9 @@ import { useLayoutEffect, useRef } from "react";
 import type { ChatUIMessage } from "../../lib/bot/chat-message";
 import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
-import { AssistantMessage } from "./AssistantMessage";
-import { messageText } from "./chat-view";
+import { AnswerWait, AssistantMessage, answerBubble } from "./AssistantMessage";
+import { messageText, type Wait } from "./chat-view";
+import { WaitStatus } from "./WaitStatus";
 
 type Props = {
   messages: ChatUIMessage[];
@@ -13,12 +14,15 @@ type Props = {
   flight: { text: string; from: DOMRect } | null;
   /** Called once when the visitor's newest bubble appears, so a sound can play with it. */
   onBubbleShown?: () => void;
+  /** The newest answer's wait, before its first word; before the answer arrives, a placeholder shows it. */
+  wait: Wait | undefined;
 };
 
 /** The conversation in order. The answers have no cow: the one on the chat's edge is theirs. */
-export function MessageList({ messages, typing, flight, onBubbleShown }: Props) {
+export function MessageList({ messages, typing, flight, onBubbleShown, wait }: Props) {
   const locale = useLocale();
   const newestQuestion = messages.filter((message) => message.role === "user").at(-1)?.id;
+  const last = messages.at(-1);
   return (
     <ol aria-label={t(locale, "conversationLabel")} className="flex flex-col gap-6">
       {messages.map((message) => {
@@ -40,10 +44,20 @@ export function MessageList({ messages, typing, flight, onBubbleShown }: Props) 
             <AssistantMessage
               message={message}
               typed={typing?.id === message.id ? typing.shown : undefined}
+              wait={message === last ? wait : undefined}
             />
           </li>
         );
       })}
+      {wait && last?.role === "user" && (
+        <li>
+          <article className={answerBubble} aria-label={t(locale, "answerLabel")}>
+            <AnswerWait wait={wait}>
+              <WaitStatus parts={[]} sources={[]} longWait={wait.longWait} />
+            </AnswerWait>
+          </article>
+        </li>
+      )}
     </ol>
   );
 }

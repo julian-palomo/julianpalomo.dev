@@ -64,7 +64,7 @@ test("focus moves to the question box after picking a suggestion", async ({ page
 });
 
 test("a conversation keeps getting answers past the server's message cap", async ({ page }) => {
-  // Each demo answer takes about 2s, so this many need more than the default 30s.
+  // Each demo answer takes about 6.5s, so this many need more than the default 30s.
   test.setTimeout(90_000);
   // One question more than fits in the cap when the whole conversation is sent.
   const questions = MAX_MESSAGES / 2 + 1;
