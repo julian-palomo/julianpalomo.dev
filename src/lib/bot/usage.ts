@@ -6,6 +6,7 @@
  * Two requests can read the same count and both pass, so a visitor or the
  * budget can go over by one answer. That is accepted rather than locked.
  */
+import { type CachedAnswer, cachedSourcesSchema } from "./cached-answer";
 import type { TokenUsage } from "./limits";
 
 /**
@@ -109,6 +110,19 @@ export type UsageStore = {
   ): Promise<{ visitorMessages: number; spentMicroUsd: number }>;
   countMessage(day: string, visitor: string): Promise<void>;
   addUsage(day: string, usage: TokenUsage, costMicroUsd: number): Promise<void>;
+  /** A suggestion's stored answer for this version and page language, if there is one. */
+  cachedAnswer(
+    version: string,
+    locale: string,
+    question: string,
+  ): Promise<CachedAnswer | undefined>;
+  /** Stores a suggestion's answer. The first one stored for a key stays; a later write is ignored. */
+  cacheAnswer(
+    version: string,
+    locale: string,
+    question: string,
+    answer: CachedAnswer,
+  ): Promise<void>;
 };
 
 export function d1UsageStore(db: D1Like): UsageStore {
@@ -154,6 +168,34 @@ export function d1UsageStore(db: D1Like): UsageStore {
              cost_micro_usd = cost_micro_usd + excluded.cost_micro_usd`,
         )
         .bind(day, usage.input, usage.output, usage.cacheRead, usage.cacheWrite, costMicroUsd)
+        .run();
+    },
+
+    async cachedAnswer(version, locale, question) {
+      const row = await db
+        .prepare(
+          "SELECT text, sources FROM cached_answers WHERE version = ? AND locale = ? AND question = ?",
+        )
+        .bind(version, locale, question)
+        .first<{ text: unknown; sources: unknown }>();
+      if (row === null || typeof row.text !== "string" || typeof row.sources !== "string") {
+        return undefined;
+      }
+      // A row that doesn't parse reads as no row: the model answers instead.
+      const sources = cachedSourcesSchema.safeParse(JSON.parse(row.sources));
+      return sources.success ? { text: row.text, sources: sources.data } : undefined;
+    },
+
+    async cacheAnswer(version, locale, question, answer) {
+      // Two visitors asking a new suggestion at once both get the model's
+      // answer; the first row written wins and the second write does nothing.
+      await db
+        .prepare(
+          `INSERT INTO cached_answers (version, locale, question, text, sources, created_at)
+           VALUES (?, ?, ?, ?, ?, ?)
+           ON CONFLICT (version, locale, question) DO NOTHING`,
+        )
+        .bind(version, locale, question, answer.text, JSON.stringify(answer.sources), Date.now())
         .run();
     },
   };

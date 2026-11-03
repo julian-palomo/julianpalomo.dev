@@ -17,7 +17,10 @@ import {
 } from "ai";
 import { z } from "zod";
 import { type Claim, confirmedClaims } from "../claims";
+import type { Locale } from "../i18n/locale";
 import { localeSchema } from "../i18n/locale";
+import { answerVersion, cacheable, suggestionFor } from "./answer-cache";
+import type { CachedAnswer } from "./cached-answer";
 import { type ChatErrorCode, chatErrorBody, STREAM_ERROR_TEXT } from "./chat-error";
 import type { ChatUIMessage } from "./chat-message";
 import { parseCitations, type Source } from "./citations";
@@ -181,6 +184,38 @@ function errorResponse(status: 400 | 429 | 500 | 503, error: ChatErrorCode): Res
   return Response.json(chatErrorBody(error), { status });
 }
 
+/** A visitor message's text, its text parts joined. */
+function textOf(message: { parts: { type: string; text?: unknown }[] }): string {
+  return message.parts
+    .flatMap((part) => (part.type === "text" && typeof part.text === "string" ? [part.text] : []))
+    .join("");
+}
+
+/**
+ * A stored suggestion answer, sent as the same UI message stream a model
+ * answer makes: its sources, then its text, whole. The client's reveal paces
+ * it as usual, and its request ends as for any answer, so the chat's
+ * analytics events fire alike.
+ */
+function replayResponse(answer: CachedAnswer): Response {
+  const stream = createUIMessageStream<ChatUIMessage>({
+    execute: ({ writer }) => {
+      writer.write({ type: "start" });
+      if (answer.sources.length > 0) {
+        writer.write({ type: "data-sources", id: "sources", data: { sources: answer.sources } });
+      }
+      writer.write({ type: "text-start", id: "cached" });
+      writer.write({ type: "text-delta", id: "cached", delta: answer.text });
+      writer.write({ type: "text-end", id: "cached" });
+      writer.write({ type: "finish", finishReason: "stop" });
+    },
+  });
+  return createUIMessageStreamResponse({ stream });
+}
+
+/** Where a suggestion's answer is read from and stored, when the cache applies to this request. */
+type CacheKey = { store: UsageStore; version: string; locale: Locale; question: string };
+
 /** Answers a POST to /api/chat. `env` is the Worker's environment, unparsed. */
 export async function handleChat(
   request: Request,
@@ -210,19 +245,48 @@ export async function handleChat(
     // The limits, checked before the model is created. Demo answers cost
     // nothing and skip them, so previews and e2e never need D1.
     let recordUsage: ((usage: TokenUsage) => Promise<void>) | undefined;
+    let store: UsageStore | undefined;
     if (apiKey !== undefined && isD1(DB) && salt !== undefined) {
-      const store = deps.createStore(DB);
+      store = deps.createStore(DB);
       const day = utcDay();
       const ip = request.headers.get("CF-Connecting-IP") ?? LOCAL_VISITOR_IP;
       const visitor = await visitorHash(ip, day, salt);
       const verdict = checkLimits(await store.readToday(day, visitor));
       if (!verdict.ok) return errorResponse(429, verdict.limit);
       await store.countMessage(day, visitor);
-      recordUsage = (usage) => store.addUsage(day, usage, estimateCostMicroUsd(usage));
+      const counted = store;
+      recordUsage = (usage) => counted.addUsage(day, usage, estimateCostMicroUsd(usage));
     }
 
+    // A suggested question, on the real model's path only: demo mode never
+    // reads or writes the cache. The limits above still apply to it, so it
+    // counts as one of the visitor's messages and is refused once a daily
+    // limit is reached. History is ignored for these: a suggestion is a
+    // standalone question, so a hit replays the standalone answer and a miss
+    // asks the model the suggestion alone, so what it stores is that answer.
+    const last = body.data.messages.at(-1);
+    const question =
+      store !== undefined && last !== undefined
+        ? suggestionFor(textOf(last), body.data.locale)
+        : undefined;
+    let cacheKey: CacheKey | undefined;
+    if (store !== undefined && question !== undefined) {
+      // The cache fails open: an error reading it, such as a table that
+      // doesn't exist yet, is logged and the model answers as usual. The
+      // limits above stay fail-closed.
+      try {
+        const version = await answerVersion();
+        const hit = await store.cachedAnswer(version, body.data.locale, question);
+        if (hit !== undefined) return replayResponse(hit);
+        cacheKey = { store, version, locale: body.data.locale, question };
+      } catch (error) {
+        console.error("chat cache not read", error);
+      }
+    }
+
+    const asked = question !== undefined && last !== undefined ? [last] : body.data.messages;
     const messages = await convertToModelMessages(
-      body.data.messages.filter((message) => message.parts.length > 0),
+      asked.filter((message) => message.parts.length > 0),
     );
     const claims = confirmedClaims();
     const tools = buildTools(claims);
@@ -235,6 +299,8 @@ export async function handleChat(
         // The claims tools returned during this answer, in the order they
         // arrived. Only these ids may become sources.
         const sources = new Map<string, Source>();
+        // Whether the model's stream reported an error, so a broken answer is never stored.
+        let errored = false;
         // The tokens of every step that finished, added as each one ends.
         // Never read onEnd's totalUsage instead: when the model fails as a
         // later step starts, it comes back empty and the finished steps'
@@ -266,7 +332,10 @@ export async function handleChat(
           providerOptions: { anthropic: anthropicOptions },
           // The one log of a model error. Without it the SDK logs the error
           // itself, and the UI stream below would log it a second time.
-          onError: ({ error }) => logStreamError(error),
+          onError: ({ error }) => {
+            errored = true;
+            logStreamError(error);
+          },
           onToolExecutionEnd: ({ toolOutput }) => {
             if (toolOutput.type !== "tool-result") return;
             const output = claimsOutputSchema.safeParse(toolOutput.output);
@@ -291,6 +360,20 @@ export async function handleChat(
             const { invalid } = parseCitations(text, new Set(sources.keys()));
             // Ids only: the answer can quote the visitor, so its text is never logged.
             if (invalid.length > 0) console.warn("chat: invalid citations", invalid);
+            const ok = cacheable({
+              finishReason: steps.at(-1)?.finishReason,
+              aborted: request.signal.aborted,
+              errored,
+              invalidCitations: invalid.length,
+              text,
+            });
+            if (cacheKey === undefined || !ok) return;
+            const { store: cache, version, locale, question: asked } = cacheKey;
+            // Fails open like the read: the answer has already streamed.
+            const write = cache
+              .cacheAnswer(version, locale, asked, { text, sources: [...sources.values()] })
+              .catch((error: unknown) => console.error("chat answer not cached", error));
+            deps.waitUntil(write);
           },
         });
         writer.merge(
