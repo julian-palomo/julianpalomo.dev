@@ -41,7 +41,7 @@ everyone else English, and the language toggle always wins. Under the intro,
 it, and "Contact" opens a form that emails me. The form is protected by
 Cloudflare Turnstile and a limit of 5 messages a day per visitor, and the
 message is never stored ([`docs/contact.md`](docs/contact.md)). A Projects
-page (`/projects`, `/es/projects`) shows Form:at and this site, each with why
+page (`/projects`, `/es/projects`) shows this site and Form:at, each with why
 I made it and what it does, taken from the facts I've confirmed. A How it's
 built page (`/how-its-built`, `/es/how-its-built`) explains, for people who
 don't program, how the assistant is kept from making up my experience and

@@ -1020,10 +1020,10 @@ language toggle goes to the same page in the other language.
 
 ### Projects
 
-- **One card per project:** Form:at, then julianpalomo.dev. Each card has the
-  chat card's 2px `border` and 20px radius, and holds the name (Bricolage,
-  24px), when and how it was made, the "why" in Julian's own words, three to
-  five points, and its links.
+- **One card per project,** newest first: julianpalomo.dev, then Form:at.
+  Each card has the chat card's 2px `border` and 20px radius, and holds the
+  name (Bricolage, 24px), when and how it was made, the "why" in Julian's
+  own words, three to five points, and its links.
 - **Every point is taken from one of Julian's confirmed claims,** shortened
   and adding nothing: no figure, purpose or result the claim doesn't state.
   Julian approves the copy in both languages.

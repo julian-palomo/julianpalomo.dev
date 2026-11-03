@@ -29,8 +29,8 @@ describe("the Projects page's copy", () => {
     expect(shape("es")).toEqual(shape("en"));
   });
 
-  it("puts Form:at first, then julianpalomo.dev", () => {
-    expect(t("en", "projects").map((project) => project.id)).toEqual(["format", "site"]);
+  it("lists the newest first: julianpalomo.dev, then Form:at", () => {
+    expect(t("en", "projects").map((project) => project.id)).toEqual(["site", "format"]);
   });
 });
 

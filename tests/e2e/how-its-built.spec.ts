@@ -90,7 +90,10 @@ test("the home page's card, the footers and the Projects card link to the page",
     page.getByRole("contentinfo").getByRole("link", { name: en.howItsBuiltTitle }),
   ).toHaveAttribute("href", "/how-its-built");
   await expect(
-    page.getByRole("article").nth(1).getByRole("link", { name: en.howItsBuiltTitle }),
+    page
+      .getByRole("article")
+      .filter({ has: page.getByRole("heading", { name: "julianpalomo.dev" }) })
+      .getByRole("link", { name: en.howItsBuiltTitle }),
   ).toHaveAttribute("href", "/how-its-built");
 });
 

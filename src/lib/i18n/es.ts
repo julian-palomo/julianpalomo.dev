@@ -198,7 +198,7 @@ export const es: Messages = {
   pagesLabel: "Páginas",
   projectsTitle: "Proyectos",
   howItsBuiltTitle: "Cómo está hecha",
-  projectsCard: "Form:at y esta web, con capturas y por qué hice cada una.",
+  projectsCard: "Esta web y Form:at, con capturas y por qué hice cada una.",
   howItsBuiltCard: "Cómo está hecha la vaca para que no pueda inventarse mi experiencia.",
   howItsBuilt: {
     lead: "Los asistentes de IA a veces se inventan cosas, y las dicen con mucha seguridad. Este está hecho para que no pueda inventarse mi experiencia. Te cuento cómo, en palabras sencillas.",
@@ -314,34 +314,6 @@ export const es: Messages = {
   // Las líneas "why" son las palabras de Julián, tal cual.
   projects: [
     {
-      id: "format",
-      name: "Form:at",
-      meta: "Proyecto personal, hecho en solitario · mayo de 2026 – actualidad",
-      why: "Teniendo una afinidad con el colectivo de música Form:at, para salir del monopolio de las plataformas más usadas y de pago como SoundCloud, YouTube, Mixcloud etc, decidimos que sería una idea genial tener un reproductor propio, a partir de ahí le fui añadiendo funcionalidades que en el resto de plataformas son de pago, y en esa es gratis.",
-      points: [
-        {
-          claim: "format-offline",
-          text: "Guarda sesiones de 90 minutos (100–220 MB cada una) para escucharlas sin cobertura: IndexedDB con una comprobación previa del espacio, un service worker que atiende peticiones Range para avanzar y retroceder, y reproducción desde la pantalla de bloqueo.",
-        },
-        {
-          claim: "format-cloudflare",
-          text: "Todo en Cloudflare: TanStack Start en Pages/Workers, D1 para el catálogo y la analítica, R2 para el audio, subidas prefirmadas directas a R2 para archivos de 220 MB y Web Push desde Workers.",
-        },
-        {
-          claim: "format-admin",
-          text: "Un panel de administración tras Cloudflare Access, con verificación JWT en el servidor en cada escritura.",
-        },
-        {
-          claim: "format-tooling",
-          text: "Un monorepo con pnpm y Turborepo, con un sistema de diseño compartido (Storybook, Chromatic), Vitest y Playwright en Chromium y WebKit, y CI/CD en GitHub Actions; hecho con Claude Code.",
-        },
-      ],
-      links: [
-        { label: "formatglasgow.com", href: "https://formatglasgow.com/" },
-        { label: "Código en GitHub", href: "https://github.com/julian-palomo/form-at" },
-      ],
-    },
-    {
       id: "site",
       name: "julianpalomo.dev",
       meta: "Proyecto personal · octubre de 2026 – actualidad",
@@ -370,6 +342,34 @@ export const es: Messages = {
       ],
       links: [
         { label: "Código en GitHub", href: "https://github.com/julian-palomo/julianpalomo.dev" },
+      ],
+    },
+    {
+      id: "format",
+      name: "Form:at",
+      meta: "Proyecto personal, hecho en solitario · mayo de 2026 – actualidad",
+      why: "Teniendo una afinidad con el colectivo de música Form:at, para salir del monopolio de las plataformas más usadas y de pago como SoundCloud, YouTube, Mixcloud etc, decidimos que sería una idea genial tener un reproductor propio, a partir de ahí le fui añadiendo funcionalidades que en el resto de plataformas son de pago, y en esa es gratis.",
+      points: [
+        {
+          claim: "format-offline",
+          text: "Guarda sesiones de 90 minutos (100–220 MB cada una) para escucharlas sin cobertura: IndexedDB con una comprobación previa del espacio, un service worker que atiende peticiones Range para avanzar y retroceder, y reproducción desde la pantalla de bloqueo.",
+        },
+        {
+          claim: "format-cloudflare",
+          text: "Todo en Cloudflare: TanStack Start en Pages/Workers, D1 para el catálogo y la analítica, R2 para el audio, subidas prefirmadas directas a R2 para archivos de 220 MB y Web Push desde Workers.",
+        },
+        {
+          claim: "format-admin",
+          text: "Un panel de administración tras Cloudflare Access, con verificación JWT en el servidor en cada escritura.",
+        },
+        {
+          claim: "format-tooling",
+          text: "Un monorepo con pnpm y Turborepo, con un sistema de diseño compartido (Storybook, Chromatic), Vitest y Playwright en Chromium y WebKit, y CI/CD en GitHub Actions; hecho con Claude Code.",
+        },
+      ],
+      links: [
+        { label: "formatglasgow.com", href: "https://formatglasgow.com/" },
+        { label: "Código en GitHub", href: "https://github.com/julian-palomo/form-at" },
       ],
     },
   ],
