@@ -18,12 +18,15 @@ import { Composer } from "./Composer";
 import {
   answerAsText,
   answerOutcome,
+  LONG_WAIT_MS,
   latestMessages,
   messageText,
   outOfQuestions,
   remainingSuggestions,
   shouldFollow,
   sourceCount,
+  WAIT_FADE_MS,
+  type Wait,
 } from "./chat-view";
 import { Greeting } from "./Greeting";
 import { MessageList } from "./MessageList";
@@ -101,14 +104,45 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
     return () => clearTimeout(timer);
   }, [cheering]);
 
+  // The wait before an answer's first word (DESIGN.md section 10): the pill
+  // and the chips while it lasts, a longer wait's line and notebook after
+  // LONG_WAIT_MS, and a short fade as the first word comes. Stop and an error
+  // end it at once.
+  const answerHasText = reveal.revealing && reveal.shown > 0;
+  const waiting =
+    (requesting || reveal.revealing) && !answerHasText && !stopped && status !== "error";
+  const [longWait, setLongWait] = useState(false);
+  useEffect(() => {
+    if (!waiting) return;
+    const timer = setTimeout(() => setLongWait(true), LONG_WAIT_MS);
+    return () => {
+      clearTimeout(timer);
+      setLongWait(false);
+    };
+  }, [waiting]);
+  const [wasWaiting, setWasWaiting] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  if (waiting !== wasWaiting) {
+    setWasWaiting(waiting);
+    setLeaving(!waiting && answerHasText);
+  }
+  useEffect(() => {
+    if (!leaving) return;
+    const timer = setTimeout(() => setLeaving(false), WAIT_FADE_MS);
+    return () => clearTimeout(timer);
+  }, [leaving]);
+  const wait: Wait | undefined =
+    waiting || leaving ? { longWait: waiting && longWait, leaving: !waiting } : undefined;
+
   const cowState = useCowState({
     status,
-    answerHasText: reveal.revealing && reveal.shown > 0,
+    answerHasText,
     revealing: reveal.revealing,
     stopped,
     composer: { hasText: input.length > 0, focused: composerFocused },
     entrance: entrance.cow,
     cheering,
+    longWait: wait?.longWait,
   });
 
   // Sending swaps Send for Stop, a suggestion removes its own button, and
@@ -235,6 +269,7 @@ export function Chat({ onStarted }: { onStarted?: () => void }) {
               messages={messages}
               flight={flight}
               typing={reveal.revealing ? { id: latestAnswer?.id, shown: reveal.shown } : undefined}
+              wait={wait}
             />
           )}
           {keepAsking.length > 0 && (

@@ -42,7 +42,7 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 
 ## The chat's motion lives in `src/styles/chat.css`
 
-- Each word fading in as an answer types itself out (the pace is in `src/components/chat/reveal.ts`), source chips rising, a claim opening, the visitor's bubble popping in and the status pill's dots, all inside `prefers-reduced-motion: no-preference` (`DESIGN.md` section 11), plus the citation numbers' 24px hit area, a pseudo-element that doesn't change the line. `src/components/chat/` sets the classes; a FLIP from a suggestion chip runs with the Web Animations API in `MessageList.tsx`, skipped with reduced motion.
+- Each word fading in as an answer types itself out (the pace is in `src/components/chat/reveal.ts`), source chips rising, a claim opening, the visitor's bubble popping in, the status pill's sweep and the wait's fade as the first word comes, all inside `prefers-reduced-motion: no-preference` (`DESIGN.md` section 11), plus the citation numbers' 24px hit area, a pseudo-element that doesn't change the line. The sweep moves a window and a copy of the line in opposite directions with `transform` only, never `background-position`; `WaitStatus.tsx` gives both one delay from `performance.now()`, so a remounted pill carries on in phase. `src/components/chat/` sets the classes; a FLIP from a suggestion chip runs with the Web Animations API in `MessageList.tsx`, skipped with reduced motion.
 
 ## The landscape's SVG styles live in `src/styles/landscape.css`
 
@@ -57,6 +57,7 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - Its keyframes come from the `<style>` of `docs/design/assistant-cow.svg`, prefixed `cow-`, and are keyed by the `data-state` and `data-pat` that `src/components/cow/AssistantCow.tsx` sets. Only the chat's cow has `.cow-live`, so the link preview card's stays still. Its 8px rise over the chat's edge (`.edge-lift`, `src/components/chat/ChatEdge.tsx`) lives here too.
 - Every rule that moves it sits inside `prefers-reduced-motion: no-preference`, so with reduced motion it's the still drawing in every state. Only `transform` and `opacity` animate.
 - The lick lasts 1.6s here and in `LICK_MS` (`src/lib/cow-state.ts`); keep the two in step.
+- The `reading` state, after a long wait, is the one shown outside `no-preference`: the glasses, the notebook held in front and the head lowered 5 units say what the cow is doing, so with reduced motion they show, still. The notebook's rise, the glasses' fade and the head's sweep along the lines sit inside `no-preference`, like the rest. The notebook sits outside `.tilt`, so it stays put while the head moves; the glasses sit inside it, so they move with the head.
 - Its tilt towards the pointer arrives as `--cow-follow` from `src/components/cow/use-cow-follow.ts` and is applied with the `rotate` property on the drawing, which composes with the `transform` its states animate.
 
 ## The page's entrance lives in `src/styles/entrance.css`

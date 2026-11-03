@@ -34,6 +34,11 @@ vi.mock(import("../../src/lib/claims"), async (importOriginal) => ({
 }));
 
 /** A D1 binding the endpoint accepts; tests swap the store built on it for fakeStore(). */
+// A demo answer takes its real time, about 5s: 0.6s to the lookup and 3.5s
+// held back before the words (src/lib/bot/demo.ts). Vitest's 5s default
+// would race it.
+const DEMO_ANSWER_TIMEOUT_MS = 15_000;
+
 const fakeDb = {
   prepare: () => {
     throw new Error("unit tests use the fake store, never D1");
@@ -539,34 +544,38 @@ describe("demo mode", () => {
     },
   );
 
-  it("streams a get_claims call and an answer quoting a confirmed claim with its citation", async () => {
-    const warnLog = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const createModel = vi.fn();
-    const response = await chat(
-      chatRequest({ messages: [userMessage("What did he do?")] }),
-      { BOT_DEMO: "1" },
-      { createModel },
-    );
+  it(
+    "streams a get_claims call and an answer quoting a confirmed claim with its citation",
+    async () => {
+      const warnLog = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const createModel = vi.fn();
+      const response = await chat(
+        chatRequest({ messages: [userMessage("What did he do?")] }),
+        { BOT_DEMO: "1" },
+        { createModel },
+      );
 
-    expect(response.status).toBe(200);
-    const all = await chunks(response);
-    expect(createModel).not.toHaveBeenCalled();
-    expect(startChunk(all)).toMatchObject({ messageMetadata: { demo: true } });
-    expect(all).toContainEqual(
-      expect.objectContaining({ type: "tool-input-available", toolName: "get_claims" }),
-    );
-    expect(all.find((chunk) => chunk.type === "data-sources")).toMatchObject({
-      data: { sources: [{ id: sentinel.id }] },
-    });
-    const text = all
-      .filter((chunk) => chunk.type === "text-delta")
-      .map((chunk) => chunk.delta)
-      .join("");
-    expect(text).toContain("Demo answer");
-    expect(text).toContain(`${sentinel.text} [[${sentinel.id}]]`);
-    expect(warnLog).not.toHaveBeenCalled();
-    warnLog.mockRestore();
-  });
+      expect(response.status).toBe(200);
+      const all = await chunks(response);
+      expect(createModel).not.toHaveBeenCalled();
+      expect(startChunk(all)).toMatchObject({ messageMetadata: { demo: true } });
+      expect(all).toContainEqual(
+        expect.objectContaining({ type: "tool-input-available", toolName: "get_claims" }),
+      );
+      expect(all.find((chunk) => chunk.type === "data-sources")).toMatchObject({
+        data: { sources: [{ id: sentinel.id }] },
+      });
+      const text = all
+        .filter((chunk) => chunk.type === "text-delta")
+        .map((chunk) => chunk.delta)
+        .join("");
+      expect(text).toContain("Demo answer");
+      expect(text).toContain(`${sentinel.text} [[${sentinel.id}]]`);
+      expect(warnLog).not.toHaveBeenCalled();
+      warnLog.mockRestore();
+    },
+    DEMO_ANSWER_TIMEOUT_MS,
+  );
 });
 
 describe("limits", () => {
@@ -644,17 +653,21 @@ describe("limits", () => {
     expect(createModel).not.toHaveBeenCalled();
   });
 
-  it("never touches the store in demo mode", async () => {
-    const createStore = vi.fn();
-    const response = await chat(
-      chatRequest({ messages: [userMessage("Hi")] }),
-      { BOT_DEMO: "1" },
-      { createStore },
-    );
-    await response.text();
-    expect(response.status).toBe(200);
-    expect(createStore).not.toHaveBeenCalled();
-  });
+  it(
+    "never touches the store in demo mode",
+    async () => {
+      const createStore = vi.fn();
+      const response = await chat(
+        chatRequest({ messages: [userMessage("Hi")] }),
+        { BOT_DEMO: "1" },
+        { createStore },
+      );
+      await response.text();
+      expect(response.status).toBe(200);
+      expect(createStore).not.toHaveBeenCalled();
+    },
+    DEMO_ANSWER_TIMEOUT_MS,
+  );
 });
 
 describe("usage", () => {
@@ -1020,17 +1033,21 @@ describe("the suggestion cache", () => {
     expect(errorLog).toHaveBeenCalledWith("chat answer not cached", expect.any(Error));
   });
 
-  it("never touches the cache in demo mode", async () => {
-    const createStore = vi.fn(() => store);
-    const response = await handleChat(
-      chatRequest({ messages: [userMessage(suggestion)], locale: "en" }),
-      { BOT_DEMO: "1" },
-      { createStore, waitUntil: () => {} },
-    );
-    await response.text();
+  it(
+    "never touches the cache in demo mode",
+    async () => {
+      const createStore = vi.fn(() => store);
+      const response = await handleChat(
+        chatRequest({ messages: [userMessage(suggestion)], locale: "en" }),
+        { BOT_DEMO: "1" },
+        { createStore, waitUntil: () => {} },
+      );
+      await response.text();
 
-    expect(createStore).not.toHaveBeenCalled();
-    expect(store.cachedAnswer).not.toHaveBeenCalled();
-    expect(store.cacheAnswer).not.toHaveBeenCalled();
-  });
+      expect(createStore).not.toHaveBeenCalled();
+      expect(store.cachedAnswer).not.toHaveBeenCalled();
+      expect(store.cacheAnswer).not.toHaveBeenCalled();
+    },
+    DEMO_ANSWER_TIMEOUT_MS,
+  );
 });

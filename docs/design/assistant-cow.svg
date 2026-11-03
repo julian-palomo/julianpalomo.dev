@@ -1,5 +1,5 @@
 <!-- Reference artwork: the assistant, a Highland cow (DESIGN.md, "The assistant"). Classes: tilt, jaw, talk, licks/lick-r/lick-l/lick-mouth. The idle loop is on here. -->
-<svg xmlns="http://www.w3.org/2000/svg" class="cow cow-idle" viewBox="5 26 190 150" width="380" height="300" role="img" aria-label="Highland cow"><style>.cow{--horn:#D9B98A;--horn-hi:#F2DEBC;--ear:#6E3410;--face:#8E461A;--fringe:#B5662E;--fringe-hi:#D0904F;--strand:#6E3410;--muzzle:#C98A55;--chin:#B9784A;--pad:#EBC6A0;--nostril:#6B3A1E;--mouth:#5A1A16;--tongue:#E48A8A;--tongue-dark:#C96B70}
+<svg xmlns="http://www.w3.org/2000/svg" class="cow cow-idle" viewBox="5 26 190 150" width="380" height="300" role="img" aria-label="Highland cow"><style>.cow{--horn:#D9B98A;--horn-hi:#F2DEBC;--ear:#6E3410;--face:#8E461A;--fringe:#B5662E;--fringe-hi:#D0904F;--strand:#6E3410;--muzzle:#C98A55;--chin:#B9784A;--pad:#EBC6A0;--nostril:#6B3A1E;--mouth:#5A1A16;--tongue:#E48A8A;--tongue-dark:#C96B70;--notebook-cover:#2B6F4A;--notebook-page:#F7F1E3;--notebook-line:#B8A98C;--glasses-frame:#2B1608;--glasses-lens:#FFFFFF}
 .cow .tilt,.cow .lick-r,.cow .lick-l{transform-box:view-box}
 .cow .tilt{transform-origin:100px 130px}
 .cow .lick-r{transform-origin:104px 148px}
@@ -27,6 +27,9 @@
 @keyframes tilt{0%,12%{transform:rotate(0deg)}28%,44%{transform:rotate(-10deg)}62%,78%{transform:rotate(10deg)}94%,100%{transform:rotate(0deg)}}
 @keyframes idle{0%,14%{transform:rotate(0deg)}18%,26%{transform:rotate(-7deg)}30%,62%{transform:rotate(0deg)}66%,70%{transform:rotate(6deg)}74%,100%{transform:rotate(0deg)}}
 @keyframes think{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(-4deg)}}
+.cow-read .notebook,.cow-read .glasses{opacity:1}
+.cow-read .tilt{animation:read 3s ease-in-out infinite}
+@keyframes read{0%{transform:translateY(5px) rotate(-4deg)}70%{transform:translateY(5px) rotate(4deg)}84%,100%{transform:translateY(5px) rotate(-4deg)}}
 </style><g class="tilt">
 <g transform="translate(0 16)">
 <path d="M74 60 L42 58 Q32 57 28 48 L15 20 Q13 16 12 21 L20 56 Q24 74 42 74 L72 78 Z" fill="var(--horn)"></path>
@@ -89,5 +92,19 @@
 <path d="M97 150 C 88 151 79 146 73 137" fill="none" stroke="var(--tongue-dark)" stroke-width="1.8" stroke-linecap="round"></path>
 </g>
 </g>
+<g class="glasses" opacity="0">
+<path d="M79.5 110 L64 103 M120.5 110 L136 103" fill="none" stroke="var(--glasses-frame)" stroke-width="2" stroke-linecap="round"></path>
+<circle cx="88" cy="111" r="8.5" fill="var(--glasses-lens)" fill-opacity="0.3" stroke="var(--glasses-frame)" stroke-width="2.2"></circle>
+<circle cx="112" cy="111" r="8.5" fill="var(--glasses-lens)" fill-opacity="0.3" stroke="var(--glasses-frame)" stroke-width="2.2"></circle>
+<path d="M96.5 110 Q100 107 103.5 110" fill="none" stroke="var(--glasses-frame)" stroke-width="2" stroke-linecap="round"></path>
+<path d="M84 107 q2 -2 5 -2 M108 107 q2 -2 5 -2" fill="none" stroke="var(--glasses-lens)" stroke-width="1.4" stroke-linecap="round"></path>
+</g>
+</g>
+<g class="notebook" opacity="0">
+<path d="M54 122 L100 127 L146 122 L148 154 L100 158 L52 154 Z" fill="var(--notebook-cover)"></path>
+<path d="M57 124 L100 129 L100 155 L56 151 Z" fill="var(--notebook-page)"></path>
+<path d="M100 129 L143 124 L144 151 L100 155 Z" fill="var(--notebook-page)"></path>
+<path d="M100 129 L100 155" fill="none" stroke="var(--notebook-line)" stroke-width="1"></path>
+<path d="M70 134 L95 136.8 M70 140 L95 142.8 M70 146 L88 148 M105 136.8 L130 134 M105 142.8 L130 140 M105 148 L124 146" fill="none" stroke="var(--notebook-line)" stroke-width="1.4" stroke-linecap="round"></path>
 </g>
 </svg>
