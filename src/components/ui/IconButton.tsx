@@ -11,7 +11,7 @@ type Props = Omit<ComponentProps<"button">, "aria-label" | "children" | "classNa
 };
 
 const shape =
-  "inline-flex size-11 shrink-0 items-center justify-center rounded-full transition-transform duration-[80ms] motion-safe:active:scale-[0.92] disabled:active:scale-100";
+  "inline-flex size-11 shrink-0 items-center justify-center rounded-full transition-transform duration-[80ms] motion-safe:active:scale-[0.92] disabled:active:scale-100 aria-disabled:opacity-50 aria-disabled:active:scale-100";
 
 const looks: Record<Look, string> = {
   accent: "bg-accent text-on-accent hover:brightness-110 disabled:opacity-50",

@@ -6,7 +6,7 @@
 
 const REPO = "https://github.com/julian-palomo/julianpalomo.dev/blob/main";
 
-export const DOCS = [
+const DOCS = [
   "docs/architecture.md",
   ".claude/rules/claims.md",
   "docs/adr/2026-11-02-cached-suggestion-answers.md",

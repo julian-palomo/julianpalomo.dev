@@ -49,9 +49,10 @@ test("a season in the sky panel shows the hand", async ({ page }) => {
   expect(await cursor(winter)).toBe("pointer");
 });
 
-test("a row on How it's built shows the hand", async ({ page }) => {
+test("a stop on How it's built's ring shows the hand", async ({ page }) => {
   await page.goto("/how-its-built");
-  expect(await cursor(page.locator("summary").first())).toBe("pointer");
+  const stop = page.getByRole("button", { name: "Claude", exact: true });
+  expect(await cursor(stop)).toBe("pointer");
 });
 
 test("the contact form's Send keeps the arrow while the message is sending", async ({ page }) => {

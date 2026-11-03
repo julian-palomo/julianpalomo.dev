@@ -224,79 +224,138 @@ export const es: Messages = {
       title: "Un valle de verdad",
       body: "El paisaje de arriba está en directo. La estación sigue el calendario, el sol está a la altura real que tiene ahora mismo sobre Glasgow, y el tiempo es el de Glasgow de la última media hora. Si allí llueve, aquí también.",
     },
+    howAnswered: "Cómo se responde una pregunta",
+    ring: {
+      pause: "Pausar",
+      play: "Reproducir el recorrido",
+      technical: "La parte técnica",
+      question: {
+        name: "Tu pregunta",
+        plain: "Tu pregunta va primero al servidor de esta web, nunca directamente a la IA.",
+        technical: (characters, messages) =>
+          `POST /api/chat. Como mucho ${numbers.format(characters)} caracteres, y solo los últimos ${messages} mensajes, empezando por una pregunta.`,
+      },
+      limits: {
+        name: "Límites diarios",
+        plain: (questions) =>
+          `Cada visitante puede hacer ${questions} preguntas al día, y la web entera tiene un tope de gasto diario. Si se pasa un límite, ni siquiera se llama a la IA.`,
+        technical:
+          "Cuentas en Cloudflare D1. Un visitante es un SHA-256 de la IP (en IPv6, su red /64), la fecha UTC y una sal secreta, así que no se guarda ninguna IP. Pasado un límite, la respuesta es un 429.",
+      },
+      claude: {
+        name: "Claude",
+        plain:
+          "Claude, una IA de la empresa Anthropic, escribe la respuesta. No puede buscar en internet: solo puede consultar los datos que he confirmado, en el centro del círculo.",
+        technical:
+          "Claude Sonnet 5.5 con tres herramientas de solo lectura: list_topics, get_claims y search_claims. Hasta 5 pasos por respuesta.",
+      },
+      check: {
+        name: "Revisión de citas",
+        plain:
+          "Cada dato que cita la respuesta tiene que ser uno que Claude haya consultado para esa respuesta. Si no lo es, no se muestra ninguna fuente para él.",
+        technical:
+          "citations.ts lee las marcas [[claim-id]]. Un id que ninguna herramienta devolvió no tiene chip, y el servidor lo registra.",
+      },
+      answer: {
+        name: "Respuesta + fuentes",
+        plain:
+          "La respuesta se escribe sola, con fuentes numeradas. Abre una para ver el dato y el día en que lo confirmé.",
+        technical:
+          "Por streaming. Cada claim que devuelve una herramienta se envía en el momento, como una parte data-sources, antes del texto que lo cita; luego el texto se escribe solo, palabra a palabra, en el navegador.",
+      },
+      facts: {
+        name: "Datos confirmados",
+        plain:
+          "Una lista de datos sobre mí, cada uno escrito y comprobado por mí, con el día en que lo confirmé. Claude puede leerla, nunca cambiarla.",
+        technical:
+          "src/content/claims.json. Solo los claims con fecha de confirmación llegan a las herramientas, y solo Julián pone esa fecha.",
+      },
+      shortcut: {
+        name: "Atajo",
+        plain: (questions) =>
+          `Las preguntas sugeridas guardan una respuesta, así que volver a hacer una la reproduce al momento, sin llamar a la IA. Aun así, cuenta como una de tus ${questions}.`,
+        technical:
+          "cached_answers en D1, con una clave que es un hash del modelo, sus ajustes, el prompt, las herramientas y los claims: cualquier cambio empieza un juego nuevo.",
+      },
+    },
     howIBuiltIt: "Cómo la hice",
-    buildFlow: {
-      plan: "Un plan",
-      tasks: "Tareas pequeñas",
-      sessions: "Sesiones de programación",
-      reviewers: "Dos revisores de IA",
-      mailbox: "Buzón",
-      supervisor: "Supervisor",
-      me: "Yo: decido",
+    cycle: {
+      actors: {
+        me: { name: "Yo", role: "decido" },
+        claudeCode: { name: "Claude Code", role: "una sesión por tarea" },
+        github: { name: "GitHub", role: "tareas y buzones" },
+        supervisor: { name: "Supervisor", role: "Claude, en la app" },
+      },
+      previous: "Paso anterior",
+      next: "Paso siguiente",
+      again: "Empezar de nuevo",
+      position: (step, steps) => `${step} de ${steps}`,
+      views: "Cómo contarlo",
+      plain: "En palabras sencillas",
+      developers: "Para desarrolladores",
+      steps: [
+        {
+          plain:
+            "Le doy una tarea a una sesión de programación de Claude Code, un asistente de IA para escribir código. Cada una trabaja en su propia copia del código.",
+          technical: "/implement-issue 87, en su propio git worktree.",
+        },
+        {
+          plain:
+            "Antes de escribir código, escribe su plan en la tarea y deja una nota en su buzón.",
+          technical:
+            'Un comentario con el plan en el issue #87, y luego el aviso "plan: #87" en el PR del buzón.',
+        },
+        {
+          plain: "La nota despierta al supervisor.",
+          technical: "Un comentario en el PR del buzón despierta al hilo en la nube suscrito a él.",
+        },
+        {
+          plain:
+            "El supervisor revisa el plan con todo el proyecto en la cabeza. A veces le doy el OK yo.",
+          technical: "Un comentario del dueño en el issue, publicado después del plan: el OK.",
+        },
+        {
+          plain: "La sesión ve el OK y lo construye.",
+          technical: "wait-for-reply.sh mira cada 2 minutos; luego implementa.",
+        },
+        {
+          plain:
+            "Dos revisores de IA leen el cambio: uno comprueba que se cumplen las reglas, y el otro que la documentación sigue diciendo la verdad.",
+          technical:
+            "/handoff: pnpm check, los tests, y luego constraint-reviewer y docs-truth-checker.",
+        },
+        {
+          plain: "Envía el cambio a GitHub y deja otra nota.",
+          technical: '/ship-pr, CI en verde, y luego "ready: PR #N" en el PR del buzón.',
+        },
+        {
+          plain: "El supervisor revisa el cambio y lo prueba en una vista previa de la web.",
+          technical:
+            "Una revisión en el PR, una prueba en su vista previa de Workers, y la etiqueta run-evals si toca el bot.",
+        },
+        {
+          plain: "Me cuenta lo que ha encontrado, en palabras sencillas.",
+          technical: "Un mensaje en la app de Claude, nunca un merge.",
+        },
+        {
+          plain: "Decido yo. Solo yo acepto un cambio en la web.",
+          technical: "Julián hace el merge; Cloudflare Workers Builds despliega main.",
+        },
+      ],
     },
-    answerFlow: {
-      question: "Tu pregunta",
-      limits: "Límites diarios",
-      model: "Claude",
-      tools: "Datos confirmados",
-      check: "Comprobación de citas",
-      answer: "Respuesta + fuentes",
+    docNames: {
+      "docs/architecture.md": "Cómo se responde una pregunta",
+      ".claude/rules/claims.md": "Las reglas de los claims",
+      "docs/adr/2026-11-02-cached-suggestion-answers.md": "La decisión de guardar respuestas",
+      ".claude/skills/implement-issue/SKILL.md": "La skill implement-issue",
+      "AGENTS.md#2-workflow": "AGENTS.md: el flujo de trabajo",
+      ".claude/README.md": "La configuración de Claude Code",
+      ".claude/skills/ship-pr/SKILL.md": "La skill ship-pr",
+      "docs/evals.md": "Las evals",
+      "AGENTS.md#1-hard-constraints": "AGENTS.md: las reglas fijas",
+      "docs/adr/README.md": "Las decisiones (ADRs)",
     },
-    flowAlt:
-      "El dibujo muestra el flujo: un plan se convierte en tareas pequeñas; cada tarea va a su propia sesión de programación; dos revisores de IA leen el cambio; un buzón despierta al supervisor, que lo revisa; y yo decido si entra.",
-    steps: [
-      {
-        title: "Hecha con ayuda de la IA, pero con reglas",
-        body: "Hice esta web con la ayuda de Claude, una IA de la empresa Anthropic, y de Claude Code, su asistente para escribir código. Les di reglas por escrito: pueden proponer cambios, pero solo yo los acepto, y solo yo puedo aprobar una línea sobre mi experiencia.",
-      },
-      {
-        title: "Primero, un plan",
-        body: "Antes de escribir código, preparé el plan con Claude: fases (los datos, el asistente, su examen, el diseño…) y, en cada fase, tareas pequeñas, cada una escrita como una petición clara en GitHub, la web donde vive el código.",
-      },
-      {
-        title: "Un asistente de programación por tarea",
-        body: "Varias sesiones de Claude Code trabajan a la vez en mi ordenador, cada una en su propia tarea y en su propia copia del código, para que nunca se pisen.",
-      },
-      {
-        title: "Dos revisores en cada cambio",
-        body: "Antes de que un cambio me llegue, dos revisores de IA lo leen: uno comprueba que se cumplen las reglas del proyecto, y el otro que la documentación sigue diciendo la verdad.",
-      },
-      {
-        title: "Un supervisor que ve el conjunto",
-        body: "Unas conversaciones con Claude, en la app de Claude, supervisan el trabajo. Llevan notas de todo el proyecto, de sus decisiones y de cómo me gusta hacer las cosas, así que revisan cada plan y cada cambio con más contexto que la sesión que lo escribió.",
-      },
-      {
-        title: "Buzones entre ellos",
-        body: 'Se comunican por buzones: peticiones especiales en GitHub que nunca se aceptan, donde una sesión de programación deja una nota corta, como "plan listo" o "cambio listo", que despierta a su supervisor.',
-      },
-      {
-        title: "Decido yo",
-        body: "No se construye nada hasta que su plan está aprobado, solo yo puedo confirmar un dato sobre mí, y solo yo acepto un cambio en la web.",
-      },
-    ],
-    forDevelopers: "Para desarrolladores",
-    developersIntro: "La parte técnica, con enlaces a los documentos del propio repositorio.",
-    diagramLabel: "Cómo se responde una pregunta",
-    diagramSteps: [
-      "La pregunta llega al servidor, a POST /api/chat.",
-      "Se comprueban los límites del día en Cloudflare D1, por visitante y para toda la web.",
-      "Claude responde, con herramientas de solo lectura que devuelven solo claims confirmados.",
-      "La comprobación de citas solo acepta una cita si una herramienta devolvió ese claim para esta respuesta.",
-      "La respuesta llega por streaming con citas numeradas y sus fuentes.",
-    ],
-    docsHeading: "En el repositorio",
-    docs: [
-      { label: "Cómo se responde una pregunta", path: "docs/architecture.md" },
-      { label: "Las evals: casos, juez y umbrales", path: "docs/evals.md" },
-      { label: "Las reglas de los claims", path: ".claude/rules/claims.md" },
-      { label: "AGENTS.md: las reglas que sigue cada agente", path: "AGENTS.md" },
-      { label: "El flujo de trabajo y los buzones", path: "AGENTS.md#2-workflow" },
-      {
-        label: "La configuración de Claude Code: reglas, hooks, skills y revisores",
-        path: ".claude/README.md",
-      },
-      { label: "Las decisiones (ADRs)", path: "docs/adr/README.md" },
-    ],
+    newTab: ", en GitHub, se abre en una pestaña nueva",
   },
   askTheCow: "← Pregunta a la vaca",
   anythingElse: "¿Algo más? Pregúntame",
