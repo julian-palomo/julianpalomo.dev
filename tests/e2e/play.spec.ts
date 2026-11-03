@@ -68,7 +68,9 @@ for (const width of [320, 390]) {
     await expect(bubble).toBeVisible({ timeout: GEAR_WAIT });
     const hint = await bubble.boundingBox();
     const title = await page.getByRole("heading", { level: 1 }).boundingBox();
-    expect(hint && title && hint.y + hint.height).toBeLessThanOrEqual(title?.y ?? 0);
+    // Both are on screen, so both have a box; a missing one must fail, never pass.
+    if (!hint || !title) throw new Error("the hint or the title has no box");
+    expect(hint.y + hint.height).toBeLessThanOrEqual(title.y);
   });
 }
 
