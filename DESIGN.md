@@ -31,6 +31,7 @@ closed, the live site shows only the parts already built.
 15. [Accessibility](#15-accessibility)
 16. [Reference files](#16-reference-files)
 17. [Not in this design](#17-not-in-this-design)
+18. [Inner pages](#18-inner-pages)
 
 ## 1. Principles
 
