@@ -50,7 +50,7 @@ must keep doing; the ADRs say why.
 
 - **Demo mode answers only when there is no API key and `BOT_DEMO` is `"1"`.** With a key the flag is ignored, so production can never serve the demo. `BOT_DEMO` is set for previews (`previews.vars` in `wrangler.jsonc`) and for e2e (`env.e2e`, built with `CLOUDFLARE_ENV=e2e`); never set it at the top level.
 - `demo.ts` is a scripted mock model: it calls the real `get_claims` and quotes the first claim it returns, word for word, with its citation. It never writes anything else about Julian. The UI shows its "Demo" label from `metadata.demo`, never from the text.
-- The demo is paced like a real answer: 600ms before the lookup, 2s after the tool result before the first word (as the real model sends nothing for about that long), then one word every 40ms. So the cow's thinking and talking states, and the wait's pill and chips, show on previews and in e2e (`tests/e2e/cow.spec.ts`, `tests/e2e/chat-wait.spec.ts`). Sending the whole text in one chunk would skip them.
+- The demo is paced like a real answer: 600ms before the lookup, 3.5s after the tool result before the first word (the real model sends nothing for about 2s; the demo waits longer so the cow's notebook, after 3s, shows), then one word every 40ms. So the cow's thinking, reading and talking states, and the wait's pill and chips, show on previews and in e2e (`tests/e2e/cow.spec.ts`, `tests/e2e/chat-wait.spec.ts`). Sending the whole text in one chunk would skip them.
 - `env.e2e` has `secrets.required: []` so the Vite plugin doesn't copy a local `.dev.vars`, with a real key, into the e2e build, and `routes: []` so it never inherits the production domain. Keep both empty.
 
 ## The chat UI

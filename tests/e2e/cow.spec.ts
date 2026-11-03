@@ -87,7 +87,10 @@ test("the cow listens while the visitor types", async ({ page }) => {
   await expect(liveCow(page)).toHaveAttribute("data-state", "listening");
 });
 
-test("the cow thinks, talks while the answer streams, licks once, then idles", async ({ page }) => {
+// The demo holds its words back past the long wait, so the cow reads too.
+test("the cow thinks, reads, talks while the answer streams, licks once, then idles", async ({
+  page,
+}) => {
   const states = await recordCowStates(page);
   await ask(page, "What has Julian worked on?");
 
@@ -95,6 +98,7 @@ test("the cow thinks, talks while the answer streams, licks once, then idles", a
   await expect(liveCow(page)).toHaveAttribute("data-state", "idle", { timeout: 10_000 });
   expect(states.slice(states.indexOf("thinking"))).toEqual([
     "thinking",
+    "reading",
     "talking",
     "satisfied",
     "idle",

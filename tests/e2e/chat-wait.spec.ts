@@ -5,7 +5,7 @@ import { en } from "../../src/lib/i18n/en";
 
 // The wait before an answer's first word (DESIGN.md section 10). Demo mode
 // calls get_claims with no filter, which returns every confirmed claim, and
-// holds the words back 2s after it, as the real model does.
+// holds the words back 3.5s after it, past the long wait's 3s.
 
 test.beforeEach(async ({ page }) => {
   await page.route("**/api/weather", (route) => route.fulfill({ json: { weather: null } }));
@@ -41,7 +41,7 @@ test("the pill and the chips go once the first word is on screen", async ({ page
   await ask(page);
   await expect(chips(page)).toBeVisible();
   await expect(answerText(page)).toContainText(DEMO_ANSWER_INTRO.split(" ")[0] ?? "", {
-    timeout: 8000,
+    timeout: 10_000,
   });
   // After their 150ms fade.
   await expect(chips(page)).toHaveCount(0, { timeout: 1000 });
@@ -55,7 +55,7 @@ test("the first word starts where it stays: the pill and chips leave the flow as
   await ask(page);
   await expect(chips(page)).toBeVisible();
   const text = answerText(page);
-  await expect(text).not.toBeEmpty({ timeout: 8000 });
+  await expect(text).not.toBeEmpty({ timeout: 10_000 });
   const first = await text.boundingBox();
   await expect(chips(page)).toHaveCount(0, { timeout: 1000 });
   const after = await text.boundingBox();

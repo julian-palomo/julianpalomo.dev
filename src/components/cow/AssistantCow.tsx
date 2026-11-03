@@ -261,27 +261,69 @@ function CowDrawing({ size, className }: { size: number; className: string | und
             />
           </g>
         </g>
+        {/* Small round glasses, part of the head, so they lower and sweep
+            with it: only in the reading state. */}
+        <g className="glasses" opacity="0">
+          <path
+            d="M79.5 110 L64 103 M120.5 110 L136 103"
+            fill="none"
+            stroke={cow["glasses-frame"]}
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <circle
+            cx="88"
+            cy="111"
+            r="8.5"
+            fill={cow["glasses-lens"]}
+            fillOpacity="0.3"
+            stroke={cow["glasses-frame"]}
+            strokeWidth="2.2"
+          />
+          <circle
+            cx="112"
+            cy="111"
+            r="8.5"
+            fill={cow["glasses-lens"]}
+            fillOpacity="0.3"
+            stroke={cow["glasses-frame"]}
+            strokeWidth="2.2"
+          />
+          <path
+            d="M96.5 110 Q100 107 103.5 110"
+            fill="none"
+            stroke={cow["glasses-frame"]}
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M84 107 q2 -2 5 -2 M108 107 q2 -2 5 -2"
+            fill="none"
+            stroke={cow["glasses-lens"]}
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+        </g>
       </g>
-      {/* Only in the reading state, after a long wait: held at the right of
-          the muzzle, by the right hoof on the chat's edge, so the chewing jaw
-          stays in view. One page turns around the spine. */}
+      {/* Only in the reading state, after a long wait: held up in both hooves,
+          which the chat's edge draws over its sides, in front of the mouth and
+          the chin, under the nostrils. It stays still while the head, above
+          it, follows the lines. */}
       <g className="notebook" opacity="0">
         <path
-          d="M138 128 L162 132 L186 128 L188 156 L162 160 L136 156 Z"
+          d="M54 122 L100 127 L146 122 L148 154 L100 158 L52 154 Z"
           fill={cow["notebook-cover"]}
         />
-        <path d="M140 129 L162 133 L162 157 L139 153 Z" fill={cow["notebook-page"]} />
-        <path d="M162 133 L184 129 L185 153 L162 157 Z" fill={cow["notebook-page"]} />
+        <path d="M57 124 L100 129 L100 155 L56 151 Z" fill={cow["notebook-page"]} />
+        <path d="M100 129 L143 124 L144 151 L100 155 Z" fill={cow["notebook-page"]} />
+        <path d="M100 129 L100 155" fill="none" stroke={cow["notebook-line"]} strokeWidth="1" />
         <path
-          d="M143 137 L158 139.5 M143 142 L158 144.5 M143 147 L155 149 M166 139.5 L181 137 M166 144.5 L181 142 M166 149.5 L178 147"
+          d="M70 134 L95 136.8 M70 140 L95 142.8 M70 146 L88 148 M105 136.8 L130 134 M105 142.8 L130 140 M105 148 L124 146"
           fill="none"
           stroke={cow["notebook-line"]}
-          strokeWidth="1.2"
+          strokeWidth="1.4"
           strokeLinecap="round"
         />
-        <g className="notebook-turn">
-          <path d="M162 133 L184 129 L185 153 L162 157 Z" fill={cow["notebook-page"]} />
-        </g>
       </g>
     </svg>
   );

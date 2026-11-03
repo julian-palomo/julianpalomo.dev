@@ -7,9 +7,9 @@
  *
  * The SVG's own `transform="scale(0)"` and `opacity="0"` hide the tongue and
  * the open mouth; never set `transform` or `opacity` on those groups outside
- * an animation, or they show. The notebook is the one exception: it shows in
- * the reading state, with reduced motion too, since it says what the cow is
- * doing, not how it moves.
+ * an animation, or they show. The notebook, the glasses and the lowered head
+ * are the exception: they show in the reading state with reduced motion too,
+ * since they say what the cow is doing, not how it moves.
  */
 
 .cow .tilt,
@@ -27,22 +27,18 @@
 .cow .lick-l {
   transform-origin: 96px 148px;
 }
-.cow .notebook,
-.cow .notebook-turn {
+.cow .notebook {
   transform-box: view-box;
 }
-.cow .notebook {
-  transform-origin: 162px 160px;
-}
-/* The spine, which the turning page swings around. */
-.cow .notebook-turn {
-  transform-origin: 162px 145px;
-  opacity: 0;
-}
 
-/* Reading, after a long wait: the notebook, open. Only the chat's cow reads. */
-.cow-live[data-state="reading"] .notebook {
+/* Reading, after a long wait: glasses on, the notebook held open in front,
+   and the head lowered 5 units towards it. Only the chat's cow reads. */
+.cow-live[data-state="reading"] .notebook,
+.cow-live[data-state="reading"] .glasses {
   opacity: 1;
+}
+.cow-live[data-state="reading"] .tilt {
+  transform: translateY(5px);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -69,14 +65,11 @@
     transform: rotate(-7deg);
   }
 
-  /* Thinking: chews with a slight thoughtful tilt. Reading, after a long
-     wait, keeps chewing the same way. */
-  .cow-live[data-state="thinking"] .tilt,
-  .cow-live[data-state="reading"] .tilt {
+  /* Thinking: chews with a slight thoughtful tilt. */
+  .cow-live[data-state="thinking"] .tilt {
     animation: cow-think 2.4s ease-in-out infinite;
   }
-  .cow-live[data-state="thinking"] .jaw,
-  .cow-live[data-state="reading"] .jaw {
+  .cow-live[data-state="thinking"] .jaw {
     animation: cow-chew 0.55s ease-in-out infinite alternate;
   }
 
@@ -109,16 +102,22 @@
     }
   }
 
-  /* On the chat's edge (src/components/chat/ChatEdge.tsx), it rises 8px
-     over the edge while it thinks and while a pointer is over it. */
-  /* The notebook rises into its hoof in 0.3s, and a page turns every 1.2s. */
+  /* Reading: the notebook rises into its hooves and the glasses fade in, in
+     0.3s; then the head, lowered, follows the lines, a slow sweep from left
+     to right and a quicker return, every 3s. The jaw is behind the notebook,
+     so it doesn't chew. */
   .cow-live[data-state="reading"] .notebook {
     animation: cow-notebook-in 0.3s ease-out both;
   }
-  .cow-live[data-state="reading"] .notebook-turn {
-    animation: cow-page-turn 1.2s ease-in-out 0.3s infinite;
+  .cow-live[data-state="reading"] .glasses {
+    animation: cow-fade-in 0.3s ease-out both;
+  }
+  .cow-live[data-state="reading"] .tilt {
+    animation: cow-read 3s ease-in-out infinite;
   }
 
+  /* On the chat's edge (src/components/chat/ChatEdge.tsx), it rises 8px
+     over the edge while it thinks and while a pointer is over it. */
   .edge-lift {
     transition: transform 0.3s ease;
   }
@@ -315,20 +314,25 @@
     transform: none;
   }
 }
-@keyframes cow-page-turn {
+@keyframes cow-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* Keep the 5-unit drop in every frame: the animation replaces the still
+   rule's transform. */
+@keyframes cow-read {
   0% {
-    opacity: 0;
-    transform: scaleX(1);
+    transform: translateY(5px) rotate(-4deg);
   }
-  10% {
-    opacity: 1;
+  70% {
+    transform: translateY(5px) rotate(4deg);
   }
-  90% {
-    opacity: 1;
-    transform: scaleX(-1);
-  }
+  84%,
   100% {
-    opacity: 0;
-    transform: scaleX(-1);
+    transform: translateY(5px) rotate(-4deg);
   }
 }

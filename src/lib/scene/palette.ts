@@ -28,6 +28,8 @@ export const assistantCow = {
   "notebook-cover": "#2B6F4A",
   "notebook-page": "#F7F1E3",
   "notebook-line": "#B8A98C",
+  "glasses-frame": "#2B1608",
+  "glasses-lens": "#FFFFFF",
 } as const;
 
 /** The five moments of the day, from darkest to brightest (DESIGN.md section 7). */

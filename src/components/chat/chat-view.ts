@@ -221,7 +221,7 @@ export type Wait = { longWait: boolean; leaving: boolean };
 export const WAIT_FADE_MS = 150;
 
 /** How long without a word on screen counts as a long wait: the pill's last line, and the cow's notebook. */
-export const LONG_WAIT_MS = 5000;
+export const LONG_WAIT_MS = 3000;
 
 /**
  * The status pill's line, from sending until the first word is on screen
