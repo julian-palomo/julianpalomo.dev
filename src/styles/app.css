@@ -8,6 +8,7 @@
 @import "./entrance.css";
 @import "./contact.css";
 @import "./transitions.css";
+@import "./how.css";
 
 /* The focus ring on every interactive element: 3px of accent, 2px away (DESIGN.md section 15). */
 @layer base {

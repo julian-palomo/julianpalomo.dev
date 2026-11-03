@@ -9,6 +9,7 @@ export type CowState =
   | "listening"
   | "hearing"
   | "thinking"
+  | "reading"
   | "talking"
   | "satisfied"
   | "sorry";
@@ -29,6 +30,8 @@ export type CowSituation = {
   cheering?: boolean;
   /** A question asked by voice: recording it, transcribing it, or what went wrong; null otherwise. */
   voice?: "recording" | "transcribing" | "error" | null;
+  /** The answer has kept the visitor waiting long enough, with no word on screen, for the notebook. */
+  longWait?: boolean;
 };
 
 /** How long the one lick of `satisfied`, and of a pat, lasts. Keep in step with cow.css. */
@@ -38,14 +41,16 @@ export const LICK_MS = 1600;
  * The cow's next state. It follows the typing, not the stream: it talks from
  * the first word on screen until the last, through a tool call or a pause in
  * the stream, and an answer that just finished typing plays `satisfied` once,
- * as does the entrance's greeting and a sent contact message. The entrance,
- * while it plays, wins.
+ * as does the entrance's greeting and a sent contact message. A long wait
+ * before the first word turns its thinking into reading a notebook. The
+ * entrance, while it plays, wins.
  * `previous` is what it showed last; the caller ends `satisfied` after
  * LICK_MS. Applying it twice to the same situation gives the same state.
  */
 export function nextCowState(previous: CowState, situation: CowSituation): CowState {
   const { status, answerHasText, revealing, stopped, composer, entrance, cheering, voice } =
     situation;
+  const thinking = situation.longWait ? "reading" : "thinking";
   if (entrance !== null) return entrance;
   // A voice question: it hears while it records, chews while the words come
   // back, as it thinks, and is sorry when it couldn't.
@@ -59,13 +64,14 @@ export function nextCowState(previous: CowState, situation: CowSituation): CowSt
     case "error":
       return "sorry";
     case "submitted":
-      return "thinking";
+      return thinking;
     case "streaming":
-      return answerHasText ? "talking" : "thinking";
+      return answerHasText ? "talking" : thinking;
     case "ready": {
-      if (revealing && !stopped) return answerHasText ? "talking" : "thinking";
+      if (revealing && !stopped) return answerHasText ? "talking" : thinking;
       const listening = composer.hasText && composer.focused;
-      const justAnswered = previous === "thinking" || previous === "talking";
+      const justAnswered =
+        previous === "thinking" || previous === "reading" || previous === "talking";
       if (!stopped && !listening && (justAnswered || previous === "satisfied")) {
         return "satisfied";
       }

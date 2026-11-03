@@ -148,10 +148,9 @@ in `.claude/rules/styling.md`. UI components still never use a colour literal.
   ("Download CV", "Contact"), each with a 16px line icon before its words: a
   sheet with a folded corner and an envelope. Never a 3D edge or a drop
   shadow.
-- **The hand cursor** shows on everything that can be pressed: buttons,
-  summaries that open, and the sky panel's options; never on a disabled
-  button, a field or plain text. A slider's thumb shows the open hand, closed
-  while it's dragged.
+- **The hand cursor** shows on everything that can be pressed: buttons and
+  the sky panel's options; never on a disabled button, a field or plain
+  text. A slider's thumb shows the open hand, closed while it's dragged.
 - **Gestures on hover.** With a mouse, a button answers the pointer with a
   small gesture on a spring (section 11), about 0.3s, back to rest:
 
@@ -615,6 +614,7 @@ through.
 | Listening            | The visitor is typing                                            | Holds its head tilted, as if listening                                                                                    |
 | Hearing              | A question is being recorded (section 10)                        | Holds its head tilted, as Listening does, with its right ear raised 14°                                                   |
 | Thinking             | A question was sent and no word is on screen yet                 | Chews (the jaw moves side to side every 0.55s) with a slight thoughtful tilt                                              |
+| Reading              | 3s have passed with no word on screen yet                        | Puts on small round glasses, holds an open notebook in both hooves in front of its mouth, and follows the lines           |
 | Talking              | The answer is typing itself out, from its first word to its last | The mouth opens and closes, irregularly, every 1.8s                                                                       |
 | Satisfied            | The answer just finished typing                                  | Licks once (1.6s), then goes back to idle                                                                                 |
 | Sorry                | An error or the daily limit                                      | Lowers its head and stays still                                                                                           |
@@ -653,8 +653,28 @@ mobile; desktop is the same inside the right-hand card.
    ends the chat, just above the fixed composer, so the composer stays as
    short as before.
 2. **Thinking.** The question jumps into place as a bubble, with a small
-   bounce and a "pop". The cow chews. A status pill says what's happening in
-   words ("Looking up claims…") with three bouncing dots. Send becomes Stop.
+   bounce and a "pop". The cow chews. Send becomes Stop. Until the first word
+   of the answer is on screen, its bubble holds:
+   - **A status pill** that says what's happening, in words, with a light
+     sweeping through them from right to left: "Reading your question…";
+     "Looking up claims…" while a tool runs; "Reading 3 confirmed facts…"
+     once the tool has found them ("Reading", not "Using": the answer may
+     not cite them all); "Writing the answer…" when it found none; and
+     "Chewing it over properly…" once 3s have passed with no word, when the
+     cow also brings out its notebook (section 9). The line is `muted` on
+     `background`, and the light a narrow band of `foreground`, so it reads
+     between sweeps; a new line doesn't restart the sweep.
+   - **The claims it's reading,** as small chips under the pill, each with
+     its label (as in "Cazoo · Role") and a small check in `accent`: at most
+     five, then "+N more". They rise one after another, 300ms apart, and
+     claims a second lookup finds join at the end. They're a list labelled
+     "Reading", not announced: screen readers hear "Answering…" once.
+
+   As the first word comes, the pill and the chips leave the flow and fade
+   out over the top of the bubble in 0.15s, so the text starts where it
+   stays. Stop, an error or the daily limit removes them at once. A
+   suggested question with a stored answer gets its sources and its words
+   almost together, so they may show for a moment and fade.
 3. **Answering.** The answer types itself out. What has arrived waits in a
    buffer and appears word by word at a steady pace, whatever pace the
    stream has: about 150 characters a second, faster when it falls more than
@@ -675,8 +695,8 @@ mobile; desktop is the same inside the right-hand card.
    "Hide sources", which also closes an open claim. Each answer starts folded
    and keeps its own state while the page is open. Tapping a chip opens the
    claim exactly as Julian confirmed it, with "Confirmed by Julian on 27 Oct
-   2026 · from his CV". Under the answer: "Copy", and "Keep asking" with the
-   suggested questions not asked yet. Suggestion chips, the first three and
+   2026 · from his CV". Under the answer: "Keep asking" with the suggested
+   questions not asked yet. Suggestion chips, the first three and
    these, are centred at every width, wrapped rows too, and so is the "Keep
    asking" heading.
 5. **Out of questions, or something went wrong.** Errors are warm too: the cow
@@ -697,8 +717,6 @@ mobile; desktop is the same inside the right-hand card.
   ([`docs/adr/2026-10-31-sources-behind-a-link.md`](docs/adr/2026-10-31-sources-behind-a-link.md)). To show the claim's
   text and confirmation date, the `data-sources` part carries them; the
   model, the prompt and the tools don't change.
-- **Copy** copies the answer as plain text with its sources listed at the
-  end, ready to paste into an email.
 - **Screen readers:** "Answering…" is announced when an answer starts, and the
   full answer once when it has finished typing, never piece by piece. This settles the
   VoiceOver check left open in phase 4.
@@ -765,6 +783,10 @@ text, in both languages, in the pull request that adds it.
 | The visitor's bubble appears                                | 0.5s                                                                                                           | `cubic-bezier(.3, 1.5, .5, 1)` (a small overshoot) |
 | Source chips rise                                           | 0.45s, 80ms apart                                                                                              | `cubic-bezier(.3, 1.4, .5, 1)`                     |
 | A claim opens                                               | 0.35s                                                                                                          | `ease`                                             |
+| The status pill's light sweeps through its words            | 1.8s a sweep, right to left, on a loop                                                                         | `linear`                                           |
+| The claims being read rise, as an answer is awaited         | 0.45s each, 300ms apart                                                                                        | Like source chips                                  |
+| The wait's pill and chips fade as the first word comes      | 0.15s                                                                                                          | `ease`                                             |
+| The cow's notebook and glasses, after a long wait           | 0.3s in; then the head sweeps the lines in 3s                                                                  | `ease-out`; the sweep `ease-in-out`                |
 | Each word as an answer types itself out                     | 0.2s fade; about 150 characters a second, faster when more than about 0.6s behind                              | `ease`                                             |
 | Button press                                                | 80ms                                                                                                           | `ease`                                             |
 | The gear spins in                                           | 0.6s, 2s after the entrance                                                                                    | Spring-like overshoot, then 3 pulses               |
@@ -779,6 +801,13 @@ text, in both languages, in the pull request that adds it.
 | Nessie rises, glides and sinks                              | About 4s                                                                                                       | `ease-in-out`                                      |
 | A window flickering like a candle                           | 0.8s                                                                                                           | `ease-in-out`                                      |
 | Moving to another page                                      | 250ms: the hero morphs, the rest cross-fades; the page's name moves to or from its title tab in 350ms          | `ease-out`                                         |
+| How it's built: the ring's autoplay                         | 2.8s a stop                                                                                                    | Section 18                                         |
+| How it's built: the ring's dot to the next stop             | 1.1s, always clockwise                                                                                         | `ease`                                             |
+| How it's built: Claude's fetch and the facts' glow          | 1.2s, 0.9s after the dot leaves                                                                                | `ease-in-out`                                      |
+| How it's built: the cycle's dot to the next actor           | 0.9s                                                                                                           | `ease`                                             |
+| How it's built: the cycle's marching line                   | 0.6s a dash and gap, looping                                                                                   | `linear`                                           |
+| How it's built: an actor that keeps the step pulses         | 1.4s, looping                                                                                                  | `ease-in-out`                                      |
+| How it's built: a ring card rises in                        | 0.3s                                                                                                           | `ease`                                             |
 | The cow raising its ear while it hears (section 10)         | 0.3s                                                                                                           | `ease`                                             |
 | The time on the recording button                            | Every 0.25s, up to 0:30                                                                                        | None                                               |
 
@@ -863,7 +892,10 @@ With `prefers-reduced-motion: reduce`:
 - the theme changes with a 0.3s crossfade, and the landscape's colours change
   instantly;
 - answer text appears as it arrives, without typing itself out or fading;
-  sources appear without rising;
+  sources, and the claims being read while an answer is awaited, appear
+  without rising, and the status pill's line is still;
+- after a long wait the cow's glasses and notebook simply show, its head
+  lowered, with no sweep along the lines;
 - the gear appears without spinning or pulsing;
 - moving to another page changes it at once, with no transition;
 - no gesture on hover, the cow doesn't follow the pointer, the valley
@@ -1102,17 +1134,55 @@ language toggle goes to the same page in the other language.
   sources it shows, the exam before every change, the limits and what isn't
   kept, the live valley). The numbers (questions a day, days a question is
   kept) come from the code, so the page stays true if they change.
-- **Part 2, "How I built it":** a drawing of the way of working (a plan,
-  small tasks, programming sessions, two AI reviewers, a mailbox, a
-  supervisor, and Julian deciding), then seven short steps. The drawing is
-  decoration, with a text alternative for screen readers; the steps carry the
-  meaning.
-- **Part 3, "For developers":** the only technical part, a `<details>`
-  closed by default, so a phone's reader never scrolls past it. It holds a
-  diagram of how a question is answered, with its accessible name and its
-  steps as a list under it, and links to the repository's documents.
-- **The drawings** are inline SVGs in the site's tokens (boxes in `tint` with
-  a `border` outline, arrows in `muted`, the last box in `accent`), so they
-  follow both themes. They're at most 340px wide, centred.
+- **Part 2, "How a question is answered": a ring.** Five stops on a circle,
+  clockwise from the top: Your question, Daily limits, Claude, Citation
+  check, Answer + sources. In the centre, a dashed tile, "Confirmed facts",
+  with a book icon and a dashed spoke from Claude; near the top, a small
+  "Shortcut" pill on a chord from Your question to Answer + sources (the
+  suggested questions' stored answers). A dot in `accent` turns round the
+  circle to the current stop, which fills in `accent`; it always turns
+  clockwise, so from the last stop to the first it goes on round, never
+  back. On Claude, a small dot runs out along the spoke to the facts and
+  back, and the tile glows.
+  - **It plays by itself**, every 2.8s, until the "Pause" ("Pausar") button
+    stops it; "Play the journey" ("Reproducir el recorrido") starts it again.
+    Tapping a stop, the centre or the shortcut pauses it and shows that one.
+    It holds while the pointer or focus is on it, and while the tab is
+    hidden. With reduced motion it starts paused.
+  - **Under the ring** (beside it from `lg`), a card for the current stop:
+    its name, the plain sentence, and a "The technical side" ("La parte
+    técnica") disclosure with the technical line and its GitHub link. Every
+    card sits in the same cell, so the tallest sets the height and autoplay
+    never moves the page; the disclosure stays open from stop to stop.
+- **Part 3, "How I built it": a cycle.** Four actors on a diamond: Me (top,
+  in `accent`, "I decide"), Claude Code (right, drawn as a small stack, "one
+  session per task"), GitHub (bottom, "tasks and mailboxes") and Supervisor
+  (left, "Claude, in the app"). Ten steps, which the visitor walks through
+  with "Previous step", "Next step" ("Start again" on the last) and "N of
+  10"; nothing plays by itself. Each step's line marches in `accent` from one
+  actor to the next, a dot moves to the one that receives the change, and
+  that actor gets an `accent` ring; it pulses when the step stays with it,
+  as with the two reviewers.
+  - **Under it** (beside it from `lg`), a card with a two-way switch, "In
+    plain words" | "For developers" ("En palabras sencillas" | "Para
+    desarrolladores"), then the step's actors ("Me → Claude Code") and its
+    plain sentence, or its technical line and GitHub link.
+- **The technical side lives on each diagram,** next to the step it
+  explains, not in a box at the end of the page. Every link names its document,
+  goes to the file on GitHub, opens in a new tab and ends in ↗; screen
+  readers hear ", on GitHub, opens in a new tab" instead.
+- **The drawings** are inline SVGs in the site's tokens (lines in `border`
+  and `muted`, the dots and the current line in `accent`), at most 340px
+  wide, centred, with the stops and actors as HTML over them. They follow
+  both themes, and nothing in them overlaps at 320px.
+- **Accessibility:** every stop is a real `<button>`, in reading order (the
+  five stops, then the centre, then the shortcut), with `aria-pressed` and
+  `aria-controls` pointing at the one card container. That card isn't a live
+  region, so autoplay doesn't talk over a screen reader. The cycle's card is
+  a polite live region, since only the visitor moves it.
+- **Motion:** the ring's dot travels in 1.1s, the cycle's in 0.9s, and a
+  ring card rises in over 0.3s. With reduced motion the dots jump, nothing
+  marches, pulses, fetches or glows, and the card just changes. Only
+  `transform` and `opacity` move (`src/styles/how.css`).
 - "Claude" and "Claude Code" are named once, with what they are, at their
   first mention.

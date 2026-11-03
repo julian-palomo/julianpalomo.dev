@@ -2,7 +2,8 @@
  * The chat's motion (DESIGN.md sections 10 and 11) and the citation numbers'
  * hit area. Classes set by src/components/chat/. Colours are tokens only;
  * everything that moves sits inside the no-preference block, so with reduced
- * motion text, chips, claims and bubbles simply appear.
+ * motion text, chips, claims and bubbles simply appear, and the status
+ * pill's line is still.
  */
 
 /* A citation is a small green number in the line. Its button is wider than
@@ -26,16 +27,20 @@
   transform: translate(-50%, -50%);
 }
 
-/* Three dots after the status pill's words. */
-.status-dots {
-  display: inline-flex;
-  gap: 3px;
+/* The light that sweeps through the status pill's words: a narrow window
+   over the line, soft at both edges, holding a copy of the line in
+   `foreground` over the real one in `muted`. Without motion it isn't drawn,
+   and the line is plain `muted` text. */
+.wait-sweep {
+  display: none;
 }
-.status-dots span {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: currentcolor;
+
+/* As the first word comes, the pill and the chips fade out over the text.
+   With reduced motion they go at once. */
+@media (prefers-reduced-motion: reduce) {
+  .wait-leave {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -55,14 +60,38 @@
   .bubble-pop {
     animation: chat-pop 0.5s cubic-bezier(0.3, 1.5, 0.5, 1);
   }
-  .status-dots span {
-    animation: chat-dot 1s ease-in-out infinite;
+  /* The window and its copy move the same distance in opposite directions,
+     1.8s a sweep (SWEEP_MS in WaitStatus.tsx), from right to left. The
+     window is 40% of the line: 250% of it is the line's width, and the copy,
+     as wide as the line, moves from -100% to 40% of it. Their delays are
+     inline, from one clock, so a remounted pill carries on. */
+  .wait-sweep {
+    display: block;
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: 40%;
+    overflow: hidden;
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      currentcolor 35%,
+      currentcolor 65%,
+      transparent
+    );
+    animation: chat-sweep 1.8s linear infinite;
   }
-  .status-dots span:nth-child(2) {
-    animation-delay: 0.15s;
+  .wait-sweep-copy {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: 250%;
+    color: var(--color-foreground);
+    animation: chat-sweep-copy 1.8s linear infinite;
   }
-  .status-dots span:nth-child(3) {
-    animation-delay: 0.3s;
+  /* 0.15s, WAIT_FADE_MS in chat-view.ts. */
+  .wait-leave {
+    animation: chat-fade 0.15s ease reverse forwards;
   }
 }
 
@@ -104,12 +133,19 @@
     transform: none;
   }
 }
-@keyframes chat-dot {
-  0%,
-  100% {
-    transform: none;
+@keyframes chat-sweep {
+  from {
+    transform: translateX(250%);
   }
-  50% {
-    transform: translateY(-3px);
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes chat-sweep-copy {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(40%);
   }
 }

@@ -148,6 +148,27 @@ describe("nextCowState", () => {
     expect(nextCowState("sorry", typingAfterError)).toBe("sorry");
   });
 
+  it("reads its notebook once the wait is long, before the first word", () => {
+    expect(nextCowState("thinking", situation({ status: "submitted", longWait: true }))).toBe(
+      "reading",
+    );
+    expect(nextCowState("thinking", situation({ status: "streaming", longWait: true }))).toBe(
+      "reading",
+    );
+  });
+
+  it("talks once a word is on screen, however long the wait was", () => {
+    expect(nextCowState("reading", { ...streamingText, longWait: true })).toBe("talking");
+  });
+
+  it("is sorry on an error, even after a long wait", () => {
+    expect(nextCowState("reading", situation({ status: "error", longWait: true }))).toBe("sorry");
+  });
+
+  it("licks once when an answer that kept it reading ends", () => {
+    expect(nextCowState("reading", done)).toBe("satisfied");
+  });
+
   it("thinks again when a question is sent after an error", () => {
     expect(nextCowState("sorry", submitted)).toBe("thinking");
   });
@@ -162,8 +183,26 @@ describe("nextCowState", () => {
   });
 
   it("gives the same state when applied twice to the same situation", () => {
-    const states: CowState[] = ["idle", "listening", "thinking", "talking", "satisfied", "sorry"];
-    const situations = [quiet, typing, submitted, lookingUp, streamingText, typingOut, done];
+    const states: CowState[] = [
+      "idle",
+      "listening",
+      "thinking",
+      "reading",
+      "talking",
+      "satisfied",
+      "sorry",
+    ];
+    const longWait = situation({ status: "streaming", longWait: true });
+    const situations = [
+      quiet,
+      typing,
+      submitted,
+      lookingUp,
+      longWait,
+      streamingText,
+      typingOut,
+      done,
+    ];
     for (const previous of states) {
       for (const now of situations) {
         const once = nextCowState(previous, now);

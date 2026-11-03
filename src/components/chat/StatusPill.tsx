@@ -1,7 +1,6 @@
 /**
- * What the chat is doing, in words, with three bouncing dots (still with
- * reduced motion): an answer's "Looking up claims…", or a voice question's
- * "Listening…".
+ * What a voice question is doing, in words, with three bouncing dots (still
+ * with reduced motion): "Listening…", then "Transcribing…".
  */
 export function StatusPill({ text }: { text: string }) {
   return (

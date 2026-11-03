@@ -7,7 +7,9 @@
  *
  * The SVG's own `transform="scale(0)"` and `opacity="0"` hide the tongue and
  * the open mouth; never set `transform` or `opacity` on those groups outside
- * an animation, or they show.
+ * an animation, or they show. The notebook, the glasses and the lowered head
+ * are the exception: they show in the reading state with reduced motion too,
+ * since they say what the cow is doing, not how it moves.
  */
 
 .cow .tilt,
@@ -29,6 +31,19 @@
 }
 .cow .lick-l {
   transform-origin: 96px 148px;
+}
+.cow .notebook {
+  transform-box: view-box;
+}
+
+/* Reading, after a long wait: glasses on, the notebook held open in front,
+   and the head lowered 5 units towards it. Only the chat's cow reads. */
+.cow-live[data-state="reading"] .notebook,
+.cow-live[data-state="reading"] .glasses {
+  opacity: 1;
+}
+.cow-live[data-state="reading"] .tilt {
+  transform: translateY(5px);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -103,12 +118,27 @@
     }
   }
 
+  /* Reading: the notebook rises into its hooves and the glasses fade in, in
+     0.3s; then the head, lowered, follows the lines, a slow sweep from left
+     to right and a quicker return, every 3s. The jaw is behind the notebook,
+     so it doesn't chew. */
+  .cow-live[data-state="reading"] .notebook {
+    animation: cow-notebook-in 0.3s ease-out both;
+  }
+  .cow-live[data-state="reading"] .glasses {
+    animation: cow-fade-in 0.3s ease-out both;
+  }
+  .cow-live[data-state="reading"] .tilt {
+    animation: cow-read 3s ease-in-out infinite;
+  }
+
   /* On the chat's edge (src/components/chat/ChatEdge.tsx), it rises 8px
      over the edge while it thinks and while a pointer is over it. */
   .edge-lift {
     transition: transform 0.3s ease;
   }
-  .edge-lift[data-state="thinking"] {
+  .edge-lift[data-state="thinking"],
+  .edge-lift[data-state="reading"] {
     transform: translateY(-8px);
   }
   @media (hover: hover) {
@@ -288,5 +318,37 @@
   94%,
   100% {
     transform: rotate(0deg);
+  }
+}
+@keyframes cow-notebook-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes cow-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* Keep the 5-unit drop in every frame: the animation replaces the still
+   rule's transform. */
+@keyframes cow-read {
+  0% {
+    transform: translateY(5px) rotate(-4deg);
+  }
+  70% {
+    transform: translateY(5px) rotate(4deg);
+  }
+  84%,
+  100% {
+    transform: translateY(5px) rotate(-4deg);
   }
 }

@@ -17,7 +17,8 @@ import {
   sourceCount,
   sourcesLinkLabel,
   splitIntoChunks,
-  toolStatus,
+  waitChips,
+  waitLine,
 } from "../../src/components/chat/chat-view";
 import { chatErrorBody } from "../../src/lib/bot/chat-error";
 import type { Source } from "../../src/lib/bot/citations";
@@ -99,27 +100,76 @@ describe("renderAnswer", () => {
   });
 });
 
-describe("toolStatus", () => {
-  it("names the running tool in plain words", () => {
-    expect(toolStatus([{ type: "tool-get_claims", state: "input-available" }], "en")).toBe(
-      "Looking up claims…",
-    );
-    expect(toolStatus([{ type: "tool-list_topics", state: "input-streaming" }], "en")).toBe(
-      "Checking what topics exist…",
-    );
+describe("waitLine", () => {
+  const running = (type: string) => ({ type, state: "input-available" });
+  const done = (type: string) => ({ type, state: "output-available" });
+
+  it("reads the question before anything else has come", () => {
+    expect(waitLine([], 0, false, "en")).toBe("Reading your question…");
+    expect(waitLine([{ type: "step-start" }], 0, false, "es")).toBe("Leyendo tu pregunta…");
   });
 
-  it("speaks the page's language", () => {
-    expect(toolStatus([{ type: "tool-search_claims", state: "input-available" }], "es")).toBe(
+  it("names the running tool in plain words", () => {
+    expect(waitLine([running("tool-get_claims")], 0, false, "en")).toBe("Looking up claims…");
+    expect(waitLine([{ type: "tool-list_topics", state: "input-streaming" }], 0, false, "en")).toBe(
+      "Checking what topics exist…",
+    );
+    expect(waitLine([running("tool-search_claims")], 0, false, "es")).toBe(
       "Buscando en los datos confirmados…",
     );
   });
 
-  it("says nothing once tools are done or when there are none", () => {
-    expect(
-      toolStatus([{ type: "tool-get_claims", state: "output-available" }], "en"),
-    ).toBeUndefined();
-    expect(toolStatus([{ type: "text" }], "en")).toBeUndefined();
+  it("counts the confirmed facts it's reading, in both languages", () => {
+    const parts = [done("tool-get_claims")];
+    expect(waitLine(parts, 3, false, "en")).toBe("Reading 3 confirmed facts…");
+    expect(waitLine(parts, 1, false, "en")).toBe("Reading 1 confirmed fact…");
+    expect(waitLine(parts, 3, false, "es")).toBe("Leyendo 3 datos confirmados…");
+    expect(waitLine(parts, 1, false, "es")).toBe("Leyendo 1 dato confirmado…");
+  });
+
+  it("says a second tool is running even after facts arrived", () => {
+    const parts = [done("tool-get_claims"), running("tool-search_claims")];
+    expect(waitLine(parts, 4, false, "en")).toBe("Looking up claims…");
+  });
+
+  it("writes the answer once a tool has come back with no claims", () => {
+    expect(waitLine([done("tool-get_claims")], 0, false, "en")).toBe("Writing the answer…");
+    expect(waitLine([{ type: "tool-list_topics", state: "output-error" }], 0, false, "es")).toBe(
+      "Escribiendo la respuesta…",
+    );
+  });
+
+  it("chews it over after a long wait, over anything else", () => {
+    expect(waitLine([running("tool-get_claims")], 2, true, "en")).toBe("Chewing it over properly…");
+    expect(waitLine([], 0, true, "es")).toBe("Rumiándolo bien…");
+  });
+});
+
+describe("waitChips", () => {
+  const claim = (id: string): Source => ({ ...remote, id });
+  const ids = (sources: Source[]) => sources.map((source) => source.id);
+
+  it("shows the claims in the order they came", () => {
+    const { shown, more } = waitChips([claim("b"), claim("a")]);
+    expect(ids(shown)).toEqual(["b", "a"]);
+    expect(more).toBe(0);
+  });
+
+  it("shows at most five, and counts the rest", () => {
+    const sources = ["a", "b", "c", "d", "e", "f", "g"].map(claim);
+    const { shown, more } = waitChips(sources);
+    expect(ids(shown)).toEqual(["a", "b", "c", "d", "e"]);
+    expect(more).toBe(2);
+  });
+
+  it("keeps the first claims' places when a second call adds more at the end", () => {
+    const first = waitChips([claim("a"), claim("b")]);
+    const second = waitChips([claim("a"), claim("b"), claim("c")]);
+    expect(ids(second.shown).slice(0, 2)).toEqual(ids(first.shown));
+  });
+
+  it("shows nothing before any claim has come", () => {
+    expect(waitChips([])).toEqual({ shown: [], more: 0 });
   });
 });
 
@@ -262,22 +312,14 @@ describe("splitIntoChunks", () => {
 });
 
 describe("answerAsText", () => {
-  it("drops the citations and lists the sources at the end", () => {
-    const { chips } = renderAnswer("It moved to Zustand [[redux-zustand]].", [zustand], false);
-    expect(
-      answerAsText(
-        "It moved to Zustand [[redux-zustand]].",
-        chips,
-        { cv: "CV", julian: "Julian" },
-        "Sources:",
-      ),
-    ).toBe("It moved to Zustand.\n\nSources:\n1. CV · Cazoo · Redux → Zustand");
+  it("drops every citation marker and the space it leaves before punctuation", () => {
+    expect(answerAsText("It moved to Zustand [[redux-zustand]]. Remote too [[made-up]].")).toBe(
+      "It moved to Zustand. Remote too.",
+    );
   });
 
   it("is just the text when nothing was cited", () => {
-    expect(answerAsText("No sources here.", [], { cv: "CV", julian: "Julian" }, "Sources:")).toBe(
-      "No sources here.",
-    );
+    expect(answerAsText("No sources here.")).toBe("No sources here.");
   });
 });
 

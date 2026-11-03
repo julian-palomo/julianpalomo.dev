@@ -65,8 +65,8 @@ the answer unfolds a chip for each one, such as "1 · CV · Cazoo · Redux →
 Zustand"; a citation only counts if the model looked that fact up while
 answering. Tapping a number or a chip opens the claim as I confirmed it, with
 the date I confirmed it; the model never sees that date.
-Answers type themselves out word by word, can be copied with their sources,
-and are followed by more questions to ask. On a phone the chat gets a compact
+Answers type themselves out word by word and are followed by more questions
+to ask. On a phone the chat gets a compact
 bar and a composer fixed above the keyboard; screen readers hear each answer
 once, whole. A shared link shows a preview card in its language, the tab shows
 the cow's head, and search engines get a sitemap and a schema.org `Person`. Every question goes through two daily limits kept in Cloudflare
@@ -188,7 +188,7 @@ CI runs `pnpm eval` once when the `run-evals` label is added to a pull
 request that changes the assistant's code, the claims, the evals or the
 dependencies, never on a push. It runs on a separate API key and writes the
 score, the critical failures and the cost to the job's summary.
-There a pass rate below 90% is a warning, not a failure: one run of 40 answers
+There a pass rate below 90% is a warning, not a failure: one run of 51 answers
 is too small to tell a real drop from noise. Every other reason still fails
 the job.
 

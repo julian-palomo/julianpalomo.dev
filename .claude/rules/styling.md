@@ -7,7 +7,7 @@ paths:
 # Styling
 
 Tailwind CSS 4 through `@tailwindcss/vite`. `src/styles/app.css` imports
-Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `cow.css`, `entrance.css`, `contact.css` and `transitions.css`;
+Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `cow.css`, `entrance.css`, `contact.css`, `transitions.css` and `how.css`;
 `src/routes/__root.tsx` links `app.css`.
 
 ## Fonts live only in `src/styles/fonts.css`
@@ -42,7 +42,7 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 
 ## The chat's motion lives in `src/styles/chat.css`
 
-- Each word fading in as an answer types itself out (the pace is in `src/components/chat/reveal.ts`), source chips rising, a claim opening, the visitor's bubble popping in and the status pill's dots, all inside `prefers-reduced-motion: no-preference` (`DESIGN.md` section 11), plus the citation numbers' 24px hit area, a pseudo-element that doesn't change the line. `src/components/chat/` sets the classes; a FLIP from a suggestion chip runs with the Web Animations API in `MessageList.tsx`, skipped with reduced motion.
+- Each word fading in as an answer types itself out (the pace is in `src/components/chat/reveal.ts`), source chips rising, a claim opening, the visitor's bubble popping in, the status pill's sweep and the wait's fade as the first word comes, all inside `prefers-reduced-motion: no-preference` (`DESIGN.md` section 11), plus the citation numbers' 24px hit area, a pseudo-element that doesn't change the line. The sweep moves a window and a copy of the line in opposite directions with `transform` only, never `background-position`; `WaitStatus.tsx` gives both one delay from `performance.now()`, so a remounted pill carries on in phase. `src/components/chat/` sets the classes; a FLIP from a suggestion chip runs with the Web Animations API in `MessageList.tsx`, skipped with reduced motion.
 
 ## The landscape's SVG styles live in `src/styles/landscape.css`
 
@@ -57,6 +57,7 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - Its keyframes come from the `<style>` of `docs/design/assistant-cow.svg`, prefixed `cow-`, and are keyed by the `data-state` and `data-pat` that `src/components/cow/AssistantCow.tsx` sets. Only the chat's cow has `.cow-live`, so the link preview card's stays still. Its 8px rise over the chat's edge (`.edge-lift`, `src/components/chat/ChatEdge.tsx`) lives here too.
 - Every rule that moves it sits inside `prefers-reduced-motion: no-preference`, so with reduced motion it's the still drawing in every state. Only `transform` and `opacity` animate.
 - The lick lasts 1.6s here and in `LICK_MS` (`src/lib/cow-state.ts`); keep the two in step.
+- The `reading` state, after a long wait, is the one shown outside `no-preference`: the glasses, the notebook held in front and the head lowered 5 units say what the cow is doing, so with reduced motion they show, still. The notebook's rise, the glasses' fade and the head's sweep along the lines sit inside `no-preference`, like the rest. The notebook sits outside `.tilt`, so it stays put while the head moves; the glasses sit inside it, so they move with the head.
 - Its tilt towards the pointer arrives as `--cow-follow` from `src/components/cow/use-cow-follow.ts` and is applied with the `rotate` property on the drawing, which composes with the `transform` its states animate.
 
 ## The page's entrance lives in `src/styles/entrance.css`
@@ -69,6 +70,10 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - The view transition between pages (`DESIGN.md` sections 11 and 18): the timing of every `::view-transition-*` pseudo-element, the hero's snapshots anchored at the bottom, and `animation: none` under reduced motion. The router decides when a transition runs (`src/router.tsx`, `src/lib/page-transition.ts`).
 - The names live in `src/components/page/transition-names.ts`, as Tailwind classes. A name may be on one element per page only; the hero's is set only while it's on screen.
 
+## How it's built's diagrams' motion lives in `src/styles/how.css`
+
+- The ring's dot turning and Claude's fetch with the facts' glow, the cycle's dot, marching line and pulse, and a ring card rising in (`DESIGN.md` sections 11 and 18). `src/components/how/` sets the classes, and the dots' positions as inline transforms. Everything that moves sits inside `prefers-reduced-motion: no-preference`, and only `transform` and `opacity` animate: the marching line moves a dashed line along itself, never its `stroke-dashoffset`.
+
 ## Focus
 
 - `app.css` gives every `:focus-visible` element a 3px `accent` outline 2px away (`DESIGN.md` section 15). Never remove it without a replacement.
@@ -77,7 +82,7 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 
 ## Shared pieces live in `src/components/ui/`
 
-- Small, typed and feature-free. `IconButton` is a round, flat, 44px icon-only button with a required `label` (its accessible name) and a `look`: `accent`, `glass` (`bg-glass` with a 6px blur) for buttons on the landscape, or `tint` for buttons on a panel. Its press scale (0.92 over 80ms) runs only under `motion-safe`.
+- Small, typed and feature-free. `IconButton` is a round, flat, 44px icon-only button with a required `label` (its accessible name) and a `look`: `accent`, `glass` (`bg-glass` with a 6px blur) for buttons on the landscape, or `tint` for buttons on a panel. Its press scale (0.92 over 80ms) runs only under `motion-safe`; `aria-disabled` dims it to 50% and stops the press, while it keeps focus (How it's built's Previous step).
 - `BubbleTail` is a speech bubble's comic-style tail (`DESIGN.md` section 4), on the bubble's `left`, `top` or `bottom` edge, in `field` and `border`. Its callers place it so its joining edge covers the bubble's 1.5px border: the hero's hello, the cow's "Moo!" and the gear's hint.
 - `CloseIcon` is the cross on a dialog's or panel's Close button: the gear's panel and the contact form.
 - `boop.ts` plays a button's gesture on hover (`DESIGN.md` sections 4 and 11): `boopOnHover` takes the parts to move, by their `data-boop` name, and keyframes as a function of the spring in `src/lib/spring.ts`, and plays them with the Web Animations API. Only with a mouse and without reduced motion, checked at the moment of hovering. A part that already has a CSS transform of its own (the theme toggle's sun and moon) moves in a group of its own inside it, so the two never fight.
@@ -91,4 +96,4 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - Semantic elements first (`main`, `h1`, `nav`, `button`); the e2e test finds the page by role (`tests/e2e/home.spec.ts`).
 - The layout works at 375px wide (small phone) before anything else.
 
-If `tokens.css`, `fonts.css`, `cow.css`, `landscape.css`, `play.css`, `chat.css`, `entrance.css`, `contact.css`, `transitions.css`, `app.css`, `src/lib/scene/palette.ts` or `src/components/ui/` change shape, update this rule.
+If `tokens.css`, `fonts.css`, `cow.css`, `landscape.css`, `play.css`, `chat.css`, `entrance.css`, `contact.css`, `transitions.css`, `how.css`, `app.css`, `src/lib/scene/palette.ts` or `src/components/ui/` change shape, update this rule.

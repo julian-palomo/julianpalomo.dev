@@ -8,6 +8,11 @@ export default defineConfig({
   testDir: "tests/e2e",
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
+  // A demo answer is whole about 6.5s after it's asked: 0.6s to the lookup,
+  // 3.5s held back (src/lib/bot/demo.ts), then the words typing themselves
+  // out. The default 5s would race it, and 10s would leave too little room
+  // on a slow runner.
+  expect: { timeout: 15_000 },
   reporter: isCI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL: `http://localhost:${port}`,

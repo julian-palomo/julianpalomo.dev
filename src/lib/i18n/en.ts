@@ -5,6 +5,7 @@
  * it in its own way.
  */
 
+import type { Doc } from "../how/docs";
 import { site } from "../site";
 
 const numbers = new Intl.NumberFormat("en");
@@ -52,11 +53,6 @@ export const en = {
   ],
   conversationLabel: "Conversation",
   keepAsking: "Keep asking",
-  copy: "Copy",
-  copied: "Copied",
-  couldntCopy: "Couldn't copy",
-  // The heading of the sources in a copied answer.
-  sourcesHeading: "Sources:",
   citationLabel: (number: number, label: string) => `Source ${number}: ${label}`,
   confirmedBy: (date: string, from: string) => `Confirmed by Julian on ${date} · ${from}`,
   fromCv: "from his CV",
@@ -77,6 +73,14 @@ export const en = {
   demo: "Demo",
   lookingUpClaims: "Looking up claims…",
   checkingTopics: "Checking what topics exist…",
+  // The pill's line from sending to the first word (DESIGN.md section 10).
+  readingQuestion: "Reading your question…",
+  readingFacts: (count: number) =>
+    count === 1 ? "Reading 1 confirmed fact…" : `Reading ${count} confirmed facts…`,
+  writingAnswer: "Writing the answer…",
+  chewingItOver: "Chewing it over properly…",
+  waitChipsLabel: "Reading",
+  moreFacts: (count: number) => `+${count} more`,
 
   questionLabel: "Your question",
   send: "Send",
@@ -268,80 +272,144 @@ export const en = {
       title: "A real valley",
       body: "The landscape at the top is live. The season follows the calendar, the sun sits at the height it really has over Glasgow right now, and the weather is Glasgow's, from the last half hour. If it's raining there, it's raining here.",
     },
+    // The ring: how a question is answered (src/lib/how/ring.ts). The numbers
+    // the code sets arrive as arguments; the names that live in model.ts and
+    // tools.ts are written out, and tests/unit/how-its-built.test.ts checks them.
+    howAnswered: "How a question is answered",
+    ring: {
+      pause: "Pause",
+      play: "Play the journey",
+      technical: "The technical side",
+      question: {
+        name: "Your question",
+        plain: "Your question goes to this site's server first, never straight to the AI.",
+        technical: (characters: number, messages: number) =>
+          `POST /api/chat. At most ${numbers.format(characters)} characters, and only the latest ${messages} messages, starting with a question.`,
+      },
+      limits: {
+        name: "Daily limits",
+        plain: (questions: number) =>
+          `Each visitor can ask ${questions} questions a day, and the whole site has a daily spending cap. Over a limit, the AI isn't even called.`,
+        technical:
+          "Counts in Cloudflare D1. A visitor is a SHA-256 of the IP (for IPv6, its /64 network), the UTC date and a secret salt, so no IP is kept. Over a limit, the answer is a 429.",
+      },
+      claude: {
+        name: "Claude",
+        plain:
+          "Claude, an AI made by the company Anthropic, writes the answer. It can't search the internet: it can only look things up in the facts I've confirmed, in the middle of the circle.",
+        technical:
+          "Claude Sonnet 5.5 with three read-only tools: list_topics, get_claims and search_claims. Up to 5 steps per answer.",
+      },
+      check: {
+        name: "Citation check",
+        plain:
+          "Every fact the answer cites must be one Claude looked up for this answer. If it isn't, no source is shown for it.",
+        technical:
+          "citations.ts reads the [[claim-id]] markers. An id that no tool returned gets no chip, and the server logs it.",
+      },
+      answer: {
+        name: "Answer + sources",
+        plain:
+          "The answer types itself out with numbered sources. Open one to see the fact and the day I confirmed it.",
+        technical:
+          "Streamed. Each claim a tool returns is sent at once, as a data-sources part, before the text that cites it; the text then types itself out word by word in the browser.",
+      },
+      facts: {
+        name: "Confirmed facts",
+        plain:
+          "A list of facts about me, each written and checked by me, with the day I confirmed it. Claude can read it, never change it.",
+        // Not the field's own name: tests/e2e/bundle.spec.ts fails if it reaches the browser.
+        technical:
+          "src/content/claims.json. Only claims with a confirmation date reach the tools, and only Julian sets that date.",
+      },
+      shortcut: {
+        name: "Shortcut",
+        plain: (questions: number) =>
+          `The suggested questions keep a stored answer, so asking one again replays it at once, with no AI call. It still counts as one of your ${questions}.`,
+        technical:
+          "cached_answers in D1, keyed by a hash of the model, its settings, the prompt, the tools and the claims: any change starts a fresh set.",
+      },
+    },
     howIBuiltIt: "How I built it",
-    // The words in the two drawings.
-    buildFlow: {
-      plan: "A plan",
-      tasks: "Small tasks",
-      sessions: "Programming sessions",
-      reviewers: "Two AI reviewers",
-      mailbox: "Mailbox",
-      supervisor: "Supervisor",
-      me: "Me: I decide",
+    // The cycle: how a change goes round (src/lib/how/cycle.ts), one entry per step.
+    cycle: {
+      actors: {
+        me: { name: "Me", role: "I decide" },
+        claudeCode: { name: "Claude Code", role: "one session per task" },
+        github: { name: "GitHub", role: "tasks and mailboxes" },
+        supervisor: { name: "Supervisor", role: "Claude, in the app" },
+      },
+      previous: "Previous step",
+      next: "Next step",
+      again: "Start again",
+      position: (step: number, steps: number) => `${step} of ${steps}`,
+      views: "How to tell it",
+      plain: "In plain words",
+      developers: "For developers",
+      steps: [
+        {
+          plain:
+            "I give a task to a programming session of Claude Code, an AI assistant for writing code. Each one works in its own copy of the code.",
+          technical: "/implement-issue 87, in its own git worktree.",
+        },
+        {
+          plain:
+            "Before any code, it writes its plan on the task and leaves a note in its mailbox.",
+          technical: 'A plan comment on issue #87, then the pointer "plan: #87" on the mailbox PR.',
+        },
+        {
+          plain: "The note wakes the supervisor.",
+          technical: "A comment on the mailbox PR wakes the cloud thread subscribed to it.",
+        },
+        {
+          plain:
+            "The supervisor reviews the plan with the whole project in mind. Sometimes I OK it myself.",
+          technical: "An owner comment on the issue, posted after the plan: the OK.",
+        },
+        {
+          plain: "The session sees the OK and builds it.",
+          technical: "wait-for-reply.sh checks every 2 minutes; then it implements.",
+        },
+        {
+          plain:
+            "Two AI reviewers read the change: one checks the rules are kept, the other that the docs still tell the truth.",
+          technical:
+            "/handoff: pnpm check, tests, then constraint-reviewer and docs-truth-checker.",
+        },
+        {
+          plain: "It sends the change to GitHub and leaves another note.",
+          technical: '/ship-pr, CI green, then "ready: PR #N" on the mailbox PR.',
+        },
+        {
+          plain: "The supervisor reviews the change and tries it on a preview of the site.",
+          technical:
+            "A review on the PR, a test on its Workers preview, and the run-evals label if it touches the bot.",
+        },
+        {
+          plain: "It tells me what it found, in plain words.",
+          technical: "A message in the Claude app, never a merge.",
+        },
+        {
+          plain: "I decide. Only I accept a change into the site.",
+          technical: "Julian merges; Cloudflare Workers Builds deploys main.",
+        },
+      ],
     },
-    answerFlow: {
-      question: "Your question",
-      limits: "Daily limits",
-      model: "Claude",
-      tools: "Confirmed facts",
-      check: "Citation check",
-      answer: "Answer + sources",
-    },
-    flowAlt:
-      "The drawing shows the flow: a plan becomes small tasks; each task goes to its own programming session; two AI reviewers read the change; a mailbox wakes the supervisor, who reviews it; and I decide whether it goes in.",
-    steps: [
-      {
-        title: "Made with AI's help, but with rules",
-        body: "I built this site with the help of Claude, an AI made by the company Anthropic, and Claude Code, its assistant for writing code. I gave it written rules: it can propose changes, but only I accept them, and only I can approve a line about my experience.",
-      },
-      {
-        title: "A plan first",
-        body: "Before any code, I worked out the plan with Claude: phases (the facts, the assistant, its exam, the design…), and in each phase small tasks, each written as a clear request on GitHub, the website where the code lives.",
-      },
-      {
-        title: "One programming assistant per task",
-        body: "Several Claude Code sessions work at the same time on my computer, each on its own task and in its own copy of the code, so they never step on each other.",
-      },
-      {
-        title: "Two reviewers on every change",
-        body: "Before a change reaches me, two AI reviewers read it: one checks that the project's rules are kept, the other that the documentation still tells the truth.",
-      },
-      {
-        title: "A supervisor who sees the whole picture",
-        body: "Conversations with Claude in the Claude app supervise the work. They keep notes on the whole project, its decisions and how I like things done, so they review each plan and each change with more context than the session that wrote it.",
-      },
-      {
-        title: "Mailboxes between them",
-        body: 'They talk through mailboxes: special requests on GitHub that are never accepted, where a programming session leaves a short note, like "plan ready" or "change ready", that wakes its supervisor.',
-      },
-      {
-        title: "I decide",
-        body: "Nothing is built until its plan is approved, only I can confirm a fact about me, and only I accept a change into the site.",
-      },
-    ],
-    forDevelopers: "For developers",
-    developersIntro: "The technical side, with links to the repository's own documents.",
-    diagramLabel: "How a question is answered",
-    diagramSteps: [
-      "The question reaches the server, at POST /api/chat.",
-      "Today's limits are checked in Cloudflare D1, per visitor and for the whole site.",
-      "Claude answers, with read-only tools that return only confirmed claims.",
-      "The citation check keeps a citation only if a tool returned that claim for this answer.",
-      "The answer streams back with numbered citations and its sources.",
-    ],
-    docsHeading: "In the repository",
-    docs: [
-      { label: "How a question is answered", path: "docs/architecture.md" },
-      { label: "The evals: cases, judge and thresholds", path: "docs/evals.md" },
-      { label: "The rules for claims", path: ".claude/rules/claims.md" },
-      { label: "AGENTS.md: the rules every agent follows", path: "AGENTS.md" },
-      { label: "The workflow and the mailboxes", path: "AGENTS.md#2-workflow" },
-      {
-        label: "The Claude Code setup: rules, hooks, skills and reviewers",
-        path: ".claude/README.md",
-      },
-      { label: "The decisions (ADRs)", path: "docs/adr/README.md" },
-    ],
+    // Each document's name, on the link that opens it (src/lib/how/docs.ts).
+    docNames: {
+      "docs/architecture.md": "How a question is answered",
+      ".claude/rules/claims.md": "The rules for claims",
+      "docs/adr/2026-11-02-cached-suggestion-answers.md": "The decision on stored answers",
+      ".claude/skills/implement-issue/SKILL.md": "The implement-issue skill",
+      "AGENTS.md#2-workflow": "AGENTS.md: the workflow",
+      ".claude/README.md": "The Claude Code setup",
+      ".claude/skills/ship-pr/SKILL.md": "The ship-pr skill",
+      "docs/evals.md": "The evals",
+      "AGENTS.md#1-hard-constraints": "AGENTS.md: the hard constraints",
+      "docs/adr/README.md": "The decisions (ADRs)",
+    } satisfies Record<Doc, string>,
+    // Said after each document's name, for screen readers.
+    newTab: ", on GitHub, opens in a new tab",
   },
   askTheCow: "← Ask the cow",
   anythingElse: "Anything else? Ask me",

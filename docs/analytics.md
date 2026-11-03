@@ -22,7 +22,7 @@ else gets a `400` and isn't stored.
 | `visit`                       | `page` (`home`, `projects`, `how_its_built`), `ref` (`linkedin`, `cv`, `github`, `other` or `none`), `referrer_host` (hostname only, or null), `returning`     | Which pages are read, how many come, from where, new or returning                                    |
 | `question`                    | `via` (`typed`, which includes a question asked by voice and sent from the box, or `suggestion`), `suggestion` (its index in the list, or null), `nth`, `text` | Who talks, what they ask, which suggestions, questions per visit                                     |
 | `answer`                      | `nth`, `sources` (the chips shown), `outcome` (`done`, `stopped`, `error`, `visitor_limit`, `daily_budget`)                                                    | Questions with no claim to answer them, limits hit                                                   |
-| `sources_opened`, `copied`    | none                                                                                                                                                           | Whether people read the sources                                                                      |
+| `sources_opened`              | none                                                                                                                                                           | Whether people read the sources                                                                      |
 | `toy`                         | `which` (`moo`, `panel_open`, `slider` with its `slider`, `back_to_live`, `theme`, `language`, `sound`)                                                        | Which toys get played with                                                                           |
 | `cv_download`, `contact_sent` | none                                                                                                                                                           | CV downloads and messages: a press on "Download CV", and a message that went (never one that failed) |
 | `outbound`                    | `to` (`linkedin` or `github`)                                                                                                                                  | Where people go next, from the links in the chat's error notice                                      |
@@ -149,7 +149,7 @@ it prints:
 - how questions were asked (typed, or which suggestion);
 - finished answers with no sources;
 - answers by outcome, which shows the limits hit;
-- sources opened, answers copied, toys, CV downloads and contact messages, and outbound links.
+- sources opened, toys, CV downloads and contact messages, and outbound links.
 
 Then it lists the last 30 days' questions whose finished answer showed no
 source: what the assistant had no claim for.

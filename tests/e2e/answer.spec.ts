@@ -19,7 +19,8 @@ test("a citation opens its claim with when Julian confirmed it", async ({ page }
   await ask(page, "What has Julian worked on?");
   const answer = page.getByRole("article", { name: "Answer" });
   await expect(answer).toContainText(DEMO_ANSWER_INTRO);
-  await expect(answer.getByRole("button", { name: /^Copy$/ })).toBeVisible();
+  // The announcer holds the whole answer once its last word is on screen.
+  await expect(page.getByTestId("chat-announcer")).toContainText(DEMO_ANSWER_INTRO);
 
   const citation = answer.getByRole("button", { name: /^Source 1: / });
   await expect(citation).toHaveText("1");
@@ -70,17 +71,21 @@ test("the answer types itself out, and its sources link appears only after the l
   expect(final?.length).toBe(text?.length);
 });
 
-test("Copy puts the answer and its sources on the clipboard", async ({ page, context }) => {
-  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+test("a finished answer has no Copy button, in either language", async ({ page }) => {
   await ask(page, "What has Julian worked on?");
+  // Checked on the finished answer, so a button that came at the end would show.
+  await expect(page.getByTestId("chat-announcer")).toContainText(DEMO_ANSWER_INTRO);
   const answer = page.getByRole("article", { name: "Answer" });
-  const copy = answer.getByRole("button", { name: /^Copy$/ });
-  await copy.click();
-  await expect(answer.getByRole("button", { name: "Copied" })).toBeVisible();
-  const copied = await page.evaluate(() => navigator.clipboard.readText());
-  expect(copied.startsWith(DEMO_ANSWER_INTRO)).toBe(true);
-  expect(copied).not.toContain("[[");
-  expect(copied).toMatch(/\n\nSources:\n1\. (CV|Julian) · /);
+  await expect(answer.getByRole("button", { name: /^Check sources/ })).toBeVisible();
+  await expect(answer.getByRole("button", { name: /^Cop(y|ied)$/ })).toHaveCount(0);
+
+  await page.goto("/es");
+  await page.getByLabel("Tu pregunta").fill("¿En qué ha trabajado Julián?");
+  await page.getByRole("button", { name: "Enviar" }).click();
+  await expect(page.getByTestId("chat-announcer")).toContainText(DEMO_ANSWER_INTRO);
+  const respuesta = page.getByRole("article", { name: "Respuesta" });
+  await expect(respuesta.getByRole("button", { name: /^Ver fuentes/ })).toBeVisible();
+  await expect(respuesta.getByRole("button", { name: /^Copia(r|do)$/ })).toHaveCount(0);
 });
 
 test("the sources stay folded until the link opens them, from the keyboard too", async ({
@@ -277,7 +282,7 @@ test.describe("with reduced motion", () => {
   test("the answer, its chips and its claim appear without animating", async ({ page }) => {
     await ask(page, "What has Julian worked on?");
     const answer = page.getByRole("article", { name: "Answer" });
-    await expect(answer.getByRole("button", { name: /^Copy$/ })).toBeVisible();
+    await expect(page.getByTestId("chat-announcer")).toContainText(DEMO_ANSWER_INTRO);
     await answer.getByRole("button", { name: /^Source 1: / }).click();
     // The number opened the list too, so its chips are part of the check.
     await expect(answer.getByRole("list", { name: "Sources" })).toBeVisible();
