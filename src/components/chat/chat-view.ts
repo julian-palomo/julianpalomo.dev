@@ -211,18 +211,57 @@ const TOOL_STATUS: Record<string, "lookingUpClaims" | "checkingTopics"> = {
   "tool-list_topics": "checkingTopics",
 };
 
-/** A plain-words line while one of the answer's tools is still running, or undefined. */
-export function toolStatus(
+/**
+ * The answer's wait, from sending until its first word, then for the short
+ * fade as that word comes (`leaving`).
+ */
+export type Wait = { longWait: boolean; leaving: boolean };
+
+/** How long the wait's pill and chips take to fade as the first word comes. Keep in step with chat.css. */
+export const WAIT_FADE_MS = 150;
+
+/** How long without a word on screen counts as a long wait: the pill's last line, and the cow's notebook. */
+export const LONG_WAIT_MS = 5000;
+
+/**
+ * The status pill's line, from sending until the first word is on screen
+ * (DESIGN.md section 10). `parts` are the answer's so far, empty before it
+ * arrives. The first that holds wins: a long wait; a tool still running; the
+ * claims found so far; a tool that found none; otherwise still reading the
+ * question. An answer with no tool can't be told from one whose tool call
+ * hasn't started yet, so it reads the question until its text comes.
+ */
+export function waitLine(
   parts: readonly { type: string; state?: unknown }[],
+  sourceCount: number,
+  longWait: boolean,
   locale: Locale,
-): string | undefined {
+): string {
+  if (longWait) return t(locale, "chewingItOver");
   for (let index = parts.length - 1; index >= 0; index--) {
     const part = parts[index];
     const running = part?.state === "input-streaming" || part?.state === "input-available";
     const key = part && running ? TOOL_STATUS[part.type] : undefined;
     if (key) return t(locale, key);
   }
-  return undefined;
+  if (sourceCount > 0) return t(locale, "readingFacts")(sourceCount);
+  const toolDone = parts.some(
+    (part) =>
+      part.type.startsWith("tool-") &&
+      (part.state === "output-available" || part.state === "output-error"),
+  );
+  return t(locale, toolDone ? "writingAnswer" : "readingQuestion");
+}
+
+/** The most claims shown as chips while the answer is on its way; the rest are counted. */
+const WAIT_CHIPS = 5;
+
+/** The claims shown as chips while the answer is on its way, in the order they came, and how many more there are. */
+export function waitChips(
+  sources: readonly Source[],
+  max: number = WAIT_CHIPS,
+): { shown: Source[]; more: number } {
+  return { shown: sources.slice(0, max), more: Math.max(sources.length - max, 0) };
 }
 
 /**

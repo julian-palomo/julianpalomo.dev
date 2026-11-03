@@ -61,6 +61,13 @@ export const es: Messages = {
   demo: "Demo",
   lookingUpClaims: "Buscando en los datos confirmados…",
   checkingTopics: "Mirando qué temas hay…",
+  readingQuestion: "Leyendo tu pregunta…",
+  readingFacts: (count) =>
+    count === 1 ? "Leyendo 1 dato confirmado…" : `Leyendo ${count} datos confirmados…`,
+  writingAnswer: "Escribiendo la respuesta…",
+  chewingItOver: "Rumiándolo bien…",
+  waitChipsLabel: "Leyendo",
+  moreFacts: (count) => `+${count} más`,
 
   questionLabel: "Tu pregunta",
   send: "Enviar",

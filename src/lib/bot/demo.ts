@@ -46,8 +46,12 @@ function firstClaimIn(prompt: readonly unknown[]): { id: string; text: string } 
 }
 
 // Paced like a real answer, so a preview shows the cow thinking during the
-// lookup and talking while the words arrive, instead of skipping both.
+// lookup and talking while the words arrive, instead of skipping both. The
+// real model sends nothing for about 2s after a tool result, then the whole
+// answer at once, so the demo holds its words back as long: the wait before
+// the first word shows, with the pill and the claims it's reading.
 const LOOKUP_DELAY_MS = 600;
+const ANSWER_DELAY_MS = 2000;
 const WORD_DELAY_MS = 40;
 
 /** The answer one word at a time, each word with the spaces after it. */
@@ -72,7 +76,7 @@ export function createDemoModel(): MockLanguageModelV4 {
       const claim = firstClaimIn(prompt);
       const hasLookedUp = prompt.some((message) => message.role === "tool");
       let chunks: StreamPart[];
-      let initialDelayInMs = 0;
+      let initialDelayInMs = ANSWER_DELAY_MS;
       if (claim) {
         chunks = textAnswer(
           `${DEMO_ANSWER_INTRO} Here is a claim as an example: ${claim.text} [[${claim.id}]]`,

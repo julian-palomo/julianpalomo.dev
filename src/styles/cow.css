@@ -50,11 +50,14 @@
     transform: rotate(-7deg);
   }
 
-  /* Thinking: chews with a slight thoughtful tilt. */
-  .cow-live[data-state="thinking"] .tilt {
+  /* Thinking: chews with a slight thoughtful tilt. Reading, after a long
+     wait, keeps chewing the same way. */
+  .cow-live[data-state="thinking"] .tilt,
+  .cow-live[data-state="reading"] .tilt {
     animation: cow-think 2.4s ease-in-out infinite;
   }
-  .cow-live[data-state="thinking"] .jaw {
+  .cow-live[data-state="thinking"] .jaw,
+  .cow-live[data-state="reading"] .jaw {
     animation: cow-chew 0.55s ease-in-out infinite alternate;
   }
 
@@ -92,7 +95,8 @@
   .edge-lift {
     transition: transform 0.3s ease;
   }
-  .edge-lift[data-state="thinking"] {
+  .edge-lift[data-state="thinking"],
+  .edge-lift[data-state="reading"] {
     transform: translateY(-8px);
   }
   @media (hover: hover) {
