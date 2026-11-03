@@ -3,6 +3,7 @@ import { QUESTION_TEXT_DAYS } from "../../lib/analytics/events";
 import { MAX_VISITOR_MESSAGES_PER_DAY } from "../../lib/bot/limits";
 import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
+import { OutsideLink } from "../ui/OutsideLink";
 import { Flow } from "./Flow";
 
 // The repository's files, on GitHub, for the box at the end.
@@ -134,9 +135,12 @@ export function HowItsBuilt() {
             <ul className="flex flex-col gap-1.5">
               {copy.docs.map((doc) => (
                 <li key={doc.path}>
-                  <a href={`${REPO}/${doc.path}`} className="font-medium text-accent underline">
+                  <OutsideLink
+                    href={`${REPO}/${doc.path}`}
+                    className="font-medium text-accent underline"
+                  >
                     {doc.label}
-                  </a>
+                  </OutsideLink>
                 </li>
               ))}
             </ul>

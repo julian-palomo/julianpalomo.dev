@@ -2,6 +2,7 @@ import type { Messages } from "../../lib/i18n/en";
 import { t } from "../../lib/i18n/t";
 import { useLocale } from "../i18n/useLocale";
 import { type InnerPageName, PageLink } from "../page/PageLinks";
+import { OutsideLink } from "../ui/OutsideLink";
 import { PROJECT_SHOTS, SHOTS, type ShotName } from "./shots";
 
 /** A project's page on this site, linked before its other links. */
@@ -54,9 +55,9 @@ export function ProjectCard({ project }: { project: Project }) {
         )}
         {project.links.map((link) => (
           <li key={link.href}>
-            <a href={link.href} className="font-medium text-accent underline">
+            <OutsideLink href={link.href} className="font-medium text-accent underline">
               {link.label}
-            </a>
+            </OutsideLink>
           </li>
         ))}
       </ul>

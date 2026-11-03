@@ -83,6 +83,7 @@ Tailwind, `tokens.css`, `fonts.css`, `landscape.css`, `play.css`, `chat.css`, `c
 - `CloseIcon` is the cross on a dialog's or panel's Close button: the gear's panel and the contact form.
 - `boop.ts` plays a button's gesture on hover (`DESIGN.md` sections 4 and 11): `boopOnHover` takes the parts to move, by their `data-boop` name, and keyframes as a function of the spring in `src/lib/spring.ts`, and plays them with the Web Animations API. Only with a mouse and without reduced motion, checked at the moment of hovering. A part that already has a CSS transform of its own (the theme toggle's sun and moon) moves in a group of its own inside it, so the two never fight.
 - `Button` is the wide, flat, fully round button (`DESIGN.md` section 4), with a `look` (`primary` today) and a 0.97 press scale under `motion-safe`. "Back to live Glasgow" is its first caller.
+- `OutsideLink` is every link to another site (`DESIGN.md` section 15): a new tab with `rel="noopener"`, and an `aria-label` of its visible text plus `opensInNewTab`, rather than a hidden span, which can leave a stray space in the name. `tests/e2e/links.spec.ts` checks every link on every page by its origin, so a plain `<a>` to another site fails it.
 - A piece, or a new look of one, is added with its first caller, not ahead of it.
 
 ## Markup
