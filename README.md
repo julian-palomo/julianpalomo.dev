@@ -84,7 +84,7 @@ confirmed it, with the date I confirmed it; the model never sees that date.
 way.
 
 Every question goes through two daily limits kept in Cloudflare D1: 30
-questions per visitor, and about $3 of model spend across everyone. Visitors
+questions per visitor, and about $1 of model spend across everyone. Visitors
 are counted by a hash that changes every day, never by their IP. The live
 site has its API key and its limits in place, so the chat answers on
 [julianpalomo.dev](https://julianpalomo.dev); without a key it says it isn't
