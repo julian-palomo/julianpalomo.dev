@@ -5,6 +5,7 @@ import {
   chatErrorMessage,
   confirmationLine,
   hideTrailingPartialMarker,
+  keyboardInset,
   latestMessages,
   messageText,
   nextSources,
@@ -441,5 +442,34 @@ describe("sourceCount", () => {
     expect(sourceCount(text, [zustand, remote])).toBe(2);
     expect(sourceCount(text, [zustand])).toBe(1);
     expect(sourceCount("No claim covers that.", [zustand])).toBe(0);
+  });
+});
+
+describe("keyboardInset", () => {
+  // Opera and Brave on Android, mid-scroll: the address bar shows and the
+  // visual viewport is 56px shorter than the layout viewport.
+  const addressBar = { innerHeight: 760, viewportHeight: 704, viewportTop: 0 };
+
+  it("keeps the composer at the bottom without focus, whatever the viewport says", () => {
+    expect(keyboardInset({ ...addressBar, focused: false })).toBe(0);
+  });
+
+  it("lifts it by what the keyboard covers while the box has focus", () => {
+    // iOS Safari: a 336px keyboard over an 844px page.
+    expect(
+      keyboardInset({ innerHeight: 844, viewportHeight: 508, viewportTop: 0, focused: true }),
+    ).toBe(336);
+  });
+
+  it("counts a visual viewport scrolled down within the page", () => {
+    expect(
+      keyboardInset({ innerHeight: 844, viewportHeight: 508, viewportTop: 20, focused: true }),
+    ).toBe(316);
+  });
+
+  it("never pushes it below the bottom edge", () => {
+    expect(
+      keyboardInset({ innerHeight: 760, viewportHeight: 816, viewportTop: 0, focused: true }),
+    ).toBe(0);
   });
 });

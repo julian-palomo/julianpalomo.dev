@@ -15,6 +15,7 @@ import { springs } from "../../lib/spring";
 import { useLocale } from "../i18n/useLocale";
 import { boopOnHover } from "../ui/boop";
 import { IconButton } from "../ui/IconButton";
+import { keyboardInset } from "./chat-view";
 
 // On hover Send's arrow nudges up and springs back.
 const onSendHover = boopOnHover({
@@ -67,7 +68,8 @@ export function Composer({
   const counterId = useId();
   const hintId = useId();
   const box = useRef<HTMLTextAreaElement | null>(null);
-  const keyboard = useKeyboardInset();
+  const [focused, setFocused] = useState(false);
+  const keyboard = useKeyboardInset(focused);
 
   // The textarea's own ref and the caller's, which Chat uses to give focus back.
   const setRefs = (element: HTMLTextAreaElement | null) => {
@@ -119,7 +121,8 @@ export function Composer({
       <form
         onSubmit={submit}
         // Below 1024px the form is fixed to the bottom; on a keyboard that
-        // overlays the page (iOS Safari) it moves up by what the keyboard covers.
+        // overlays the page (iOS Safari) it moves up by what the keyboard
+        // covers, and only while the box has focus.
         style={{ bottom: keyboard }}
         className="enter-chat-later flex flex-col gap-2 max-lg:fixed max-lg:inset-x-0 max-lg:z-30 max-lg:border-t-2 max-lg:border-border max-lg:bg-background max-lg:px-4 max-lg:pt-3 max-lg:pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:max-lg:px-6"
       >
@@ -141,8 +144,14 @@ export function Composer({
             value={value}
             onChange={(event) => onChange(event.target.value)}
             onKeyDown={onKeyDown}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            onFocus={() => {
+              setFocused(true);
+              onFocus();
+            }}
+            onBlur={() => {
+              setFocused(false);
+              onBlur();
+            }}
             readOnly={busy}
             disabled={closed}
             placeholder={closed ? t(locale, "questionsBackTomorrow") : undefined}
@@ -191,27 +200,34 @@ export function Composer({
 }
 
 /**
- * How many pixels an on-screen keyboard covers at the bottom of the page.
- * Chrome on Android shrinks the page instead (`interactive-widget` in the
- * viewport meta), so this stays 0 there; iOS Safari overlays its keyboard,
- * and the visual viewport says by how much.
+ * How many pixels an on-screen keyboard covers at the bottom of the page,
+ * while the box has focus (`keyboardInset` in chat-view.ts). iOS Safari
+ * overlays its keyboard, and the visual viewport says by how much. Chromium
+ * browsers on Android shrink the page for the keyboard instead
+ * (`interactive-widget` in the viewport meta), but their visual viewport
+ * also loses about 56px while the address bar shows during a scroll, which
+ * is why focus gates it.
  */
-function useKeyboardInset(): number {
-  const [inset, setInset] = useState(0);
+function useKeyboardInset(focused: boolean): number {
+  const [viewport, setViewport] = useState({ innerHeight: 0, viewportHeight: 0, viewportTop: 0 });
   useEffect(() => {
-    const viewport = window.visualViewport;
-    if (!viewport) return;
+    const visual = window.visualViewport;
+    if (!visual) return;
     const update = () =>
-      setInset(Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop));
+      setViewport({
+        innerHeight: window.innerHeight,
+        viewportHeight: visual.height,
+        viewportTop: visual.offsetTop,
+      });
     update();
-    viewport.addEventListener("resize", update);
-    viewport.addEventListener("scroll", update);
+    visual.addEventListener("resize", update);
+    visual.addEventListener("scroll", update);
     return () => {
-      viewport.removeEventListener("resize", update);
-      viewport.removeEventListener("scroll", update);
+      visual.removeEventListener("resize", update);
+      visual.removeEventListener("scroll", update);
     };
   }, []);
-  return inset;
+  return keyboardInset({ ...viewport, focused });
 }
 
 function SendIcon() {

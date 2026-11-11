@@ -358,3 +358,27 @@ export function confirmationLine(source: Source, locale: Locale): string {
 export function revealOnMount(node: HTMLElement | null): void {
   node?.scrollIntoView({ block: "nearest" });
 }
+
+/**
+ * How far the composer, fixed to the bottom of a phone, rises above it: by
+ * what an on-screen keyboard covers, the layout viewport's height less the
+ * visual viewport's bottom edge. Only while the question box has focus,
+ * since only then can a keyboard be open: Chromium browsers on Android, such
+ * as Opera and Brave, also shrink the visual viewport by about 56px as their
+ * address bar comes and goes during a scroll, and that would lift the
+ * composer with no keyboard at all.
+ */
+export function keyboardInset({
+  innerHeight,
+  viewportHeight,
+  viewportTop,
+  focused,
+}: {
+  innerHeight: number;
+  viewportHeight: number;
+  viewportTop: number;
+  focused: boolean;
+}): number {
+  if (!focused) return 0;
+  return Math.max(0, innerHeight - viewportHeight - viewportTop);
+}
