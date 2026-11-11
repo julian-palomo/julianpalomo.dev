@@ -65,7 +65,7 @@ test("with focus but the keyboard closed, the composer stays on the bottom edge"
   await page.goto("/");
   await expect(page.locator("[data-entrance]")).toHaveCount(0, { timeout: 5000 });
   // After a question the box keeps its focus, and closing Android's keyboard
-  // with the back gesture doesn't blur it; the address bar still comes and goes.
+  // with the back gesture may not blur it; the address bar still comes and goes.
   await page.getByLabel("Your question").focus();
   await shortenVisualViewport(page, 56);
   await expect(form(page)).toHaveCSS("bottom", "0px");

@@ -375,7 +375,7 @@ const KEYBOARD_MIN_PX = 120;
  * bar comes and goes during a scroll, so it counts only while the question
  * box has focus, when a keyboard can be open, and only when more is covered
  * than an address bar could cover: after a question the box keeps its focus,
- * and closing Android's keyboard with the back gesture doesn't blur it.
+ * and closing Android's keyboard with the back gesture may not blur it.
  */
 export function keyboardInset({
   innerHeight,
