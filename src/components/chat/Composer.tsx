@@ -122,7 +122,7 @@ export function Composer({
         onSubmit={submit}
         // Below 1024px the form is fixed to the bottom; on a keyboard that
         // overlays the page (iOS Safari) it moves up by what the keyboard
-        // covers, and only while the box has focus.
+        // covers, only while the box has focus.
         style={{ bottom: keyboard }}
         className="enter-chat-later flex flex-col gap-2 max-lg:fixed max-lg:inset-x-0 max-lg:z-30 max-lg:border-t-2 max-lg:border-border max-lg:bg-background max-lg:px-4 max-lg:pt-3 max-lg:pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:max-lg:px-6"
       >
@@ -200,13 +200,12 @@ export function Composer({
 }
 
 /**
- * How many pixels an on-screen keyboard covers at the bottom of the page,
- * while the box has focus (`keyboardInset` in chat-view.ts). iOS Safari
- * overlays its keyboard, and the visual viewport says by how much. Chromium
- * browsers on Android shrink the page for the keyboard instead
- * (`interactive-widget` in the viewport meta), but their visual viewport
- * also loses about 56px while the address bar shows during a scroll, which
- * is why focus gates it.
+ * How many pixels an on-screen keyboard covers at the bottom of the page
+ * (`keyboardInset` in chat-view.ts). iOS Safari overlays its keyboard, and
+ * the visual viewport says by how much. Chromium browsers on Android shrink
+ * the page for the keyboard instead (`interactive-widget` in the viewport
+ * meta), but their visual viewport also loses about 56px while the address
+ * bar shows during a scroll, which is why focus and a minimum gate it.
  */
 function useKeyboardInset(focused: boolean): number {
   const [viewport, setViewport] = useState({ innerHeight: 0, viewportHeight: 0, viewportTop: 0 });

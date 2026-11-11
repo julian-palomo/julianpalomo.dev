@@ -1,7 +1,8 @@
 import { expect, type Page, test } from "@playwright/test";
 
-// The composer, fixed to the bottom of a phone, rises only for a keyboard,
-// while its box has focus (keyboardInset in src/components/chat/chat-view.ts).
+// The composer, fixed to the bottom of a phone, rises only for a keyboard:
+// while its box has focus, and by more than an address bar covers
+// (keyboardInset in src/components/chat/chat-view.ts).
 // Playwright's phones have no address bar that comes and goes, so the visual
 // viewport is replaced with one whose height the test sets: 56px short, as
 // Opera and Brave on Android measured mid-scroll.
@@ -53,6 +54,19 @@ test("a shorter visual viewport without focus leaves the composer on the bottom 
 }) => {
   await page.goto("/");
   await expect(page.locator("[data-entrance]")).toHaveCount(0, { timeout: 5000 });
+  await shortenVisualViewport(page, 56);
+  await expect(form(page)).toHaveCSS("bottom", "0px");
+  expect(await gapUnder(page)).toBeLessThan(1);
+});
+
+test("with focus but the keyboard closed, the composer stays on the bottom edge", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator("[data-entrance]")).toHaveCount(0, { timeout: 5000 });
+  // After a question the box keeps its focus, and closing Android's keyboard
+  // with the back gesture doesn't blur it; the address bar still comes and goes.
+  await page.getByLabel("Your question").focus();
   await shortenVisualViewport(page, 56);
   await expect(form(page)).toHaveCSS("bottom", "0px");
   expect(await gapUnder(page)).toBeLessThan(1);

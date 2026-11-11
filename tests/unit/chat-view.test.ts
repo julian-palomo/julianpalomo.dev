@@ -467,6 +467,10 @@ describe("keyboardInset", () => {
     ).toBe(316);
   });
 
+  it("keeps it at the bottom with focus but no keyboard, as after a question on Android", () => {
+    expect(keyboardInset({ ...addressBar, focused: true })).toBe(0);
+  });
+
   it("never pushes it below the bottom edge", () => {
     expect(
       keyboardInset({ innerHeight: 760, viewportHeight: 816, viewportTop: 0, focused: true }),

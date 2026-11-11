@@ -360,13 +360,22 @@ export function revealOnMount(node: HTMLElement | null): void {
 }
 
 /**
+ * The least a keyboard covers. An on-screen keyboard covers well over 200px;
+ * an address bar coming and going covers about 56px. A hardware keyboard on
+ * an iPad, with only iOS's shortcut bar showing (about 55px), stays under it,
+ * so the composer doesn't rise there; below 1024px that's rare.
+ */
+const KEYBOARD_MIN_PX = 120;
+
+/**
  * How far the composer, fixed to the bottom of a phone, rises above it: by
  * what an on-screen keyboard covers, the layout viewport's height less the
- * visual viewport's bottom edge. Only while the question box has focus,
- * since only then can a keyboard be open: Chromium browsers on Android, such
- * as Opera and Brave, also shrink the visual viewport by about 56px as their
- * address bar comes and goes during a scroll, and that would lift the
- * composer with no keyboard at all.
+ * visual viewport's bottom edge. Chromium browsers on Android, such as Opera
+ * and Brave, also shrink the visual viewport by about 56px as their address
+ * bar comes and goes during a scroll, so it counts only while the question
+ * box has focus, when a keyboard can be open, and only when more is covered
+ * than an address bar could cover: after a question the box keeps its focus,
+ * and closing Android's keyboard with the back gesture doesn't blur it.
  */
 export function keyboardInset({
   innerHeight,
@@ -379,6 +388,6 @@ export function keyboardInset({
   viewportTop: number;
   focused: boolean;
 }): number {
-  if (!focused) return 0;
-  return Math.max(0, innerHeight - viewportHeight - viewportTop);
+  const covered = innerHeight - viewportHeight - viewportTop;
+  return focused && covered >= KEYBOARD_MIN_PX ? covered : 0;
 }
