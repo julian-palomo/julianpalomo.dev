@@ -20,27 +20,28 @@ files are the answer, written down at the time instead of remembered later.
 
 ## Decisions so far
 
-| Date       | Decision                                                                                                  |
-| ---------- | --------------------------------------------------------------------------------------------------------- |
-| 2026-10-26 | [A new repository, not a fork](2026-10-26-new-repo-not-fork.md)                                           |
-| 2026-10-26 | [TanStack Start on Cloudflare](2026-10-26-tanstack-start-on-cloudflare.md)                                |
-| 2026-10-26 | [The Vercel AI SDK with Claude and read-only tools](2026-10-26-ai-sdk-claude-read-only-tools.md)          |
-| 2026-10-26 | [The assistant answers only from confirmed claims](2026-10-26-answers-only-from-confirmed-claims.md)      |
-| 2026-10-26 | [The AI-first setup](2026-10-26-ai-first-setup.md)                                                        |
-| 2026-10-26 | [The site in English and Spanish](2026-10-26-english-and-spanish.md)                                      |
-| 2026-10-26 | [The licence split](2026-10-26-licence-split.md)                                                          |
-| 2026-10-26 | [Git rules and the issue workflow](2026-10-26-git-rules-and-issue-workflow.md)                            |
-| 2026-10-27 | [Deploys with Cloudflare Workers Builds](2026-10-27-deploy-with-workers-builds.md)                        |
-| 2026-10-27 | [Claims in English only](2026-10-27-claims-in-english-only.md)                                            |
-| 2026-10-27 | [Claude Haiku 5.5 at low effort, on AI SDK 7](2026-10-27-claude-model-and-ai-sdk-7.md)                    |
-| 2026-10-28 | [The visual direction: a live Highland landscape and a cow](2026-10-28-visual-direction.md)               |
-| 2026-10-28 | [Claude Sonnet 5.5 for the bot, at low effort](2026-10-28-claude-sonnet-for-the-bot.md)                   |
-| 2026-10-28 | [One URL per language: / in English, /es in Spanish](2026-10-28-language-urls.md)                         |
-| 2026-10-28 | [Evals in CI, with the pass rate reported, not enforced](2026-10-28-evals-in-ci.md)                       |
-| 2026-10-29 | [The CI evals run on a label, not on every push](2026-10-29-evals-on-a-label.md)                          |
-| 2026-10-29 | [The page's language goes after the cached prompt](2026-10-29-page-language-outside-the-cached-prompt.md) |
-| 2026-10-29 | [A theme choice lasts until Glasgow's next dusk or dawn](2026-10-29-theme-choice-until-next-twilight.md)  |
-| 2026-10-31 | [An answer's sources fold behind a "Check sources" link](2026-10-31-sources-behind-a-link.md)             |
-| 2026-11-02 | [Contact email through `send_email`](2026-11-02-email-routing-for-the-contact-form.md)                    |
-| 2026-11-02 | [First-party events in D1, with question text kept for 90 days](2026-11-02-first-party-events-in-d1.md)   |
-| 2026-11-02 | [The suggested questions are answered from a cache](2026-11-02-cached-suggestion-answers.md)              |
+| Date       | Decision                                                                                                            |
+| ---------- | ------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-26 | [A new repository, not a fork](2026-10-26-new-repo-not-fork.md)                                                     |
+| 2026-10-26 | [TanStack Start on Cloudflare](2026-10-26-tanstack-start-on-cloudflare.md)                                          |
+| 2026-10-26 | [The Vercel AI SDK with Claude and read-only tools](2026-10-26-ai-sdk-claude-read-only-tools.md)                    |
+| 2026-10-26 | [The assistant answers only from confirmed claims](2026-10-26-answers-only-from-confirmed-claims.md)                |
+| 2026-10-26 | [The AI-first setup](2026-10-26-ai-first-setup.md)                                                                  |
+| 2026-10-26 | [The site in English and Spanish](2026-10-26-english-and-spanish.md)                                                |
+| 2026-10-26 | [The licence split](2026-10-26-licence-split.md)                                                                    |
+| 2026-10-26 | [Git rules and the issue workflow](2026-10-26-git-rules-and-issue-workflow.md)                                      |
+| 2026-10-27 | [Deploys with Cloudflare Workers Builds](2026-10-27-deploy-with-workers-builds.md)                                  |
+| 2026-10-27 | [Claims in English only](2026-10-27-claims-in-english-only.md)                                                      |
+| 2026-10-27 | [Claude Haiku 5.5 at low effort, on AI SDK 7](2026-10-27-claude-model-and-ai-sdk-7.md)                              |
+| 2026-10-28 | [The visual direction: a live Highland landscape and a cow](2026-10-28-visual-direction.md)                         |
+| 2026-10-28 | [Claude Sonnet 5.5 for the bot, at low effort](2026-10-28-claude-sonnet-for-the-bot.md)                             |
+| 2026-10-28 | [One URL per language: / in English, /es in Spanish](2026-10-28-language-urls.md)                                   |
+| 2026-10-28 | [Evals in CI, with the pass rate reported, not enforced](2026-10-28-evals-in-ci.md)                                 |
+| 2026-10-29 | [The CI evals run on a label, not on every push](2026-10-29-evals-on-a-label.md)                                    |
+| 2026-10-29 | [The page's language goes after the cached prompt](2026-10-29-page-language-outside-the-cached-prompt.md)           |
+| 2026-10-29 | [A theme choice lasts until Glasgow's next dusk or dawn](2026-10-29-theme-choice-until-next-twilight.md)            |
+| 2026-10-31 | [An answer's sources fold behind a "Check sources" link](2026-10-31-sources-behind-a-link.md)                       |
+| 2026-11-02 | [Contact email through `send_email`](2026-11-02-email-routing-for-the-contact-form.md)                              |
+| 2026-11-02 | [First-party events in D1, with question text kept for 90 days](2026-11-02-first-party-events-in-d1.md)             |
+| 2026-11-02 | [The suggested questions are answered from a cache](2026-11-02-cached-suggestion-answers.md)                        |
+| 2026-11-13 | [TanStack Redact: lighter, but it re-renders the whole page on hydration](2026-11-13-tanstack-redact-experiment.md) |

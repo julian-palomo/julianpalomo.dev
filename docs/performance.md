@@ -128,6 +128,30 @@ So a visitor's second page saves seven round trips, each about 150ms on the
 mobile profile above. A first load doesn't change, so neither do Lighthouse's
 numbers. `tests/e2e/caching.spec.ts` checks the header on both kinds of file.
 
+### On this branch's preview
+
+The fix doesn't change a first load, so Lighthouse on `chore/performance-pass`'s
+Workers preview gives what production gives, within the runs' spread.
+
+- **Where:** a `workers.dev` host in demo mode, on 13 Nov 2026, Lighthouse 13.6.0, median of three runs.
+- **What it's for:** comparing with the experiments below, not with the production table above.
+
+| Page             | Form factor | Score | LCP  | TBT   | Transfer |
+| ---------------- | ----------- | ----- | ---- | ----- | -------- |
+| `/`              | Mobile      | 92    | 2.8s | 211ms | 428 KiB  |
+| `/`              | Desktop     | 100   | 0.6s | 11ms  | 428 KiB  |
+| `/projects`      | Mobile      | 98    | 1.0s | 154ms | 448 KiB  |
+| `/projects`      | Desktop     | 100   | 0.6s | 14ms  | 447 KiB  |
+| `/how-its-built` | Mobile      | 93    | 1.0s | 314ms | 381 KiB  |
+| `/how-its-built` | Desktop     | 100   | 0.3s | 21ms  | 381 KiB  |
+
+TBT varies more between runs than between pages: one page's three mobile runs
+on React gave 210, 314 and 571ms.
+
+## Experiments
+
+- **TanStack Redact** in place of React's browser runtime: about 40 KB less Brotli on every page. But it renders every page again on hydration instead of keeping the server's HTML. Not adopted for now ([ADR](adr/2026-11-13-tanstack-redact-experiment.md)).
+
 ## Proposed, not done
 
 These change what a visitor sees or hears, or are large, so they're Julian's
