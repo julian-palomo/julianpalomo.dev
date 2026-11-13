@@ -23,3 +23,7 @@ CLAUDE.local.md
 
 # Eval results, one JSON file per run of pnpm eval
 evals/results/
+
+# Julian's local exports of production analytics: a read-only script and the
+# JSON it writes. Real visitors' questions never go into the repo.
+stats-export/
