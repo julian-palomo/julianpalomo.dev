@@ -56,6 +56,30 @@
     "confirmedByJulian": "2026-11-02"
   },
   {
+    "id": "profile-name",
+    "label": "Name",
+    "text": "My name is Julian Palomo: Julian is my first name and Palomo my surname.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-13"
+  },
+  {
+    "id": "profile-interests",
+    "label": "Professional interests",
+    "text": "Right now I want to grow in software architecture, product, backend and React Native. I still really enjoy frontend with React and TypeScript, and Node, and I like DevOps too.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-13"
+  },
+  {
+    "id": "profile-ai-focus",
+    "label": "AI focus",
+    "text": "Most of my learning time now goes into managing AI agents and mastering AI applied to software engineering.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-13"
+  },
+  {
     "id": "cazoo-role",
     "label": "Role",
     "text": "Senior Frontend Engineer at Motors, the company behind the UK car marketplace Motors.co.uk, which bought the Cazoo brand in 2024 and rebranded as Cazoo in 2026; Glasgow, UK, remote, July 2022 – August 2026.",
@@ -220,11 +244,11 @@
   {
     "id": "cazoo-dealer-squad",
     "label": "Dealer squad",
-    "text": "Worked in the dealer squad before moving to the customer squad.",
+    "text": "Worked in the dealer squad before moving to the customer squad: on a legacy back-office application for dealers, and on the start of a new dealer portal built from scratch in React, with a planned BFF, until priorities changed and the squad moved to other work.",
     "area": "experience",
     "org": "Cazoo",
     "source": "julian",
-    "confirmedByJulian": "2026-11-02"
+    "confirmedByJulian": "2026-11-13"
   },
   {
     "id": "format-role",
