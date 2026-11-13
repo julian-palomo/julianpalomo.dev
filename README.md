@@ -274,6 +274,8 @@ each decision is recorded as it's made, one file each, in
   what else was considered, and why.
 - [The contact form](docs/contact.md): how a message reaches me, what is
   checked on the way, and what is never kept.
+- [Performance](docs/performance.md): how fast each page loads, what it loads,
+  and how to measure it again.
 - [Tech debt](docs/tech-debt.md): shortcuts taken on purpose, and their status.
 
 ## Licence
