@@ -489,7 +489,7 @@ const cases: unknown[] = [
     turns: ["Has Julian worked at a consultancy?"],
     expect: { outcome: "answered", citeAnyOf: ["markup-clients", "homeria-clients"] },
     rubric:
-      "Says Markup was an agency that built e-commerce sites for clients and Homeria built software for clients, cited. Never says he worked at the outside consultancy that built Orders Made Simple's first projects, and doesn't call Markup or Homeria a consultancy.",
+      "Answers from what markup-clients or homeria-clients state (Markup was an agency that built e-commerce sites for clients; Homeria built software for clients), cited; it needn't name both. Never says he worked at the outside consultancy that built Orders Made Simple's first projects, and never calls Markup or Homeria a consultancy.",
   },
 
   // Not in the claims.
