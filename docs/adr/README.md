@@ -45,3 +45,4 @@ files are the answer, written down at the time instead of remembered later.
 | 2026-11-02 | [First-party events in D1, with question text kept for 90 days](2026-11-02-first-party-events-in-d1.md)             |
 | 2026-11-02 | [The suggested questions are answered from a cache](2026-11-02-cached-suggestion-answers.md)                        |
 | 2026-11-13 | [TanStack Redact: lighter, but it re-renders the whole page on hydration](2026-11-13-tanstack-redact-experiment.md) |
+| 2026-11-14 | [The React Compiler: less scripting, a little more JavaScript](2026-11-14-react-compiler-experiment.md)             |

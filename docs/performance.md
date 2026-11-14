@@ -150,7 +150,8 @@ on React gave 210, 314 and 571ms.
 
 ## Experiments
 
-- **TanStack Redact** in place of React's browser runtime: about 40 KB less Brotli on every page. But it renders every page again on hydration instead of keeping the server's HTML. Not adopted for now ([ADR](adr/2026-11-13-tanstack-redact-experiment.md)).
+- **TanStack Redact** in place of React's browser runtime: about 40 KB less Brotli on every page. But it renders every page again on hydration instead of keeping the server's HTML, and typing a question runs nearly three times the script. Not adopted for now ([ADR](adr/2026-11-13-tanstack-redact-experiment.md)).
+- **The React Compiler,** through Babel: about a fifth to a quarter less script while the gear's sliders move or an answer streams, at 4× CPU slowdown. It costs 13 KB more Brotli on every page and a build twice as slow, and Lighthouse shows no change. Not adopted for now ([ADR](adr/2026-11-14-react-compiler-experiment.md)).
 
 ## Proposed, not done
 

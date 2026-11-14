@@ -63,6 +63,19 @@ change. The Worker gets smaller too, despite `ssr.noExternal`.
 - **The likely cause:** Redact handles that same small mismatch by rendering the whole tree again, not just the node. Not confirmed further.
 - **What it means:** the server-rendered page is thrown away on every load. The visitor doesn't see it as a change, since the new DOM matches. But it costs the work hydration is meant to save, and on a slow phone a second paint of the whole page.
 
+**Scripting time while the page is used,** on local `e2e` builds (demo mode),
+measured as in the [React Compiler ADR](2026-11-14-react-compiler-experiment.md):
+Chrome with the CPU slowed 4×, five runs per scenario, the median.
+
+| Scenario                               | React | Redact |
+| -------------------------------------- | ----- | ------ |
+| Typing 140 characters                  | 276ms | 766ms  |
+| A demo answer, from sending until Send | 154ms | 150ms  |
+| Dragging the gear's sliders            | 395ms | 583ms  |
+- Typing a question runs nearly three times the script, and the sliders about half as much again. A streaming answer costs about the same.
+- **The measurement isn't the cause.** React's commits were counted through the DevTools hook, which Redact doesn't call in production. Without the hook, both builds gave about the same times: React 291, 148 and 373ms; Redact 738, 137 and 563ms.
+- **Why Redact runs more** wasn't investigated further.
+
 **What still works** on the Redact build:
 
 - the full e2e suite: 245 of 245, in Chromium;
@@ -80,15 +93,16 @@ change. The Worker gets smaller too, despite `ssr.noExternal`.
 Don't adopt Redact now. It works, and it saves about 40 KB of Brotli on every
 page. But it re-renders every page from scratch on hydration, which loses what
 server rendering gives and made How it's built's simulated mobile LCP twice as
-slow. Adopting it is Julian's call and would be a separate issue.
+slow. And typing a question runs nearly three times the script it does on
+React. Adopting it is Julian's call and would be a separate issue.
 
 ## Alternatives considered
 
-- **Adopt it as it is:** 18% less JavaScript and CSS, against a full re-render on every load and a pre-1.0 runtime that only Chromium checked here.
+- **Adopt it as it is:** 18% less JavaScript and CSS, against a full re-render on every load, more script while typing, and a pre-1.0 runtime that only Chromium checked here.
 - **Find and remove the mismatch first,** for example render the clock's time only on the client, then try Redact again. If Redact then hydrates without replacing the root, the LCP cost should go. That's the experiment to run if Redact is reconsidered.
 - **Keep React** and look for savings elsewhere ([`../performance.md`](../performance.md) lists them). That's what this decision does for now.
 
 ## Consequences
 
 - The site stays on React DOM. Nothing in `main` changes, and the branch is deleted.
-- **If Redact is reconsidered,** start with the hydration mismatch above, then measure again with a `MutationObserver` on the page's root and Lighthouse on a preview. Check Safari and Firefox too: only Chromium was checked here.
+- **If Redact is reconsidered,** start with the hydration mismatch above, then measure again with a `MutationObserver` on the page's root, Lighthouse on a preview, and the typing scenario's scripting time. Check Safari and Firefox too: only Chromium was checked here.
