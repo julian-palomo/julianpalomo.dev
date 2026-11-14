@@ -105,6 +105,20 @@ pnpm dlx source-map-explorer@2 dist/client/assets/<chunk>.js dist/client/assets/
 
 Don't commit that build; the next `pnpm build` replaces it.
 
+### After the dependency update
+
+The tables above were taken before #174 updated the dependencies. Comparing
+two local `e2e` builds of the same code, before and after, on 14 Nov 2026
+(Brotli at quality 11). These sizes compare with each other, not with the
+production sizes above, which are as Cloudflare compressed them when it sent
+them:
+
+- **The home page's own chunk** grew from 28.5 to 30.7 KB:
+  - `ai` 7.0.172 adds about 5.5 KB minified and `@ai-sdk/react` 0.7 KB;
+  - Zod Mini adds 3 KB. `ai` now uses it for its own checks, while the site's code keeps classic Zod, so the home page ships both.
+- **The shared chunks and the inner pages' own chunks** moved by less than 0.2 KB.
+- **The Worker** grew from 2,628 to 2,769 KB raw. Visitors never download it.
+
 ## Fixes
 
 **Long-lived caching for hashed files** (`public/_headers`).
