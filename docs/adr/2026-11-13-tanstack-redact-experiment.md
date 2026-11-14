@@ -1,6 +1,6 @@
 # TanStack Redact: lighter, but it re-renders the whole page on hydration
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-13
 
 ## Context
@@ -59,8 +59,8 @@ change. The Worker gets smaller too, despite `ssr.noExternal`.
 
 - With React, the observed LCP always equals the first paint: the server's HTML is the largest paint, and it stays.
 - With Redact, in the slow runs, the same text is painted again 50 to 60ms after the first paint, once the JavaScript has run. Lighthouse's simulation then places the LCP after the scripts.
-- **What causes the repaint:** a `MutationObserver` during the load shows Redact removing the page's root container (`div.pb-12`) on every page and building it again. React keeps the server's DOM and only replaces a few small nodes, such as the hero clock's time, whose text differs between the server's render and the browser's.
-- **The likely cause:** Redact handles that same small mismatch by rendering the whole tree again, not just the node. Not confirmed further.
+- **What causes the repaint:** a `MutationObserver` during the load shows Redact removing the page's root container (`div.pb-12`) on every page and building it again. React keeps the server's DOM and changes only what updates after the load: the weather chip's time gives way to the temperature when the weather arrives, How it's built's play button changes its label as the diagram starts, and the gear comes in.
+- **The cause wasn't found.** It isn't a hydration mismatch React sees: React's development build (`pnpm dev`) logged none on `/`, `/projects`, `/how-its-built` or `/es`, on a first visit or a return one. The clock starts from the server's request time, so its first render matches the server's HTML. Why Redact replaces the root on every page is unknown.
 - **What it means:** the server-rendered page is thrown away on every load. The visitor doesn't see it as a change, since the new DOM matches. But it costs the work hydration is meant to save, and on a slow phone a second paint of the whole page.
 
 **Scripting time while the page is used,** on local `e2e` builds (demo mode),
@@ -99,10 +99,10 @@ React. Adopting it is Julian's call and would be a separate issue.
 ## Alternatives considered
 
 - **Adopt it as it is:** 18% less JavaScript and CSS, against a full re-render on every load, more script while typing, and a pre-1.0 runtime that only Chromium checked here.
-- **Find and remove the mismatch first,** for example render the clock's time only on the client, then try Redact again. If Redact then hydrates without replacing the root, the LCP cost should go. That's the experiment to run if Redact is reconsidered.
+- **Find why Redact replaces the root first,** for example by cutting a page down until Redact hydrates it in place, or by asking its maintainers. If it then keeps the server's DOM, the LCP cost should go. That's the experiment to run if Redact is reconsidered.
 - **Keep React** and look for savings elsewhere ([`../performance.md`](../performance.md) lists them). That's what this decision does for now.
 
 ## Consequences
 
 - The site stays on React DOM. Nothing in `main` changes, and the branch is deleted.
-- **If Redact is reconsidered,** start with the hydration mismatch above, then measure again with a `MutationObserver` on the page's root, Lighthouse on a preview, and the typing scenario's scripting time. Check Safari and Firefox too: only Chromium was checked here.
+- **If Redact is reconsidered,** start with why it replaces the root, then measure again with a `MutationObserver` on the page's root, Lighthouse on a preview, and the typing scenario's scripting time. Check Safari and Firefox too: only Chromium was checked here.

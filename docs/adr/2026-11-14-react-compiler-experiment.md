@@ -1,6 +1,6 @@
 # The React Compiler: less scripting, a little more JavaScript
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-14
 
 ## Context
@@ -47,7 +47,10 @@ pnpm installed them with no peer warning and asked to approve no build script.
 
 **Scripting time and React commits,** on local production builds of the
 same commit, with and without the compiler. Both were `e2e` builds, so the chat
-answered in demo mode and never called the model.
+answered in demo mode and never called the model. Measure on `e2e` builds
+only: an ordinary `pnpm build` copies `.dev.vars`, so its preview holds the
+real API key and the answer scenario would call the model. A first round did,
+for about $0.20.
 
 - **The measurement:** Chrome through Playwright, with the CPU slowed 4× (`Emulation.setCPUThrottlingRate`). Each scenario ran five times in a fresh page, and the median is reported, with the five runs' range.
 - **Scripting time** is the change in Chrome's `ScriptDuration` metric over the scenario.
