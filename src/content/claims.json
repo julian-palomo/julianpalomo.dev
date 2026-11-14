@@ -37,7 +37,7 @@
     "text": "Spanish (native), English (full professional proficiency), Italian (intermediate).",
     "area": "profile",
     "source": "julian",
-    "confirmedByJulian": "2026-11-02"
+    "confirmedByJulian": "2026-11-14"
   },
   {
     "id": "profile-learning",
@@ -78,6 +78,70 @@
     "area": "profile",
     "source": "julian",
     "confirmedByJulian": "2026-11-13"
+  },
+  {
+    "id": "profile-salary",
+    "label": "Salary",
+    "text": "I'd rather talk about salary directly, in person. It isn't what matters most to me: work-life balance and flexibility matter a lot.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-14"
+  },
+  {
+    "id": "profile-origin",
+    "label": "Origin",
+    "text": "I'm Spanish: born in Salamanca and raised in Badajoz.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-14"
+  },
+  {
+    "id": "profile-people",
+    "label": "Working with people",
+    "text": "I'm friendly and get on well with people: I work well in a team, take feedback well, have a good attitude and smile easily.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-14"
+  },
+  {
+    "id": "profile-motivation",
+    "label": "What motivates me",
+    "text": "I've always been curious about how things work, and I've followed the technologies that caught my attention and kept me motivated, such as React, TypeScript, and web and mobile apps. I enjoy keeping code clean and tidy, and seeing what the software does for its users.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-14"
+  },
+  {
+    "id": "profile-remote",
+    "label": "Remote work",
+    "text": "I've worked remotely for years: at Orders Made Simple (March 2021 – May 2022) and at Motors (July 2022 – August 2026). At Markup we also worked from home some Fridays.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-14"
+  },
+  {
+    "id": "profile-availability",
+    "label": "Availability",
+    "text": "I can start straight away.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-14"
+  },
+  {
+    "id": "profile-preferences",
+    "label": "Company preferences",
+    "text": "I'm flexible about the kind of company, team and product. The one sector I won't work in is gambling.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-14"
+  },
+  {
+    "id": "profile-hobbies",
+    "label": "Outside work",
+    "text": "Outside work I love travelling and spending time with friends, family and my partner. I enjoy sport, music and live gigs, cooking, eating out and walking, and I love skiing and diving.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-14"
   },
   {
     "id": "cazoo-role",
@@ -251,6 +315,15 @@
     "confirmedByJulian": "2026-11-13"
   },
   {
+    "id": "cazoo-team-memory",
+    "label": "Looking back",
+    "text": "I'm glad I gave all I could in those years at Motors. We had a wonderful team, and I miss them.",
+    "area": "experience",
+    "org": "Cazoo",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-14"
+  },
+  {
     "id": "format-role",
     "label": "Overview",
     "text": "Form:at, an offline-first PWA for a Glasgow electronic music collective: personal project, built solo, May 2026 – present. Live at formatglasgow.com; code at github.com/julian-palomo/form-at.",
@@ -294,6 +367,15 @@
     "org": "Form:at",
     "source": "cv",
     "confirmedByJulian": "2026-10-27"
+  },
+  {
+    "id": "format-tickets",
+    "label": "Ticket sales",
+    "text": "Form:at sells its own event tickets through Stripe Checkout: tiers that can't be oversold, a signature-verified webhook that marks orders paid, and signed QR tickets with no buyer accounts that work offline at the door.",
+    "area": "project",
+    "org": "Form:at",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-14"
   },
   {
     "id": "oms-lead-role",
@@ -386,6 +468,15 @@
     "confirmedByJulian": "2026-10-27"
   },
   {
+    "id": "markup-clients",
+    "label": "Agency work",
+    "text": "Markup was an agency that built e-commerce sites for clients such as Gant and Hunter. I worked on the Gant project.",
+    "area": "experience",
+    "org": "Markup",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-14"
+  },
+  {
     "id": "stampede-role",
     "label": "Role",
     "text": "Front End Software Engineer at Stampede (formerly BlackBx), Edinburgh, UK, November 2018 – June 2019.",
@@ -428,6 +519,15 @@
     "org": "Homeria Open Solutions",
     "source": "julian",
     "confirmedByJulian": "2026-10-27"
+  },
+  {
+    "id": "homeria-clients",
+    "label": "Client work",
+    "text": "Homeria built software for clients, among them Burger King.",
+    "area": "experience",
+    "org": "Homeria Open Solutions",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-14"
   },
   {
     "id": "looplay-role",
