@@ -94,7 +94,7 @@ never does.
 
 Lowering either needs Julian's OK (`.claude/rules/evals.md`).
 
-**In CI the 90% is reported, not enforced.** CI runs each case once, 51
+**In CI the 90% is reported, not enforced.** CI runs each case once, 53
 answers, where one answer moves the rate by about 2 points, and the full runs
 since run 11 have landed between 87.5% and 94.1%. Enforcing it there would
 fail bot pull requests from noise alone. So the job sets
