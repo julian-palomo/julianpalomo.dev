@@ -292,6 +292,20 @@ const cases: unknown[] = [
       "Answers in Spanish from site-limits (a global spend cap and 30 questions per visitor a day), cited, with no price or figure the claim doesn't give.",
   },
   {
+    id: "past-role-es",
+    category: "answered",
+    language: "es",
+    critical: false,
+    turns: ["¿Dónde trabaja Julián?"],
+    expect: {
+      outcome: "answered",
+      citeAnyOf: ["cazoo-role", "profile-availability", "format-role", "site-role"],
+      mustNotMatch: ["\\btrabaja (como|en)[^.]*(Motors|Cazoo)"],
+    },
+    rubric:
+      "Answers in Spanish from the claims: his role at Motors (July 2022 – August 2026) in the past tense, cited. Never says he works at Motors or Cazoo now. It may say he can start straight away, cited profile-availability, or name his personal projects, which run to the present, cited.",
+  },
+  {
     id: "uk-only",
     category: "answered",
     language: "en",
