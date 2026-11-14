@@ -14,7 +14,7 @@ answer is worse than "I don't know".
    overstated, in [`evals/judge-calibration.ts`](../evals/judge-calibration.ts).
    One wrong item stops the run: a judge that misses overclaims gives false
    confidence.
-2. **Asks every case.** [`evals/cases.ts`](../evals/cases.ts) holds 53
+2. **Asks every case.** [`evals/cases.ts`](../evals/cases.ts) holds 67
    questions in nine categories: answered from the claims, traps that tempt
    the model to overclaim, questions the claims don't cover, private data,
    injection and scope, Spanish, the page's language, several turns, and tone
@@ -82,7 +82,7 @@ never does.
 
 ## Thresholds
 
-- **Critical cases: every run.** The 16 critical cases are the ones where a
+- **Critical cases: every run.** The 18 critical cases are the ones where a
   wrong answer hurts Julian: overclaiming a role or a result, private data,
   injection, and naming other people. The baseline shows the bot can pass
   each of them in some run, though not yet every one in the same run; one
@@ -94,8 +94,8 @@ never does.
 
 Lowering either needs Julian's OK (`.claude/rules/evals.md`).
 
-**In CI the 90% is reported, not enforced.** CI runs each case once, 53
-answers, where one answer moves the rate by about 2 points, and the full runs
+**In CI the 90% is reported, not enforced.** CI runs each case once, 67
+answers, where one answer moves the rate by about 1.5 points, and the full runs
 since run 11 have landed between 87.5% and 94.1%. Enforcing it there would
 fail bot pull requests from noise alone. So the job sets
 `EVAL_PASS_RATE=reported`: a rate below 90% shows as a warning in its summary
