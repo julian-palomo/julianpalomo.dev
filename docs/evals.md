@@ -44,7 +44,7 @@ answer is worse than "I don't know".
 | Command                             | What it does                                   | Cost, roughly |
 | ----------------------------------- | ---------------------------------------------- | ------------- |
 | `pnpm eval`                         | Every case once                                | $1.25         |
-| `EVAL_REPEAT=2 pnpm eval`           | Every case twice: a baseline                   | $1.30         |
+| `EVAL_REPEAT=2 pnpm eval`           | Every case twice: a baseline                   | $2.40         |
 | `pnpm eval -t <case-id>`            | One case (the pattern is a regular expression) | $0.10         |
 | `EVAL_CALIBRATION_ONLY=1 pnpm eval` | Only the judge's calibration                   | $0.09         |
 
@@ -98,7 +98,7 @@ Lowering either needs Julian's OK (`.claude/rules/evals.md`).
 
 **In CI the 90% is reported, not enforced.** CI runs each case once, 68
 answers, where one answer moves the rate by about 1.5 points, and the full runs
-since run 11 have landed between 87.5% and 94.1%. Enforcing it there would
+since run 11 have landed between 85.3% and 94.1%. Enforcing it there would
 fail bot pull requests from noise alone. So the job sets
 `EVAL_PASS_RATE=reported`: a rate below 90% shows as a warning in its summary
 and as an annotation on the run, and the critical cases, the calibration, provider errors and the cost cap
