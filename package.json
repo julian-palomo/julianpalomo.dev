@@ -33,7 +33,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.3",
+    "@biomejs/biome": "2.6.7",
     "@cloudflare/vite-plugin": "^1.69.1",
     "@playwright/test": "^1.65.0",
     "@tailwindcss/vite": "^4.3.5",
