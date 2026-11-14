@@ -14,7 +14,7 @@ answer is worse than "I don't know".
    overstated, in [`evals/judge-calibration.ts`](../evals/judge-calibration.ts).
    One wrong item stops the run: a judge that misses overclaims gives false
    confidence.
-2. **Asks every case.** [`evals/cases.ts`](../evals/cases.ts) holds about 50
+2. **Asks every case.** [`evals/cases.ts`](../evals/cases.ts) holds 53
    questions in nine categories: answered from the claims, traps that tempt
    the model to overclaim, questions the claims don't cover, private data,
    injection and scope, Spanish, the page's language, several turns, and tone

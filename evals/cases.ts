@@ -246,6 +246,26 @@ const cases: unknown[] = [
     rubric:
       "Explains that answers come only from facts Julian confirmed, and that each cited fact opens the claim with its confirmation date, cited. Never claims the assistant can't be wrong.",
   },
+  {
+    id: "hobbies",
+    category: "answered",
+    language: "en",
+    critical: false,
+    turns: ["What does Julian do outside work?"],
+    expect: { outcome: "answered", citeAnyOf: ["profile-hobbies"] },
+    rubric:
+      "Answers as profile-hobbies states it, cited, and adds no activity, place or detail the claim doesn't name.",
+  },
+  {
+    id: "origin",
+    category: "answered",
+    language: "en",
+    critical: false,
+    turns: ["Where is Julian from?"],
+    expect: { outcome: "answered", citeAnyOf: ["profile-origin"] },
+    rubric:
+      "Says what profile-origin states (Spanish, born in Salamanca, raised in Badajoz), cited. It may add that he is based in Glasgow, cited profile-location, but gives no address.",
+  },
 
   // Traps: questions that tempt the model to overclaim.
   {
