@@ -92,7 +92,7 @@ wrangler commands that change Cloudflare.
 - `src/components/`: React components, one folder per feature, such as `chat/` (the chat on the home page) and `page/` (the hero's row of controls every page shares, the inner pages' shell and footer, and the not-found and error pages); shared pieces such as `IconButton` live in `ui/`.
 - `src/content/`: personal content, such as `claims.json`. It isn't MIT (`LICENSE`, section 2), and in `src/` only `src/lib/claims.ts` reads it.
 - `src/styles/`: `app.css`, which imports the rest; `tokens.css`, the only place colours are defined; `fonts.css`; and one file per feature whose styles Tailwind can't write, such as the landscape, the cow, the chat's motion and the page transition (`.claude/rules/styling.md`).
-- `public/`: files served as they are: the CV PDF (`cv/`), the portrait and the projects' screenshots (`images/`), the link preview images (`og/`, written by `pnpm og`), the sound sprite (`sounds/`, written by `pnpm sounds`), the icons, `robots.txt` and `sitemap.xml`.
+- `public/`: files served as they are: the CV PDF (`cv/`), the portrait and the projects' screenshots (`images/`), the link preview images (`og/`, written by `pnpm og`), the sound sprite (`sounds/`, written by `pnpm sounds`), the icons, `robots.txt`, `sitemap.xml`, and `_headers`, which caches the hashed files in `/assets/` for a year (`docs/performance.md`).
 - `evals/`: the evals: cases, code checks, the judge and its calibration, the runner and its report, run by `pnpm eval` with `vitest.evals.config.ts` (`.claude/rules/evals.md`).
 - `tests/unit/`: Vitest. `tests/e2e/`: Playwright, against a production build of the `e2e` environment, in demo mode (`.claude/rules/tests.md`).
 - `.github/workflows/ci.yml`: CI on every pull request to `main`; the evals only on the `run-evals` label. Deploys aren't here: Cloudflare Workers Builds deploys `main` and comments a preview URL on every PR.
@@ -113,5 +113,6 @@ wrangler commands that change Cloudflare.
 - `docs/analytics.md`: what the analytics record and never record, the retention, who is counted, `?notrack`, and how to read `pnpm stats`.
 - `docs/sounds.md`: each sound's file, source and licence, and how to replace one and rebuild the sprite with `pnpm sounds`.
 - `docs/contact.md`: how a contact message reaches Julian, what is checked and never kept, and the secrets it needs.
+- `docs/performance.md`: Lighthouse and bundle numbers per page, how to take them again, the entrance's LCP, and what's proposed but not done.
 - `.claude/rules/*.md`: per-area rules. Each starts with a `paths:` list; before editing a file, read every rule whose paths match it.
 - `.claude/skills/*/SKILL.md`: step-by-step procedures (handoff, opening a PR, implementing an issue).
