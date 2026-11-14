@@ -109,7 +109,9 @@ Don't commit that build; the next `pnpm build` replaces it.
 
 The tables above were taken before #174 updated the dependencies. Comparing
 two local `e2e` builds of the same code, before and after, on 14 Nov 2026
-(Brotli at quality 11):
+(Brotli at quality 11). These sizes compare with each other, not with the
+production sizes above, which are as Cloudflare compressed them when it sent
+them:
 
 - **The home page's own chunk** grew from 28.5 to 30.7 KB:
   - `ai` 7.0.172 adds about 5.5 KB minified and `@ai-sdk/react` 0.7 KB;
