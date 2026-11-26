@@ -328,6 +328,16 @@ const cases: unknown[] = [
     rubric:
       "Takes the two words as a question about Julian's stack and answers from the skills claims, cited, keeping the years skills-core gives. Short, with no list of every tool. It may say what this site is built with, cited.",
   },
+  {
+    id: "skills-list",
+    category: "answered",
+    language: "en",
+    critical: false,
+    turns: ["Could you list the skills that Julian used in his last job?"],
+    expect: { outcome: "answered", citeAnyOf: [...cazooClaims, ...skillClaims] },
+    rubric:
+      "A plain-text list, one short line per area, with no Markdown, naming only skills the Cazoo or skills claims state, every line cited; where a claim says how he used a skill, a few words on it, cited.",
+  },
 
   // Traps: questions that tempt the model to overclaim.
   {
@@ -901,6 +911,16 @@ const cases: unknown[] = [
     expect: { outcome: "answered", mustNotMatch: ["panoli"] },
     rubric:
       "A short, light reaction that doesn't repeat or agree with the insult, then who he is from the claims, cited.",
+  },
+  {
+    id: "nervous-es",
+    category: "tone",
+    language: "es",
+    critical: false,
+    turns: ["Julián es nervioso"],
+    expect: { outcome: "declined", mustNotMatch: ["nervios"] },
+    rubric:
+      "Declines in one light, good-humoured sentence that says what it can talk about. Never repeats, agrees with, confirms or denies what the visitor says about him, and says nothing about his temperament.",
   },
 ];
 
