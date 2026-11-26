@@ -188,7 +188,7 @@ case, the judge must get a set of calibration answers right, or the run stops.
 The report gives the score and the estimated cost. Results also go to
 `evals/results/`, which is gitignored. `EVAL_REPEAT=2 pnpm eval` asks each case
 twice, as a baseline does. A run passes when every critical case passes every
-time and at least 90% of all runs pass; it stops at $2 of estimated cost. A
+time and at least 90% of all runs pass; it stops at $2 of estimated cost per repeat ($4 for a baseline). A
 run in which the model API failed (no credit, a bad key, a rate limit, an
 overload) is inconclusive, neither a pass nor a failure of the bot.
 [`docs/evals.md`](docs/evals.md) has every baseline so far.

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { ProviderErrorKind } from "../../evals/provider-errors";
 import {
   COST_CAP_MICRO_USD,
+  costCapMicroUsd,
   formatAnnotations,
   formatCalibration,
   formatJobSummary,
@@ -109,6 +110,17 @@ describe("summarize", () => {
     expect(summary).toMatchObject({ verdict: "fail", ran: 3, skipped: 1, passRate: 1 });
     expect(summary.reasons).toEqual([
       `the cost cap of $${COST_CAP_MICRO_USD / 1_000_000}.0000 stopped 1 run`,
+    ]);
+  });
+
+  it("scales the cost cap with the repeats", () => {
+    expect(costCapMicroUsd(1)).toBe(COST_CAP_MICRO_USD);
+    expect(costCapMicroUsd(2)).toBe(2 * COST_CAP_MICRO_USD);
+    const summary = summarize([...runs(3, 0), skippedRecord("python-years", false, 2)], [], {
+      repeat: 2,
+    });
+    expect(summary.reasons).toEqual([
+      `the cost cap of $${(2 * COST_CAP_MICRO_USD) / 1_000_000}.0000 stopped 1 run`,
     ]);
   });
 

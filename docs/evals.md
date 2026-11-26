@@ -33,7 +33,7 @@ answer is worse than "I don't know".
    before: they state nothing, but would otherwise fail a calibration item.
 4. **Reports a score and a cost.** A run passes when every critical case
    passes every time and at least 90% of all runs pass. It stops at $2 of
-   estimated cost. A run that hit a provider error makes the whole run
+   estimated cost per repeat, $4 for a baseline. A run that hit a provider error makes the whole run
    inconclusive (below).
 
 ## Running them

@@ -22,11 +22,17 @@ export const PASS_RATE = 0.9;
 export type PassRatePolicy = "enforced" | "reported";
 
 /**
- * A run stops starting new runs once its estimated cost passes this ($2.00),
- * the bot, the judge and the calibration together. Up to four runs already in
- * flight can still finish past it.
+ * The cost cap per repeat ($2.00): a run stops starting new runs once its
+ * estimated cost, the bot, the judge and the calibration together, passes
+ * this times EVAL_REPEAT. Up to four runs already in flight can still finish
+ * past it.
  */
 export const COST_CAP_MICRO_USD = 2_000_000;
+
+/** The cost cap for a run that asks every case `repeat` times. */
+export function costCapMicroUsd(repeat: number): number {
+  return COST_CAP_MICRO_USD * repeat;
+}
 
 /** One run of one case, as the report and the JSON results keep it. */
 export type RunRecord = {
@@ -158,7 +164,7 @@ export function skippedRecord(caseId: string, critical: boolean, run: number): R
 export function summarize(
   records: readonly RunRecord[],
   calibration: readonly CalibrationResult[] = [],
-  options: { passRate?: PassRatePolicy } = {},
+  options: { passRate?: PassRatePolicy; repeat?: number } = {},
 ): Summary {
   const ran = records.filter(
     (record) => record.outcome === "passed" || record.outcome === "failed",
@@ -231,7 +237,7 @@ export function summarize(
   }
   if (skipped > 0) {
     reasons.push(
-      `the cost cap of ${dollars(COST_CAP_MICRO_USD)} stopped ${skipped} run${skipped === 1 ? "" : "s"}`,
+      `the cost cap of ${dollars(costCapMicroUsd(options.repeat ?? 1))} stopped ${skipped} run${skipped === 1 ? "" : "s"}`,
     );
   }
 

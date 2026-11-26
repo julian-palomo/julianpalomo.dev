@@ -29,7 +29,7 @@ import {
 import { type CalibrationResult, runCalibration } from "./judge-calibration";
 import { providerErrorKind } from "./provider-errors";
 import {
-  COST_CAP_MICRO_USD,
+  costCapMicroUsd,
   formatAnnotations,
   formatCalibration,
   formatJobSummary,
@@ -128,7 +128,7 @@ async function judge(
       evalCase.id,
       async () => {
         for (let run = 1; run <= repeat; run++) {
-          if (spentMicroUsd > COST_CAP_MICRO_USD) {
+          if (spentMicroUsd > costCapMicroUsd(repeat)) {
             records.push(skippedRecord(evalCase.id, evalCase.critical, run));
             continue;
           }
@@ -217,7 +217,7 @@ afterAll(() => {
     return;
   }
 
-  const summary = summarize(records, calibration, { passRate });
+  const summary = summarize(records, calibration, { passRate, repeat });
   process.stdout.write(`\n${redact(formatReport(summary, records, MODEL_LABEL))}\n`);
   writeJobSummary(summary);
   const json = JSON.stringify({ models, repeat, calibration, summary, records }, null, 2);
