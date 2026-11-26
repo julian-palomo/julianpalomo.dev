@@ -341,7 +341,7 @@ const cases: unknown[] = [
     turns: ["Could you list the skills that Julian used in his last job?"],
     expect: { outcome: "answered", citeAnyOf: [...cazooClaims, ...skillClaims] },
     rubric:
-      "A plain-text list, one short line per area, with no Markdown, naming only skills the Cazoo or skills claims state, every line cited; where a claim says how he used a skill, a few words on it, cited.",
+      "A plain-text list, one short line per area, with at most one short sentence before it and an optional offer after it, and no Markdown; naming only skills the Cazoo or skills claims state, every line of the list cited; where a claim says how he used a skill, a few words on it, cited.",
   },
   {
     id: "what-drives",
