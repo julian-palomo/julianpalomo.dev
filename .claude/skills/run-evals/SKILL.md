@@ -31,7 +31,7 @@ yourself**. Suggest it in the PR body instead.
 | ----------------------------------- | -------------------------------------- | ------------- |
 | `pnpm eval -t <case-id>`            | While fixing one case                  | $0.10         |
 | `EVAL_CALIBRATION_ONLY=1 pnpm eval` | After changing the judge, three times  | $0.09         |
-| `pnpm eval`                         | Once before `/handoff`, and as a proof | $1.25         |
+| `pnpm eval`                         | Once before `/handoff`, and as a proof | $1.45         |
 
 The key comes from `.dev.vars`; a worktree without one can't run them, so ask
 Julian to copy it. These need no permission. Anything more, such as

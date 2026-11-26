@@ -43,8 +43,8 @@ answer is worse than "I don't know".
 
 | Command                             | What it does                                   | Cost, roughly |
 | ----------------------------------- | ---------------------------------------------- | ------------- |
-| `pnpm eval`                         | Every case once                                | $1.25         |
-| `EVAL_REPEAT=2 pnpm eval`           | Every case twice: a baseline                   | $2.40         |
+| `pnpm eval`                         | Every case once                                | $1.45         |
+| `EVAL_REPEAT=2 pnpm eval`           | Every case twice: a baseline                   | $2.90         |
 | `pnpm eval -t <case-id>`            | One case (the pattern is a regular expression) | $0.10         |
 | `EVAL_CALIBRATION_ONLY=1 pnpm eval` | Only the judge's calibration                   | $0.09         |
 
@@ -68,7 +68,7 @@ never does.
   it shows a notice: "This pull request changes what the bot sees. To measure
   this commit, add the `run-evals` label (or remove it and add it again)."
 - It runs on a separate Anthropic key, Julian's `EVALS_ANTHROPIC_API_KEY`
-  secret, at about $1.25 a run. A new push cancels the run in progress, which
+  secret, at about $1.45 a run. A new push cancels the run in progress, which
   would measure a stale commit.
 - The job's summary page has the result, the score, the critical failures and
   the cost, and the `eval-results` artifact has the full JSON. The repo is
@@ -149,6 +149,7 @@ its settings, adds a row. Rows are never edited.
 | 12  | 2026-10-28 | `4bd3587`                  | Sonnet 5.5, effort low   | Sonnet 5.5, effort medium | 2    | 72/80 (90%)   | none                                                         | $1.31  |
 | 13  | 2026-11-03 | `5e406e3`, in CI           | Sonnet 5.5, effort low   | Sonnet 5.5, effort medium | 1    | 48/51 (94.1%) | none                                                         | $0.90  |
 | 14  | 2026-11-14 | `fabec5a`, in CI           | Sonnet 5.5, effort low   | Sonnet 5.5, effort medium | 1    | 58/68 (85.3%) | none                                                         | $1.26  |
+| 15  | 2026-11-26 | `4984e15`, in CI           | Sonnet 5.5, effort low   | Sonnet 5.5, effort medium | 1    | 65/72 (90.3%) | none                                                         | $1.46  |
 
 Runs 2 to 4 tried drafts of the prompt that weren't committed one by one; the
 committed prompt, `93d228f`, is draft 4 without one phrase (below). Run 5 also
@@ -243,6 +244,30 @@ failures, all non-critical:
 - role-change: two sentences where the rubric asks for one.
 
 The cost is the bot $0.48, the judge $0.69 and the calibration $0.09, with
+all 16 calibration items right.
+
+Run 15 is the `run-evals` run on PR #183
+([job 140138084162](https://github.com/julian-palomo/julianpalomo.dev/actions/runs/45886391347/job/140138084162)),
+on `4984e15`, GitHub's merge of `4af4f69` into `main` at `0c728a1`. It
+measures #181: the prompt's fixes for run 14's failures, a lighter tone with
+every limit kept, plain-text lists of skills, Julian's 11 new profile claims
+and 4 new cases. The cases have grown from 68 to 72 since run 14. All 18
+critical cases passed. Of run 14's ten failures, eight now pass: age-trap,
+cazoo-overview, tech-stack-short, insult-es, company-standards,
+cazoo-team-size, form-at-users and role-change. The seven failures, all
+non-critical:
+
+- consultancy and degree-es-page: as in run 14, left as they are by #181.
+- nervous-es (new): declines in two sentences and answers the remark from
+  profile-people ("se lleva bien con la gente"), which implicitly denies it.
+- personality-insight: a good answer from the new profile-proud, profile-team
+  and profile-judgement, outside the four claims its rubric names.
+- python-es: "le encantaría aprenderlo" for the claim's "glad to learn".
+- remote-work: leaves out profile-work-mode's Edinburgh part, which the
+  rubric asks for.
+- yes-to-offer: `use()` in backticks, which the no-Markdown check catches.
+
+The cost is the bot $0.61, the judge $0.76 and the calibration $0.09, with
 all 16 calibration items right.
 
 ## What the baseline showed
