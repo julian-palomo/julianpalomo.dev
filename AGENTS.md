@@ -45,7 +45,7 @@ blocks something, change course; don't look for another way to run it.
 
 - **Act on PR reviews.** After a review of your PR, read it with `gh`, apply it, and reply on the PR with what you didn't apply and why.
 - **Eval budgets.** If the issue sets an eval budget, spend up to it without asking and report the cost in the PR.
-- **The `run-evals` label.** CI runs the evals, about $1.25, only when that label is added to a pull request that touches the bot, never on a push. Julián or the cloud reviewer adds it; local Claude Code never does, and suggests it in the PR body when the bot paths changed.
+- **The `run-evals` label.** CI runs the evals, about $1.45, only when that label is added to a pull request that touches the bot, never on a push. Julián or the cloud reviewer adds it; local Claude Code never does, and suggests it in the PR body when the bot paths changed.
 - Each commit typechecks and builds on its own. Subjects are short, lowercase and imperative ("add …", "fix …").
 
 ## 3. Commands

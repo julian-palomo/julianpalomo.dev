@@ -144,6 +144,94 @@
     "confirmedByJulian": "2026-11-14"
   },
   {
+    "id": "profile-title",
+    "label": "Profession",
+    "text": "I'm a software engineer.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-26"
+  },
+  {
+    "id": "profile-team",
+    "label": "In a team",
+    "text": "In a team, what matters most to me is working comfortably day to day with easygoing people, where we can be open with each other. I'm open to criticism, review comments and suggestions on how to do my work better.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-26"
+  },
+  {
+    "id": "profile-projects",
+    "label": "What I look for in a project",
+    "text": "In a project, I look for impact, for room to learn and grow in my career, and for work that pays off because it turns out well. A project that can help people motivates me.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-26"
+  },
+  {
+    "id": "profile-judgement",
+    "label": "Others' ideas",
+    "text": "I don't trust my own judgement more than other people's. When I find a modern tool that fits the project well, I like to suggest it, but I'm very open to others proposing things or teaching me, whether they know more or less than me: it isn't about who knows more.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-26"
+  },
+  {
+    "id": "profile-proud",
+    "label": "What I'm proudest of",
+    "text": "What I'm proudest of is that my job is skilled work I enjoy and I'm good at. I like engineering and knowing how things work, and I like doing good work with good user experiences and interfaces. That's perhaps why I lean a little more towards frontend than backend: you can see the results.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-26"
+  },
+  {
+    "id": "profile-improving",
+    "label": "What I'm improving",
+    "text": "Right now I'm above all improving how I use AI: a development process that manages AI agents as efficiently as possible. I'm also improving my backend and React Native. I like getting better as an engineer in general: it's what I'll keep doing, and I enjoy it.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-26"
+  },
+  {
+    "id": "profile-brings",
+    "label": "What I bring",
+    "text": "I bring maturity, good sense and a good attitude: I'm always willing to work, and people have told me I always have a smile and I'm kind. When something hasn't gone well and we need to push harder, I get stuck in: I feel I'm the author of what I do, and I commit to the projects I work on. I also bring my knowledge: I like to share what I know and learn from what others know.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-26"
+  },
+  {
+    "id": "profile-experience",
+    "label": "Years in software",
+    "text": "I've worked in software for more than ten years.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-26"
+  },
+  {
+    "id": "profile-remote-abroad",
+    "label": "Companies outside the UK",
+    "text": "I'd work remotely for companies outside the UK too, or for any company: I'm used to working remotely.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-26"
+  },
+  {
+    "id": "profile-level",
+    "label": "Role level",
+    "text": "I'm looking for senior roles. I don't want a lead role managing people: I'd rather keep working as a senior engineer.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-26"
+  },
+  {
+    "id": "profile-contract",
+    "label": "Permanent or contract",
+    "text": "I'm mainly looking for a permanent role. I'm open to a contract too, though it isn't really my thing.",
+    "area": "profile",
+    "source": "julian",
+    "confirmedByJulian": "2026-11-26"
+  },
+  {
     "id": "cazoo-role",
     "label": "Role",
     "text": "Senior Frontend Engineer at Motors, the company behind the UK car marketplace Motors.co.uk, which bought the Cazoo brand in 2024 and rebranded as Cazoo in 2026; Glasgow, UK, remote, July 2022 – August 2026.",

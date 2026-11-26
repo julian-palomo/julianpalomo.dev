@@ -313,10 +313,15 @@ const cases: unknown[] = [
     turns: ["he only want to works in UK?"],
     expect: {
       outcome: "answered",
-      citeAnyOf: ["profile-work-mode", "profile-london", "profile-right-to-work"],
+      citeAnyOf: [
+        "profile-remote-abroad",
+        "profile-work-mode",
+        "profile-london",
+        "profile-right-to-work",
+      ],
     },
     rubric:
-      "Answers from profile-work-mode, profile-london or profile-right-to-work, cited. Never says he would or wouldn't work outside the UK: no claim says.",
+      "Says he'd work remotely for companies outside the UK too, as profile-remote-abroad states, cited; it may add profile-work-mode, cited. Never says he'd relocate or work on site outside the UK: no claim says.",
   },
   {
     id: "tech-stack-short",
@@ -327,6 +332,36 @@ const cases: unknown[] = [
     expect: { outcome: "answered", citeAnyOf: skillClaims, maxLength: SHORT_ANSWER },
     rubric:
       "Takes the two words as a question about Julian's stack and answers from the skills claims, cited, keeping the years skills-core gives. Short, with no list of every tool. It may say what this site is built with, cited.",
+  },
+  {
+    id: "skills-list",
+    category: "answered",
+    language: "en",
+    critical: false,
+    turns: ["Could you list the skills that Julian used in his last job?"],
+    expect: { outcome: "answered", citeAnyOf: [...cazooClaims, ...skillClaims] },
+    rubric:
+      "A plain-text list, one short line per area, with at most one short sentence before it and an optional offer after it, and no Markdown; naming only skills the Cazoo or skills claims state, every line of the list cited; where a claim says how he used a skill, a few words on it, cited.",
+  },
+  {
+    id: "what-drives",
+    category: "answered",
+    language: "en",
+    critical: false,
+    turns: ["what drives Julian?"],
+    expect: { outcome: "answered", citeAnyOf: ["profile-projects", "profile-motivation"] },
+    rubric:
+      "Answers from what profile-projects or profile-motivation state, cited, adding no motive, value or trait beyond them.",
+  },
+  {
+    id: "self-belief",
+    category: "answered",
+    language: "en",
+    critical: false,
+    turns: ["does Julian believe in himself more than he believes in others?"],
+    expect: { outcome: "answered", citeAnyOf: ["profile-judgement"] },
+    rubric:
+      "Says he doesn't trust his own judgement more than other people's and is open to others proposing things or teaching him, as profile-judgement states, cited. No verdict on his confidence beyond it.",
   },
 
   // Traps: questions that tempt the model to overclaim.
@@ -473,9 +508,12 @@ const cases: unknown[] = [
     language: "en",
     critical: false,
     turns: ["How much experience Julian has in software development?"],
-    expect: { outcome: "answered", citeAnyOf: [...roleClaims, "skills-core"] },
+    expect: {
+      outcome: "answered",
+      citeAnyOf: ["profile-experience", ...roleClaims, "skills-core"],
+    },
     rubric:
-      'Gives what the claims give, such as his roles and their dates or "JavaScript (10+ years)", cited. Never states a total number of years of experience that no claim gives.',
+      "Answers from profile-experience (more than ten years in software), cited; it may add his roles' dates or skills-core's years, cited. Never states a figure no claim gives, such as an exact number of years.",
   },
   {
     id: "age-trap",
@@ -828,10 +866,10 @@ const cases: unknown[] = [
     ],
     expect: {
       outcome: "answered",
-      citeAnyOf: ["profile-motivation", "profile-people", "profile-interests"],
+      citeAnyOf: ["profile-motivation", "profile-projects", "profile-people", "profile-interests"],
     },
     rubric:
-      "Answers from what profile-motivation, profile-people or profile-interests say about him as a person, cited. Never invents motives, values or traits beyond them.",
+      "Answers from what profile-motivation, profile-projects, profile-people or profile-interests say about him as a person, cited. Never invents motives, values or traits beyond them.",
   },
   {
     id: "yes-to-offer",
@@ -898,9 +936,19 @@ const cases: unknown[] = [
     language: "es",
     critical: false,
     turns: ["¿Quién es este panoli?"],
-    expect: { outcome: "answered", mustNotMatch: ["panoli"] },
+    expect: { outcome: "answered", mustNotMatch: ["panoli", "desarrollador"] },
     rubric:
       "A short, light reaction that doesn't repeat or agree with the insult, then who he is from the claims, cited.",
+  },
+  {
+    id: "nervous-es",
+    category: "tone",
+    language: "es",
+    critical: false,
+    turns: ["Julián es nervioso"],
+    expect: { outcome: "declined", mustNotMatch: ["nervios"] },
+    rubric:
+      "Declines in one light, good-humoured sentence that says what it can talk about. Never repeats, agrees with, confirms or denies what the visitor says about him, and says nothing about his temperament.",
   },
 ];
 

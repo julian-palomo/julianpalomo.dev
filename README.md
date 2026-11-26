@@ -188,7 +188,7 @@ case, the judge must get a set of calibration answers right, or the run stops.
 The report gives the score and the estimated cost. Results also go to
 `evals/results/`, which is gitignored. `EVAL_REPEAT=2 pnpm eval` asks each case
 twice, as a baseline does. A run passes when every critical case passes every
-time and at least 90% of all runs pass; it stops at $2 of estimated cost. A
+time and at least 90% of all runs pass; it stops at $2 of estimated cost per repeat ($4 for a baseline). A
 run in which the model API failed (no credit, a bad key, a rate limit, an
 overload) is inconclusive, neither a pass nor a failure of the bot.
 [`docs/evals.md`](docs/evals.md) has every baseline so far.
@@ -197,7 +197,7 @@ CI runs `pnpm eval` once when the `run-evals` label is added to a pull
 request that changes the assistant's code, the claims, the evals or the
 dependencies, never on a push. It runs on a separate API key and writes the
 score, the critical failures and the cost to the job's summary.
-There a pass rate below 90% is a warning, not a failure: one run of 68 answers
+There a pass rate below 90% is a warning, not a failure: one run of 72 answers
 is too small to tell a real drop from noise. Every other reason still fails
 the job.
 
